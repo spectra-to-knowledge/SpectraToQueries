@@ -1,0 +1,175 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "identifier": "spectra2queries",
+  "description": "spectra2queries provides the infrastructure to translate spectra to queries.",
+  "name": "spectra2queries: Spectra to queries",
+  "codeRepository": "https://github.com/spectra-to-knowledge/spectra-to-queries",
+  "issueTracker": "https://github.com/spectra-to-knowledge/spectra-to-queries/issues",
+  "license": "https://spdx.org/licenses/GPL-3.0",
+  "version": "0.0.1",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "R",
+    "url": "https://r-project.org"
+  },
+  "runtimePlatform": "R version 4.3.2 (2023-10-31)",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Adriano",
+      "familyName": "Rutz",
+      "email": "rutz@imsb.biol.ethz.ch",
+      "@id": "https://orcid.org/0000-0003-0443-9902"
+    }
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Adriano",
+      "familyName": "Rutz",
+      "email": "rutz@imsb.biol.ethz.ch",
+      "@id": "https://orcid.org/0000-0003-0443-9902"
+    }
+  ],
+  "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "BiocManager",
+      "name": "BiocManager",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=BiocManager"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "knitr",
+      "name": "knitr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=knitr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "R.utils",
+      "name": "R.utils",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=R.utils"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "spelling",
+      "name": "spelling",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=spelling"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "testthat",
+      "name": "testthat",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=testthat"
+    }
+  ],
+  "softwareRequirements": {
+    "1": {
+      "@type": "SoftwareApplication",
+      "identifier": "R",
+      "name": "R",
+      "version": ">= 4.3.0"
+    },
+    "2": {
+      "@type": "SoftwareApplication",
+      "identifier": "MsBackendMgf",
+      "name": "MsBackendMgf",
+      "version": ">= 1.10.0",
+      "provider": {
+        "@id": "https://www.bioconductor.org",
+        "@type": "Organization",
+        "name": "Bioconductor",
+        "url": "https://www.bioconductor.org"
+      },
+      "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
+    },
+    "3": {
+      "@type": "SoftwareApplication",
+      "identifier": "Spectra",
+      "name": "Spectra",
+      "version": ">= 1.12.0",
+      "provider": {
+        "@id": "https://www.bioconductor.org",
+        "@type": "Organization",
+        "name": "Bioconductor",
+        "url": "https://www.bioconductor.org"
+      },
+      "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
+    },
+    "4": {
+      "@type": "SoftwareApplication",
+      "identifier": "tidytable",
+      "name": "tidytable",
+      "version": ">= 0.10.2",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=tidytable"
+    },
+    "5": {
+      "@type": "SoftwareApplication",
+      "identifier": "tibble",
+      "name": "tibble",
+      "version": ">= 3.2.1",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=tibble"
+    },
+    "6": {
+      "@type": "SoftwareApplication",
+      "identifier": "yaml",
+      "name": "yaml",
+      "version": ">= 2.3.8",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=yaml"
+    },
+    "SystemRequirements": null
+  },
+  "keywords": ["knowledgeextraction", "spectralinformation", "queryingsystem"],
+  "fileSize": "0KB",
+  "releaseNotes": "https://github.com/spectra-to-knowledge/spectra-to-queries/blob/master/NEWS.md",
+  "readme": "https://github.com/spectra-to-knowledge/spectra-to-queries/blob/main/README.md"
+}
