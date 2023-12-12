@@ -1,0 +1,22 @@
+---
+base_dir: ./
+data:
+  path: data
+  interim:
+    path: data/interim
+    queries: data/interim/queries.tsv
+  processed:
+    path: data/processed
+  source:
+    path: data/source
+    spectra: 
+      path: data/source/spectra
+      mia: data/source/spectra/export_traitement_python_matchms-squelettes-tries.mgf
+inst:
+  path: inst
+  scripts:
+    path: inst/scripts
+  params: inst/params.yaml
+tests:
+  mode: no
+  path: tests

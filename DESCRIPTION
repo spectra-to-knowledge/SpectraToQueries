@@ -1,0 +1,37 @@
+Package: spectra2queries
+Title: Spectra to queries
+Version: 0.0.1
+Authors@R: c(
+    person("Adriano", "Rutz", , "rutz@imsb.biol.ethz.ch", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-0443-9902"))
+  )
+Maintainer: Adriano Rutz <rutz@imsb.biol.ethz.ch>
+Description: spectra2queries provides the infrastructure to translate spectra to queries.
+License: GPL (>= 3)
+URL: https://github.com/spectra-to-knowledge/spectra-to-queries
+BugReports: https://github.com/spectra-to-knowledge/spectra-to-queries/issues
+Depends:
+    R (>= 4.3.0)
+Imports:
+    MsBackendMgf (>= 1.10.0),
+    Spectra (>= 1.12.0),
+    tidytable (>= 0.10.2),
+    tibble (>= 3.2.1),
+    yaml (>= 2.3.8)
+Suggests: 
+    BiocManager,
+    knitr,
+    R.utils,
+    spelling,
+    testthat
+Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+ByteCompile: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+VignetteBuilder:
+    knitr
+biocViews: knowledge extraction, spectral information, querying system
+X-schema.org-keywords: knowledge extraction, spectral information, querying system
+Language: en-US
