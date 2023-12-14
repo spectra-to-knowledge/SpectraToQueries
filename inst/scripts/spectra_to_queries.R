@@ -18,12 +18,7 @@ DECIMALS <- params$misc$decimals
 INTENSITY_MIN <- params$ms$thresholds$ms2$intensity
 IONS_MAX <- params$misc$max_ions
 N_SPEC_MIN <- params$misc$min_n_spectra
-SENSITIVITIES <-
-  seq(
-    from = params$misc$sensitivity$from,
-    to = params$misc$sensitivity$to,
-    by = params$misc$sensitivity$by
-  )
+SENSITIVITY_MIN <- params$misc$min_sensitivity
 ZERO_VAL <- params$misc$min_total_intensity
 
 message("Import the spectra and ensure they are normalized.")
@@ -116,74 +111,75 @@ ions_table <- merged_mat |>
   tidytable::add_count(name = "count_members_per_group") |>
   tidytable::filter(value != 0)
 
-message("For ", format(SENSITIVITIES), ",")
-message("Extract the ions to perform a query,")
-message("Perform the query, and")
-message("Evaluate the performance of the query based on F-score.")
-all_queries <- SENSITIVITIES |>
+message("Extract the top ", IONS_MAX, " ions to perform a query.")
+# Calculate the sensitivity (and specificity) of the features.
+# Filter only features which sensitivity is at least `SENSITIVITY`.
+# Filter only ions occurring in at least `N_SPEC_MIN` spectra.
+# Filter only groups with at least `N_SPEC_MIN` spectra.
+ions_table_filtered <- ions_table |>
+  tidytable::group_by(ion) |>
+  tidytable::add_count(name = "count_ion") |>
+  tidytable::group_by(group, ion) |>
+  tidytable::add_count(name = "count_ion_per_group") |>
+  tidytable::ungroup() |>
+  tidytable::select(-value) |>
+  tidytable::distinct() |>
+  tidytable::filter(count_ion >= N_SPEC_MIN) |>
+  tidytable::mutate(
+    ratio_inter = count_ion_per_group / count_ion,
+    ratio_intra = count_ion_per_group / count_members_per_group
+  ) |>
+  tidytable::mutate(ratio = ratio_intra / ratio_inter) |>
+  tidytable::filter(ratio_intra >= SENSITIVITY_MIN) |>
+  tidytable::arrange(tidytable::desc(ratio_inter)) |>
+  tidytable::slice_head(
+    n = IONS_MAX,
+    weight_by = ratio,
+    by = c(group)
+  ) |>
+  tidytable::filter(count_members_per_group >= N_SPEC_MIN) |>
+  tidytable::mutate(value = 1)
+
+# Pivot back again.
+ions_table_final <- ions_table_filtered |>
+  tidytable::distinct(group, ion, value) |>
+  tidytable::pivot_wider(
+    names_from = ion,
+    values_from = value,
+    values_fn = mean
+  ) |>
+  tibble::column_to_rownames("group")
+
+# Extract the matching ions per skeleton.
+ions_list <-
+  apply(
+    X = ions_table_final[, 1:ncol(ions_table_final)],
+    MARGIN = 1,
+    FUN = function(x) {
+      names(which(x > 0))
+    }
+  )
+
+best_queries <- seq_along(ions_list) |>
   lapply(
-    FUN = function(SENSITIVITY) {
-      # Calculate the sensitivity (and specificity) of the features.
-      # Filter only features which sensitivity is at least `SENSITIVITY`.
-      # Filter only ions occurring in at least `N_SPEC_MIN` spectra.
-      # Filter only groups with at least `N_SPEC_MIN` spectra.
-      ions_table_filtered <- ions_table |>
-        tidytable::group_by(ion) |>
-        tidytable::add_count(name = "count_ion") |>
-        tidytable::group_by(group, ion) |>
-        tidytable::add_count(name = "count_ion_per_group") |>
-        tidytable::ungroup() |>
-        tidytable::filter(count_ion >= N_SPEC_MIN) |>
-        tidytable::mutate(
-          ratio_inter = count_ion_per_group / count_ion,
-          ratio_intra = count_ion_per_group / count_members_per_group
-        ) |>
-        tidytable::filter(ratio_intra >= SENSITIVITY) |>
-        tidytable::arrange(tidytable::desc(ratio_inter)) |>
-        tidytable::mutate(type = gsub(
-          pattern = ".*_",
-          replacement = "",
-          x = ion
-        )) |>
-        tidytable::group_by(group, type) |>
-        tidytable::mutate(id = match(paste(ion, type), unique(paste(ion, type)))) |>
-        tidytable::ungroup() |>
-        tidytable::filter(id <= IONS_MAX) |>
-        tidytable::select(-type) |>
-        tidytable::filter(count_members_per_group >= N_SPEC_MIN)
-
-      # Pivot back again.
-      ions_table_final <- ions_table_filtered |>
-        tidytable::distinct(group, ion, value) |>
-        tidytable::pivot_wider(
-          names_from = ion,
-          values_from = value,
-          values_fn = mean
-        ) |>
-        tibble::column_to_rownames("group")
-
-      # Extract the matching ions per skeleton.
-      ions_list <-
-        apply(
-          X = ions_table_final[, 1:ncol(ions_table_final)],
-          MARGIN = 1,
-          FUN = function(x) {
-            names(which(x > 0))
-          }
-        )
+    FUN = function(x) {
+      message("Generate all combinations of queries.")
+      combinations <-
+        generate_combinations(x = ions_list[[x]])
+      names(combinations) <-
+        rep(names(ions_list)[x], length(combinations))
 
       # Test the query.
-      queries_results <- seq_along(1:length(ions_list)) |>
-        lapply(
+      queries_results <- seq_along(1:length(combinations)) |>
+        pbmcapply::pbmclapply(
           FUN = perform_list_of_queries,
-          ions_list = ions_list,
+          ions_list = combinations,
           spectra = mia_spectra
         )
+      names(queries_results) <-
+        rep(names(ions_list)[x], length(combinations))
 
-      # Name the queries according to the corresponding skeleton.
-      names(queries_results) <- names(ions_list)
-
-      # Evaluate the performance of the query based on a F_BETA-score.
+      message("Evaluate the performance of the query based on F-score.")
       results_stats <- seq_along(1:length(queries_results)) |>
         lapply(
           FUN = function(result) {
@@ -206,27 +202,29 @@ all_queries <- SENSITIVITIES |>
           }
         )
 
-      message("Finished evaluating the query for ", SENSITIVITY)
-      return(data.frame(
-        sensitivity = SENSITIVITY,
-        skeleton = names(ions_list),
-        fscore = c(results_stats |> as.character()),
-        ions = I(ions_list)
-      ))
+      message("Finished evaluating the query for ", names(ions_list)[x])
+      message("Extract the best query (with ties) based on its F-score.")
+      return(
+        data.frame(
+          skeleton = names(combinations),
+          fscore = c(results_stats |> as.character()),
+          ions = I(combinations)
+        ) |>
+          tidytable::bind_rows() |>
+          tidytable::filter(fscore != NaN) |>
+          tidytable::arrange(tidytable::desc(fscore)) |>
+          tidytable::mutate(id = match(fscore, unique(fscore))) |>
+          tidytable::filter(id == 1) |>
+          tidytable::select(-id)
+      )
     }
   )
-
-message("Extract the best query for each skeleton based on its F-score.")
-best_queries <- all_queries |>
-  tidytable::bind_rows() |>
-  tidytable::filter(fscore != NaN) |>
-  tidytable::arrange(tidytable::desc(sensitivity)) |>
-  tidytable::arrange(tidytable::desc(fscore)) |>
-  tidytable::distinct(skeleton, .keep_all = TRUE)
 
 message("Export the best queries for further use.")
 create_dir(paths$data$interim$queries)
 best_queries |>
+  tidytable::bind_rows() |>
+  tidytable::arrange(tidytable::desc(fscore)) |>
   tidytable::fwrite(file = paths$data$interim$queries, sep = "\t")
 
 end <- Sys.time()
