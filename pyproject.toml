@@ -47,7 +47,7 @@ include = [
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
-rdkit = {version="^2023.9.3"}
+rdkit = {version="^2023.9.4"}
 
 [tool.poetry.scripts]
 spectra2queries = "spectra2queries.cli:main"
