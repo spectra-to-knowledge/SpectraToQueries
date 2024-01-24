@@ -116,6 +116,24 @@
     },
     "3": {
       "@type": "SoftwareApplication",
+      "identifier": "parallel",
+      "name": "parallel"
+    },
+    "4": {
+      "@type": "SoftwareApplication",
+      "identifier": "pbmcapply",
+      "name": "pbmcapply",
+      "version": ">= 1.5.1",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=pbmcapply"
+    },
+    "5": {
+      "@type": "SoftwareApplication",
       "identifier": "purrr",
       "name": "purrr",
       "version": ">= 1.0.2",
@@ -127,7 +145,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=purrr"
     },
-    "4": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -140,7 +158,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "5": {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -153,7 +171,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "6": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "tibble",
       "name": "tibble",
@@ -166,7 +184,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tibble"
     },
-    "7": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",

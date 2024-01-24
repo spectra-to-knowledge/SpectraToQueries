@@ -11,6 +11,11 @@ params <- "inst/params.yaml" |>
   parse_yaml()
 
 message("Loading parameters")
+if (Sys.info()["sysname"] == "Windows") {
+  mc.cores <- 1
+} else {
+  mc.cores <- parallel::detectCores()
+}
 BETA <- params$misc$beta
 BIN_WINDOWS <- params$misc$bin_windows
 DALTON <- params$ms$tolerances$mass$dalton$ms2
@@ -174,7 +179,8 @@ best_queries <- seq_along(ions_list) |>
         pbmcapply::pbmclapply(
           FUN = perform_list_of_queries,
           ions_list = combinations,
-          spectra = mia_spectra
+          spectra = mia_spectra,
+          mc.cores = mc.cores
         )
       names(queries_results) <-
         rep(names(ions_list)[x], length(combinations))
