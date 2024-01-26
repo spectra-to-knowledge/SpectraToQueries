@@ -22,6 +22,7 @@ DALTON <- params$ms$tolerances$mass$dalton$ms2
 DECIMALS <- params$misc$decimals
 INTENSITY_MIN <- params$ms$thresholds$ms2$intensity
 IONS_MAX <- params$misc$max_ions
+N_SKEL_MIN <- params$misc$min_n_skeleton
 N_SPEC_MIN <- params$misc$min_n_spectra
 SENSITIVITY_MIN <- params$misc$min_sensitivity
 ZERO_VAL <- params$misc$min_total_intensity
@@ -41,12 +42,12 @@ message(
   DALTON,
   " tolerance."
 )
-mia_spectra <- mia_spectra |>
+mia_spectra_w <- mia_spectra |>
   harmonize_mzs(dalton = DALTON)
 
 message("Calculate neutral losses, given ", DALTON, " tolerance.")
 message("Remove the ones above the precursor.")
-mia_spectra_nl <- mia_spectra |>
+mia_spectra_nl <- mia_spectra_w |>
   Spectra::neutralLoss(Spectra::PrecursorMzParam(
     filterPeaks = c("abovePrecursor"),
     msLevel = 2L,
@@ -56,7 +57,7 @@ mia_spectra_nl <- mia_spectra |>
 
 message("Bin spectra to get a matrix.")
 message("The window is ", DALTON, " divided by ", BIN_WINDOWS, ".")
-mia_spectra_binned <- mia_spectra |>
+mia_spectra_binned <- mia_spectra_w |>
   Spectra::bin(binSize = DALTON / BIN_WINDOWS)
 mia_spectra_binned_nl <- mia_spectra_nl |>
   Spectra::bin(binSize = DALTON / BIN_WINDOWS)
@@ -120,7 +121,7 @@ message("Extract the top ", IONS_MAX, " ions to perform a query.")
 # Calculate the sensitivity (and specificity) of the features.
 # Filter only features which sensitivity is at least `SENSITIVITY`.
 # Filter only ions occurring in at least `N_SPEC_MIN` spectra.
-# Filter only groups with at least `N_SPEC_MIN` spectra.
+# Filter only groups with at least `N_SKEL_MIN` spectra.
 ions_table_filtered <- ions_table |>
   tidytable::group_by(ion) |>
   tidytable::add_count(name = "count_ion") |>
@@ -142,7 +143,7 @@ ions_table_filtered <- ions_table |>
     weight_by = ratio,
     by = c(group)
   ) |>
-  tidytable::filter(count_members_per_group >= N_SPEC_MIN) |>
+  tidytable::filter(count_members_per_group >= N_SKEL_MIN) |>
   tidytable::mutate(value = 1)
 
 # Pivot back again.
