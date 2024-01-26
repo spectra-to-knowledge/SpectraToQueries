@@ -10,6 +10,8 @@ misc:
   #' The maximal number of ions in a query. INTEGER
   max_ions: 10
   #' The minimal number of spectra per skeleton. INTEGER
+  min_n_skeleton: 5
+  #' The minimal number of spectra per fragment. INTEGER
   min_n_spectra: 3
   #' The minimal total intensity of the ions to keep them in the matrix. INTEGER
   min_total_intensity: 0
