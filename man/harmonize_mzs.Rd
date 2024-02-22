@@ -7,8 +7,13 @@
 harmonize_mzs(spectra, dalton)
 }
 \arguments{
-\item{dalton}{}
+\item{spectra}{Spectra}
+
+\item{dalton}{Dalton}
 }
 \description{
 Title
+}
+\examples{
+NULL
 }

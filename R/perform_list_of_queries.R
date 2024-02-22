@@ -1,13 +1,13 @@
 #' Title
 #'
-#' @param index
-#' @param ions_list
-#' @param spectra
+#' @param index Index
+#' @param ions_list Ions list
+#' @param spectra Spectra
 #'
-#' @return
+#' @return NULL
 #' @export
 #'
-#' @examples
+#' @examples NULL
 perform_list_of_queries <- function(index, ions_list, spectra) {
   return(tidytable::tidytable(
     target = names(ions_list)[index],

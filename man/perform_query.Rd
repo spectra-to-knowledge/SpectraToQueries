@@ -7,8 +7,15 @@
 perform_query(spectra, frags, nls)
 }
 \arguments{
-\item{nls}{}
+\item{spectra}{Spectra}
+
+\item{frags}{Fragments}
+
+\item{nls}{Neutral losses}
 }
 \description{
 Title
+}
+\examples{
+NULL
 }

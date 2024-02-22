@@ -1,12 +1,12 @@
 #' Title
 #'
-#' @param matrix
-#' @param n
+#' @param matrix Matrix
+#' @param n N
 #'
-#' @return
+#' @return NULL
 #' @export
 #'
-#' @examples
+#' @examples NULL
 filter_matrix <- function(matrix, n) {
   non_null_count <-
     apply(

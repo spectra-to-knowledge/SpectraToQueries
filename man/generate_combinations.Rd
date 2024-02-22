@@ -7,8 +7,11 @@
 generate_combinations(x)
 }
 \arguments{
-\item{x}{}
+\item{x}{x}
 }
 \description{
 Title
+}
+\examples{
+NULL
 }

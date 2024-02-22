@@ -7,8 +7,13 @@
 filter_matrix(matrix, n)
 }
 \arguments{
-\item{n}{}
+\item{matrix}{Matrix}
+
+\item{n}{N}
 }
 \description{
 Title
+}
+\examples{
+NULL
 }

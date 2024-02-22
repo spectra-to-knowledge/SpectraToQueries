@@ -7,8 +7,15 @@
 perform_list_of_queries(index, ions_list, spectra)
 }
 \arguments{
-\item{spectra}{}
+\item{index}{Index}
+
+\item{ions_list}{Ions list}
+
+\item{spectra}{Spectra}
 }
 \description{
 Title
+}
+\examples{
+NULL
 }

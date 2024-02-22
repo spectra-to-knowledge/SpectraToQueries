@@ -1,12 +1,12 @@
 #' Title
 #'
-#' @param spectra
-#' @param dalton
+#' @param spectra Spectra
+#' @param dalton Dalton
 #'
-#' @return
+#' @return NULL
 #' @export
 #'
-#' @examples
+#' @examples NULL
 harmonize_mzs <- function(spectra, dalton) {
   averaged_intensities <- spectra |>
     Spectra::peaksData() |>
