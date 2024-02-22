@@ -1,11 +1,11 @@
 #' Title
 #'
-#' @param x
+#' @param x x
 #'
-#' @return
+#' @return NULL
 #' @export
 #'
-#' @examples
+#' @examples NULL
 generate_combinations <- function(x) {
   1:length(x) |>
     lapply(

@@ -9,3 +9,6 @@ normalize_peaks()
 \description{
 Title
 }
+\examples{
+NULL
+}

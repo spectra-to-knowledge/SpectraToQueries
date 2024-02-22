@@ -7,8 +7,15 @@
 create_matrix(spectra, zero_val = ZERO_VAL, name)
 }
 \arguments{
-\item{name}{}
+\item{spectra}{Spectra}
+
+\item{zero_val}{Zero value}
+
+\item{name}{Name}
 }
 \description{
 Title
+}
+\examples{
+NULL
 }

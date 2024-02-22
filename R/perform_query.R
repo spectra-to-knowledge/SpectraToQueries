@@ -1,13 +1,13 @@
 #' Title
 #'
-#' @param spectra
-#' @param frags
-#' @param nls
+#' @param spectra Spectra
+#' @param frags Fragments
+#' @param nls Neutral losses
 #'
-#' @return
+#' @return NULL
 #' @export
 #'
-#' @examples
+#' @examples NULL
 perform_query <- function(spectra, frags, nls) {
   if (length(frags) != 0) {
     spectra <- spectra[spectra |>
