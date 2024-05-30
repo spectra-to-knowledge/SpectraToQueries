@@ -58,9 +58,12 @@ mia_spectra_nl <- mia_spectra_w |>
 message("Bin spectra to get a matrix.")
 message("The window is ", DALTON, " divided by ", BIN_WINDOWS, ".")
 mia_spectra_binned <- mia_spectra_w |>
-  Spectra::bin(binSize = DALTON / BIN_WINDOWS)
+  Spectra::bin(binSize = DALTON / BIN_WINDOWS, zero.rm = FALSE) |> 
+  Spectra::applyProcessing()
 mia_spectra_binned_nl <- mia_spectra_nl |>
-  Spectra::bin(binSize = DALTON / BIN_WINDOWS)
+  Spectra::reset() |> 
+  Spectra::bin(binSize = DALTON / BIN_WINDOWS, zero.rm = FALSE) |> 
+  Spectra::applyProcessing()
 
 message("Create fragments and neutral losses matrices.")
 message(
@@ -74,6 +77,8 @@ spectra_mat <- mia_spectra_binned |>
 spectra_nl_mat <- mia_spectra_binned_nl |>
   create_matrix(name = mia_spectra_binned_nl$SKELETON) |>
   filter_matrix(n = N_SPEC_MIN)
+rm(mia_spectra_binned)
+rm(mia_spectra_binned_nl)
 
 message("Create a matrix containing fragments and neutral losses.")
 message("Round the values to ", DECIMALS, ".")
