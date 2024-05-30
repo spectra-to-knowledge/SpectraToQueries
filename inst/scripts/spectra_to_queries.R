@@ -4,6 +4,7 @@ require(
   package = "spectra2queries",
   quietly = TRUE
 )
+source("R/mcapply_hack.R")
 
 paths <- "inst/paths.yaml" |>
   parse_yaml()
@@ -11,11 +12,7 @@ params <- "inst/params.yaml" |>
   parse_yaml()
 
 message("Loading parameters")
-if (Sys.info()["sysname"] == "Windows") {
-  mc.cores <- 1
-} else {
-  mc.cores <- parallel::detectCores()
-}
+mc.cores <- parallel::detectCores()
 BETA <- params$misc$beta
 BIN_WINDOWS <- params$misc$bin_windows
 DALTON <- params$ms$tolerances$mass$dalton$ms2
