@@ -10,7 +10,10 @@ strat <- ifelse(test = .Platform$OS.type == "unix",
 )
 future::plan(strategy = strat, workers = future::nbrOfWorkers())
 progressr::handlers(
-  progressr::handler_txtprogressbar(enable = TRUE, char = cli::col_yellow(cli::symbol$star))
+  progressr::handler_txtprogressbar(
+    enable = TRUE,
+    char = cli::col_yellow(cli::symbol$star)
+  )
 )
 
 paths <- "inst/paths.yaml" |>
