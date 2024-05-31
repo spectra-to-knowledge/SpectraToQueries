@@ -31,6 +31,6 @@ perform_query <- function(spectra, frags, nls) {
       }
     }
   }
-  message("Query done.")
+  # message("Query done.")
   return(spectra)
 }
