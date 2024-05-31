@@ -28,3 +28,24 @@ perform_list_of_queries <- function(index, ions_list, spectra) {
     )
   ))
 }
+
+#' Title
+#'
+#' @param xs
+#'
+#' @return NULL
+#' @export
+#'
+#' @examples NULL
+perform_list_of_queries_progress <- function(indices, ions_list, spectra) {
+  p <- progressr::progressor(along = indices)
+  future.apply::future_lapply(
+    X = indices,
+    ions_list = ions_list,
+    spectra = spectra,
+    FUN = function(index, ions_list, spectra) {
+      p()
+      perform_list_of_queries(index, ions_list, spectra)
+    }
+  )
+}
