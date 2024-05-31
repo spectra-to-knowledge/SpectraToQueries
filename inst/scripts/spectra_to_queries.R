@@ -4,7 +4,14 @@ require(
   package = "spectra2queries",
   quietly = TRUE
 )
-source("R/mcapply_hack.R")
+strat <- ifelse(test = .Platform$OS.type == "unix",
+  yes = "multicore",
+  no = "multisession"
+)
+future::plan(strategy = strat, workers = future::nbrOfWorkers())
+progressr::handlers(
+  progressr::handler_txtprogressbar(enable = TRUE, char = cli::col_yellow(cli::symbol$star))
+)
 
 paths <- "inst/paths.yaml" |>
   parse_yaml()
@@ -55,11 +62,11 @@ mia_spectra_nl <- mia_spectra_w |>
 message("Bin spectra to get a matrix.")
 message("The window is ", DALTON, " divided by ", BIN_WINDOWS, ".")
 mia_spectra_binned <- mia_spectra_w |>
-  Spectra::bin(binSize = DALTON / BIN_WINDOWS, zero.rm = FALSE) |> 
+  Spectra::bin(binSize = DALTON / BIN_WINDOWS, zero.rm = FALSE) |>
   Spectra::applyProcessing()
 mia_spectra_binned_nl <- mia_spectra_nl |>
-  Spectra::reset() |> 
-  Spectra::bin(binSize = DALTON / BIN_WINDOWS, zero.rm = FALSE) |> 
+  Spectra::reset() |>
+  Spectra::bin(binSize = DALTON / BIN_WINDOWS, zero.rm = FALSE) |>
   Spectra::applyProcessing()
 
 message("Create fragments and neutral losses matrices.")
@@ -179,12 +186,11 @@ best_queries <- seq_along(ions_list) |>
 
       # Test the query.
       queries_results <- seq_along(1:length(combinations)) |>
-        pbmcapply::pbmclapply(
-          FUN = perform_list_of_queries,
+        perform_list_of_queries_progress(
           ions_list = combinations,
-          spectra = mia_spectra,
-          mc.cores = mc.cores
-        )
+          spectra = mia_spectra
+        ) |>
+        progressr::with_progress()
       names(queries_results) <-
         rep(names(ions_list)[x], length(combinations))
 

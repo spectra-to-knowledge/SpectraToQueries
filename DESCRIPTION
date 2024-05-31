@@ -13,11 +13,13 @@ BugReports: https://github.com/spectra-to-knowledge/spectra-to-queries/issues
 Depends:
     R (>= 4.3.0)
 Imports:
+    cli (>= 3.6.2),
+    future (>= 1.33.2),
+    future.apply (>= 1.11.2),
     MsBackendMgf (>= 1.12.0),
-    parallel,
-    pbmcapply (>= 1.5.1),
+    progressr (>= 0.14.0),
     purrr (>= 1.0.2),
-    Spectra (>= 1.14.0),
+    Spectra (>= 1.14.1),
     tidytable (>= 0.11.0),
     tibble (>= 3.2.1),
     yaml (>= 2.3.8)
