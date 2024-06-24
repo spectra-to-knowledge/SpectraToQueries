@@ -59,16 +59,11 @@ mia_spectra_nl <- mia_spectra_w |>
     filterPeaks = c("abovePrecursor"),
     msLevel = 2L,
     tolerance = DALTON
-  )) |>
-  Spectra::applyProcessing()
+  ))
 
 message("Bin spectra to get a matrix.")
 message("The window is ", DALTON, " divided by ", BIN_WINDOWS, ".")
 mia_spectra_binned <- mia_spectra_w |>
-  Spectra::bin(binSize = DALTON / BIN_WINDOWS, zero.rm = FALSE) |>
-  Spectra::applyProcessing()
-mia_spectra_binned_nl <- mia_spectra_nl |>
-  Spectra::reset() |>
   Spectra::bin(binSize = DALTON / BIN_WINDOWS, zero.rm = FALSE) |>
   Spectra::applyProcessing()
 
@@ -81,10 +76,15 @@ message(
 spectra_mat <- mia_spectra_binned |>
   create_matrix(name = mia_spectra_binned$SKELETON) |>
   filter_matrix(n = N_SPEC_MIN)
+rm(mia_spectra_binned)
+
+mia_spectra_binned_nl <- mia_spectra_nl |>
+  Spectra::reset() |>
+  Spectra::bin(binSize = DALTON / BIN_WINDOWS, zero.rm = FALSE) |>
+  Spectra::applyProcessing()
 spectra_nl_mat <- mia_spectra_binned_nl |>
   create_matrix(name = mia_spectra_binned_nl$SKELETON) |>
   filter_matrix(n = N_SPEC_MIN)
-rm(mia_spectra_binned)
 rm(mia_spectra_binned_nl)
 
 message("Create a matrix containing fragments and neutral losses.")
@@ -115,12 +115,7 @@ ions_table <- merged_mat |>
   as.data.frame() |>
   tibble::rownames_to_column(var = "group") |>
   tidytable::mutate(group = gsub(
-    pattern = "\\.",
-    replacement = " ",
-    x = group
-  )) |>
-  tidytable::mutate(group = gsub(
-    pattern = " .*",
+    pattern = "\\.[0-9]{1,2}",
     replacement = "",
     x = group
   )) |>
@@ -206,7 +201,11 @@ best_queries <- seq_along(ions_list) |>
             fp <- nrow(queries_results[[result]] |>
               tidytable::filter(target != value))
             fn <-
-              length(mia_spectra$SKELETON[mia_spectra$SKELETON == names(queries_results)[result]]) - tp
+              length(mia_spectra$SKELETON[mia_spectra$SKELETON |> gsub(
+                pattern = "+",
+                replacement = ".",
+                fixed = TRUE
+              ) == names(queries_results)[result]]) - tp
             tpfn <- tp + fn
             tpfp <- tp + fp
             recall <- tp / tpfn
