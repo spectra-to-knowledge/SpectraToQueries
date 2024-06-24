@@ -24,7 +24,12 @@ perform_list_of_queries <- function(index, ions_list, spectra) {
             as.numeric()
         ) |>
         Spectra::spectraData() |>
-        tidytable::pull(SKELETON)
+        tidytable::pull(SKELETON) |>
+        gsub(
+          pattern = "+",
+          replacement = ".",
+          fixed = TRUE
+        )
     )
   ))
 }

@@ -11,7 +11,7 @@ data:
     path: data/source
     spectra: 
       path: data/source/spectra
-      mia: data/source/spectra/export_traitement_python_matchms-squelettes-tries.mgf
+      mia: data/source/spectra/export_traitement_python_matchms-squelettes-tries-new.mgf
 inst:
   path: inst
   scripts:

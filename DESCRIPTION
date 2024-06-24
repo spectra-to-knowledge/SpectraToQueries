@@ -13,7 +13,7 @@ BugReports: https://github.com/spectra-to-knowledge/spectra-to-queries/issues
 Depends:
     R (>= 4.3.0)
 Imports:
-    cli (>= 3.6.2),
+    cli (>= 3.6.3),
     future (>= 1.33.2),
     future.apply (>= 1.11.2),
     MsBackendMgf (>= 1.12.0),
