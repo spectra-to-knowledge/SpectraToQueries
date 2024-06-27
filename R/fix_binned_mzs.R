@@ -1,0 +1,59 @@
+#' Title
+#'
+#' @param binned_m binned_matrix
+#' @param original_mzs original mzs
+#' @param dalton dalton
+#' @param decimals decimals
+#'
+#' @return NULL
+#' @export
+#'
+#' @examples NULL
+fix_binned_mzs <- function(binned_m, original_mzs, dalton, decimals) {
+  all_mzs <- original_mzs |>
+    Spectra::peaksData() |>
+    Spectra::combinePeaksData(tolerance = dalton, peaks = "union") |>
+    data.frame() |>
+    tidytable::pull("mz")
+
+  new_m <- binned_m
+
+  for (x in seq_along(1:ncol(new_m))) {
+    i <- colnames(new_m)[x]
+    val <- mean(all_mzs[abs(all_mzs - as.numeric(i)) <= dalton])
+    colnames(new_m)[x] <- ifelse(test = !is.nan(val),
+      yes = val,
+      no = i
+    )
+  }
+
+  new_m_new <- new_m %>%
+    data.frame() %>%
+    tidytable::mutate(rowname = row.names(.)) |>
+    tidytable::pivot_longer(
+      cols = -rowname,
+      names_to = "name",
+      values_to = "value"
+    ) |>
+    tidytable::mutate(name = gsub(
+      pattern = ".[0-9]{1,2}$",
+      replacement = "",
+      x = name
+    )) |>
+    tidytable::mutate(name = round(
+      x = gsub(
+        pattern = "X",
+        replacement = "",
+        x = name,
+        fixed = TRUE
+      ) |> as.numeric(),
+      digits = decimals
+    ) |> as.character()) |>
+    tidytable::group_by(rowname, name) |>
+    tidytable::summarize(value = sum(value)) |>
+    tidytable::pivot_wider(names_from = name, values_from = value) |>
+    tibble::column_to_rownames() |>
+    as.matrix()
+
+  return(new_m_new)
+}

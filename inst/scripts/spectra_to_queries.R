@@ -1,9 +1,11 @@
 start <- Sys.time()
-
+library(dplyr)
 require(
   package = "spectra2queries",
   quietly = TRUE
 )
+# weird namespace issue
+source("R/fix_binned_mzs.R")
 strat <- ifelse(test = .Platform$OS.type == "unix",
   yes = "multicore",
   no = "multisession"
@@ -24,7 +26,6 @@ params <- "inst/params.yaml" |>
 message("Loading parameters")
 mc.cores <- parallel::detectCores()
 BETA <- params$misc$beta
-BIN_WINDOWS <- params$misc$bin_windows
 DALTON <- params$ms$tolerances$mass$dalton$ms2
 DECIMALS <- params$misc$decimals
 INTENSITY_MIN <- params$ms$thresholds$ms2$intensity
@@ -40,6 +41,7 @@ mia_spectra <- paths$data$source$spectra$mia |>
   MsBackendMgf::readMgf() |>
   Spectra::Spectra() |>
   Spectra::filterMsLevel(2L) |>
+  Spectra::reduceSpectra() |>
   Spectra::addProcessing(normalize_peaks()) |>
   Spectra::filterIntensity(intensity = c(INTENSITY_MIN, Inf)) |>
   Spectra::applyProcessing()
@@ -49,6 +51,9 @@ message(
   DALTON,
   " tolerance."
 )
+mia_spectra@backend@spectraData$precursorMz <-
+  mia_spectra@backend@spectraData$PRECURSOR_MZ |>
+    as.numeric()
 mia_spectra_w <- mia_spectra |>
   harmonize_mzs(dalton = DALTON)
 
@@ -59,12 +64,15 @@ mia_spectra_nl <- mia_spectra_w |>
     filterPeaks = c("abovePrecursor"),
     msLevel = 2L,
     tolerance = DALTON
-  ))
+  )) |>
+  Spectra::applyProcessing()
+mia_spectra_w_nl <- mia_spectra_nl |>
+  harmonize_mzs(dalton = DALTON)
 
 message("Bin spectra to get a matrix.")
-message("The window is ", DALTON, " divided by ", BIN_WINDOWS, ".")
+message("The window is ", DALTON, ".")
 mia_spectra_binned <- mia_spectra_w |>
-  Spectra::bin(binSize = DALTON / BIN_WINDOWS, zero.rm = FALSE) |>
+  Spectra::bin(binSize = DALTON, zero.rm = FALSE) |>
   Spectra::applyProcessing()
 
 message("Create fragments and neutral losses matrices.")
@@ -76,15 +84,21 @@ message(
 spectra_mat <- mia_spectra_binned |>
   create_matrix(name = mia_spectra_binned$SKELETON) |>
   filter_matrix(n = N_SPEC_MIN)
+message("Fixing mzs")
+spectra_mat <- spectra_mat |>
+  fix_binned_mzs(original_mzs = mia_spectra_w, decimals = DECIMALS, dalton = DALTON)
 rm(mia_spectra_binned)
 
-mia_spectra_binned_nl <- mia_spectra_nl |>
+mia_spectra_binned_nl <- mia_spectra_w_nl |>
   Spectra::reset() |>
-  Spectra::bin(binSize = DALTON / BIN_WINDOWS, zero.rm = FALSE) |>
+  Spectra::bin(binSize = DALTON, zero.rm = FALSE) |>
   Spectra::applyProcessing()
 spectra_nl_mat <- mia_spectra_binned_nl |>
   create_matrix(name = mia_spectra_binned_nl$SKELETON) |>
   filter_matrix(n = N_SPEC_MIN)
+message("Fixing mzs")
+spectra_nl_mat <- spectra_nl_mat |>
+  fix_binned_mzs(original_mzs = mia_spectra_w_nl, decimals = DECIMALS, dalton = DALTON)
 rm(mia_spectra_binned_nl)
 
 message("Create a matrix containing fragments and neutral losses.")
@@ -115,13 +129,13 @@ ions_table <- merged_mat |>
   as.data.frame() |>
   tibble::rownames_to_column(var = "group") |>
   tidytable::mutate(group = gsub(
-    pattern = "\\.[0-9]{1,2}",
+    pattern = "\\.[0-9]{1,3}",
     replacement = "",
     x = group
   )) |>
+  tidytable::group_by(group) |>
+  tidytable::add_count(name = "group_count") |>
   tidytable::pivot_longer(cols = !starts_with("group"), names_to = "ion") |>
-  tidytable::group_by(group, ion) |>
-  tidytable::add_count(name = "count_members_per_group") |>
   tidytable::filter(value != 0)
 
 message("Extract the top ", IONS_MAX, " ions to perform a query.")
@@ -131,16 +145,17 @@ message("Extract the top ", IONS_MAX, " ions to perform a query.")
 # Filter only groups with at least `N_SKEL_MIN` spectra.
 ions_table_filtered <- ions_table |>
   tidytable::group_by(ion) |>
-  tidytable::add_count(name = "count_ion") |>
+  tidytable::add_count(name = "count_per_ion") |>
+  tidytable::ungroup() |>
   tidytable::group_by(group, ion) |>
-  tidytable::add_count(name = "count_ion_per_group") |>
+  tidytable::add_count(name = "count_per_ion_per_group") |>
   tidytable::ungroup() |>
   tidytable::select(-value) |>
   tidytable::distinct() |>
-  tidytable::filter(count_ion >= N_SPEC_MIN) |>
+  tidytable::filter(count_per_ion >= N_SPEC_MIN) |>
   tidytable::mutate(
-    ratio_inter = count_ion_per_group / count_ion,
-    ratio_intra = count_ion_per_group / count_members_per_group
+    ratio_inter = count_per_ion_per_group / count_per_ion,
+    ratio_intra = count_per_ion_per_group / group_count
   ) |>
   tidytable::mutate(ratio = ratio_intra / ratio_inter) |>
   tidytable::filter(ratio_intra >= SENSITIVITY_MIN) |>
@@ -150,7 +165,7 @@ ions_table_filtered <- ions_table |>
     weight_by = ratio,
     by = c(group)
   ) |>
-  tidytable::filter(count_members_per_group >= N_SKEL_MIN) |>
+  tidytable::filter(group_count >= N_SKEL_MIN) |>
   tidytable::mutate(value = 1)
 
 # Pivot back again.

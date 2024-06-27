@@ -3,6 +3,7 @@
 export(create_dir)
 export(create_matrix)
 export(filter_matrix)
+export(fix_binned_mzs)
 export(generate_combinations)
 export(harmonize_mzs)
 export(normalize_peaks)
