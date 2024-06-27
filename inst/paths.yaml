@@ -4,13 +4,15 @@ data:
   path: data
   interim:
     path: data/interim
-    queries: data/interim/queries.tsv
+    # queries: data/interim/queries.tsv
+    queries: data/interim/queries-grouped.tsv
   processed:
     path: data/processed
   source:
     path: data/source
     spectra: 
       path: data/source/spectra
+      # mia: data/source/spectra/export_traitement_python_matchms-squelettes-tries.mgf
       mia: data/source/spectra/export_traitement_python_matchms-squelettes-tries-new.mgf
 inst:
   path: inst
