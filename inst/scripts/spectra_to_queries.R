@@ -159,12 +159,13 @@ ions_table_filtered <- ions_table |>
   ) |>
   tidytable::mutate(ratio = ratio_intra / ratio_inter) |>
   tidytable::filter(ratio_intra >= SENSITIVITY_MIN) |>
+  tidytable::arrange(tidytable::desc(ratio)) |>
   tidytable::arrange(tidytable::desc(ratio_inter)) |>
+  tidytable::group_by(group) |>
   tidytable::slice_head(
     n = IONS_MAX,
-    weight_by = ratio,
-    by = c(group)
   ) |>
+  tidytable::ungroup() |> 
   tidytable::filter(group_count >= N_SKEL_MIN) |>
   tidytable::mutate(value = 1)
 
