@@ -8,14 +8,14 @@
 #'
 #' @examples NULL
 harmonize_mzs <- function(spectra, dalton) {
-  averaged_intensities <- spectra |>
+  spectra_new <- spectra
+  averaged_intensities <- spectra_new |>
     Spectra::peaksData() |>
     Spectra::combinePeaksData(tolerance = dalton, peaks = "union") |>
     data.frame() |>
     tidytable::pull("mz")
-
-  for (i in seq_along(1:length(spectra))) {
-    mzs <- spectra@backend@peaksData[[i]] |>
+  for (i in seq_along(1:length(spectra_new))) {
+    mzs <- spectra_new@backend@peaksData[[i]] |>
       data.frame() |>
       tidytable::pull("mz")
 
@@ -25,7 +25,7 @@ harmonize_mzs <- function(spectra, dalton) {
         mzs[j] <- averaged_intensities[matching_index]
       }
     }
-    spectra@backend@peaksData[[i]][, 1] <- mzs
+    spectra_new@backend@peaksData[[i]][, 1] <- mzs
   }
-  return(spectra)
+  return(spectra_new)
 }

@@ -17,18 +17,20 @@ main <- function() {
   skeleton_names_new_file <- "~/Git/mia-playground/src/miaplayground/data/skeletons_new.csv"
   distances_mces_file <- "~/Git/mia-playground/skeletons_distances_mces.csv"
   distances_mhfp_file <- "~/Git/mia-playground/skeletons_distances_mhfp.csv"
-  
+
   # Load data
   smiles_combinations <- read_csv(smiles_combinations_file,
-                                  col_names = c("index", "smiles_1", "smiles_2"))
+    col_names = c("index", "smiles_1", "smiles_2")
+  )
   skeleton_names <- read_csv(skeleton_names_file) |>
     # rename(name = ATTRIBUTE_Skeletons, smarts = SMARTS,smiles = Skeleton_SMILES) |>
     rename(name = Skeletons, smiles = SMILES) |>
     # distinct(name, smarts,smiles) |>
     distinct(name, smiles)
   distances <- read_csv(distances_mces_file,
-                        col_names = c("index", "time", "distance", "type"))
-  
+    col_names = c("index", "time", "distance", "type")
+  )
+
   # Merge data based on index
   merged_data <- left_join(smiles_combinations, distances, by = "index") |>
     # merged_data <- smiles_combinations |>
@@ -47,11 +49,11 @@ main <- function() {
   #   left_join(skeleton_names, by = c("smiles_1" = "smiles")) |>
   #   left_join(skeleton_names, by = c("smiles_2" = "smiles")) |>
   #   distinct()
-  
+
   ## TODO
   merged_data |>
     write_csv("~/Git/mia-playground/temp.csv")
-  
+
   # Create a distance matrix
   mat <- merged_data |>
     distinct(skeleton = name.x, skeleton_2 = name.y, distance) |>
@@ -70,17 +72,17 @@ main <- function() {
     )) |>
     column_to_rownames("skeleton") |>
     t()
-  
+
   mat[upper.tri(mat)] <- t(mat)[upper.tri(mat)]
-  
+
   # mat[mat = 0] <- 1
   # mat = as.dist(mat,upper = TRUE)
-  
+
   # Convert distance matrix to a dist object
   distance_matrix <- as.dist(1 - mat)
   distance_matrix <- as.dist(1 / mat)
   distance_matrix <- mat
-  
+
   pheatmap::pheatmap(
     mat = mat,
     display_numbers = TRUE,
@@ -89,15 +91,15 @@ main <- function() {
       distances$distance
     )))
   )
-  
-  
+
+
   distance_matrix[is.na(distance_matrix)] <- 0
-  
+
   # Build the tree
   hc <- hclust(as.dist(distance_matrix))
   plot(hc)
   clus.den <- as.dendrogram(object = hc)
-  
+
   # Redefine skeletons with <= 3 distance
   obj <- cut(clus.den, h = 3)
   plot(obj$lower[[1]])
@@ -112,17 +114,18 @@ main <- function() {
         no = name
       )) |>
       filter(name_new != name)
-  }) |> bind_rows() |>
+  }) |>
+    bind_rows() |>
     right_join(skeleton_names) |>
     mutate(name_new = ifelse(
       test = is.na(name_new),
       yes = name,
       no = name_new
     ))
-  
+
   skeleton_names_new |>
     write_csv(file = skeleton_names_new_file)
-  
+
   #
   #   tree <- hc |>
   #     ggtree::ggtree()

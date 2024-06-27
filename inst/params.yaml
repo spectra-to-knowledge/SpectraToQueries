@@ -3,8 +3,6 @@ misc:
   #' The beta part of the F score. 
   #' 0.5 means that precision is twice as important as recall. FLOAT
   beta: 0.5
-  #' The number of windows in per dalton tolerance. INTEGER
-  bin_windows: 10
   #' The number of decimals to keep. INTEGER
   decimals: 4
   #' The maximal number of ions in a query. INTEGER
