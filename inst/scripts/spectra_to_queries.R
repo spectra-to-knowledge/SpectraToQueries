@@ -53,7 +53,7 @@ message(
 )
 mia_spectra@backend@spectraData$precursorMz <-
   mia_spectra@backend@spectraData$PRECURSOR_MZ |>
-    as.numeric()
+  as.numeric()
 mia_spectra_w <- mia_spectra |>
   harmonize_mzs(dalton = DALTON)
 
@@ -165,7 +165,7 @@ ions_table_filtered <- ions_table |>
   tidytable::slice_head(
     n = IONS_MAX,
   ) |>
-  tidytable::ungroup() |> 
+  tidytable::ungroup() |>
   tidytable::filter(group_count >= N_SKEL_MIN) |>
   tidytable::mutate(value = 1)
 
