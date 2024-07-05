@@ -23,7 +23,7 @@ Imports:
     Spectra (>= 1.14.1),
     tidytable (>= 0.11.0),
     tibble (>= 3.2.1),
-    yaml (>= 2.3.8)
+    yaml (>= 2.3.9)
 Suggests: 
     BiocManager,
     knitr,
@@ -35,7 +35,7 @@ Encoding: UTF-8
 LazyData: true
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 VignetteBuilder:
     knitr
 biocViews: knowledge extraction, spectral information, querying system

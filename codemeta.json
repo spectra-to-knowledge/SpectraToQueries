@@ -235,7 +235,7 @@
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
-      "version": ">= 2.3.8",
+      "version": ">= 2.3.9",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
