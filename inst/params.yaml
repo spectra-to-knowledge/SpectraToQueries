@@ -6,15 +6,17 @@ misc:
   #' The number of decimals to keep. INTEGER
   decimals: 4
   #' The maximal number of ions in a query. INTEGER
-  max_ions: 10
+  max_ions: 5
   #' The minimal number of spectra per skeleton. INTEGER
   min_n_skeleton: 5
   #' The minimal number of spectra per fragment. INTEGER
   min_n_spectra: 3
   #' The minimal total intensity of the ions to keep them in the matrix. INTEGER
   min_total_intensity: 0
-  #' The minimal sensitivity related parameters. FLOAT
+  #' The minimal sensitivity. FLOAT
   min_sensitivity: 0.65
+  #' The minimal specificity. FLOAT
+  min_specificity: 0.10
 
 #' MS related parameters.
 ms:
