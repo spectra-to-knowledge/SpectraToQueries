@@ -4,7 +4,7 @@
 \alias{generate_combinations}
 \title{Title}
 \usage{
-generate_combinations(x)
+generate_combinations(x, max_ions)
 }
 \arguments{
 \item{x}{x}

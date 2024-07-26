@@ -1,9 +1,6 @@
 start <- Sys.time()
 library(dplyr)
-require(
-  package = "spectra2queries",
-  quietly = TRUE
-)
+require(package = "spectra2queries", quietly = TRUE)
 # weird namespace issue
 source("R/fix_binned_mzs.R")
 strat <- ifelse(test = .Platform$OS.type == "unix",
@@ -11,12 +8,10 @@ strat <- ifelse(test = .Platform$OS.type == "unix",
   no = "multisession"
 )
 future::plan(strategy = strat, workers = future::nbrOfWorkers())
-progressr::handlers(
-  progressr::handler_txtprogressbar(
-    enable = TRUE,
-    char = cli::col_yellow(cli::symbol$star)
-  )
-)
+progressr::handlers(progressr::handler_txtprogressbar(
+  enable = TRUE,
+  char = cli::col_yellow(cli::symbol$star)
+))
 
 paths <- "inst/paths.yaml" |>
   parse_yaml()
@@ -33,6 +28,7 @@ IONS_MAX <- params$misc$max_ions
 N_SKEL_MIN <- params$misc$min_n_skeleton
 N_SPEC_MIN <- params$misc$min_n_spectra
 SENSITIVITY_MIN <- params$misc$min_sensitivity
+SPECIFICITY_MIN <- params$misc$min_specificity
 ZERO_VAL <- params$misc$min_total_intensity
 
 message("Import the spectra and ensure they are normalized.")
@@ -41,7 +37,8 @@ mia_spectra <- paths$data$source$spectra$mia |>
   MsBackendMgf::readMgf() |>
   Spectra::Spectra() |>
   Spectra::filterMsLevel(2L) |>
-  Spectra::reduceSpectra() |>
+  Spectra::reduceSpectra(tolerance = DALTON) |>
+  Spectra::deisotopeSpectra(tolerance = DALTON) |>
   Spectra::addProcessing(normalize_peaks()) |>
   Spectra::filterIntensity(intensity = c(INTENSITY_MIN, Inf)) |>
   Spectra::applyProcessing()
@@ -65,6 +62,8 @@ mia_spectra_nl <- mia_spectra_w |>
     msLevel = 2L,
     tolerance = DALTON
   )) |>
+  Spectra::reduceSpectra(tolerance = DALTON) |>
+  Spectra::deisotopeSpectra(tolerance = DALTON) |>
   Spectra::applyProcessing()
 mia_spectra_w_nl <- mia_spectra_nl |>
   harmonize_mzs(dalton = DALTON)
@@ -86,7 +85,11 @@ spectra_mat <- mia_spectra_binned |>
   filter_matrix(n = N_SPEC_MIN)
 message("Fixing mzs")
 spectra_mat <- spectra_mat |>
-  fix_binned_mzs(original_mzs = mia_spectra_w, decimals = DECIMALS, dalton = DALTON)
+  fix_binned_mzs(
+    original_mzs = mia_spectra_w,
+    decimals = DECIMALS,
+    dalton = DALTON
+  )
 rm(mia_spectra_binned)
 
 mia_spectra_binned_nl <- mia_spectra_w_nl |>
@@ -98,7 +101,11 @@ spectra_nl_mat <- mia_spectra_binned_nl |>
   filter_matrix(n = N_SPEC_MIN)
 message("Fixing mzs")
 spectra_nl_mat <- spectra_nl_mat |>
-  fix_binned_mzs(original_mzs = mia_spectra_w_nl, decimals = DECIMALS, dalton = DALTON)
+  fix_binned_mzs(
+    original_mzs = mia_spectra_w_nl,
+    decimals = DECIMALS,
+    dalton = DALTON
+  )
 rm(mia_spectra_binned_nl)
 
 message("Create a matrix containing fragments and neutral losses.")
@@ -113,16 +120,13 @@ tmp <- merged_mat |>
   tibble::rownames_to_column(var = "group")
 rownames(merged_mat) <- tmp$group
 colnames(merged_mat) <-
-  c(
-    paste0(round(
-      colnames(spectra_mat) |>
-        as.numeric(), DECIMALS
-    ), "_frag"),
-    paste0(round(
-      colnames(spectra_nl_mat) |>
-        as.numeric(), DECIMALS
-    ), "_nl")
-  )
+  c(paste0(round(
+    colnames(spectra_mat) |>
+      as.numeric(), DECIMALS
+  ), "_frag"), paste0(round(
+    colnames(spectra_nl_mat) |>
+      as.numeric(), DECIMALS
+  ), "_nl"))
 
 message("Count the number of members per skeleton and pivot the matrix.")
 ions_table <- merged_mat |>
@@ -138,9 +142,10 @@ ions_table <- merged_mat |>
   tidytable::pivot_longer(cols = !starts_with("group"), names_to = "ion") |>
   tidytable::filter(value != 0)
 
-message("Extract the top ", IONS_MAX, " ions to perform a query.")
+message("Extract the best ions to perform a query.")
 # Calculate the sensitivity (and specificity) of the features.
-# Filter only features which sensitivity is at least `SENSITIVITY`.
+# Filter only features which sensitivity is at least `SENSITIVITY_MIN`.
+# Filter only features which specificity is at least `SPECIFICITY_MIN`.
 # Filter only ions occurring in at least `N_SPEC_MIN` spectra.
 # Filter only groups with at least `N_SKEL_MIN` spectra.
 ions_table_filtered <- ions_table |>
@@ -153,20 +158,18 @@ ions_table_filtered <- ions_table |>
   tidytable::select(-value) |>
   tidytable::distinct() |>
   tidytable::filter(count_per_ion >= N_SPEC_MIN) |>
+  tidytable::filter(group_count >= N_SKEL_MIN) |>
   tidytable::mutate(
     ratio_inter = count_per_ion_per_group / count_per_ion,
     ratio_intra = count_per_ion_per_group / group_count
   ) |>
-  tidytable::mutate(ratio = ratio_intra / ratio_inter) |>
+  tidytable::filter(ratio_inter >= SPECIFICITY_MIN) |>
   tidytable::filter(ratio_intra >= SENSITIVITY_MIN) |>
-  tidytable::arrange(tidytable::desc(ratio)) |>
-  tidytable::arrange(tidytable::desc(ratio_inter)) |>
-  tidytable::group_by(group) |>
-  tidytable::slice_head(
-    n = IONS_MAX,
-  ) |>
-  tidytable::ungroup() |>
-  tidytable::filter(group_count >= N_SKEL_MIN) |>
+  # tidytable::arrange(tidytable::desc(ratio_intra)) |>
+  # tidytable::arrange(tidytable::desc(ratio_inter)) |>
+  # tidytable::group_by(group) |>
+  # tidytable::slice_head(n = IONS_MAX) |>
+  # tidytable::ungroup() |>
   tidytable::mutate(value = 1)
 
 # Pivot back again.
@@ -194,16 +197,14 @@ best_queries <- seq_along(ions_list) |>
     FUN = function(x) {
       message("Generate all combinations of queries.")
       combinations <-
-        generate_combinations(x = ions_list[[x]])
+        generate_combinations(x = ions_list[[x]], max_ions = IONS_MAX)
+
       names(combinations) <-
         rep(names(ions_list)[x], length(combinations))
 
-      # Test the query.
+      message("Test the queries.")
       queries_results <- seq_along(1:length(combinations)) |>
-        perform_list_of_queries_progress(
-          ions_list = combinations,
-          spectra = mia_spectra
-        ) |>
+        perform_list_of_queries_progress(ions_list = combinations, spectra = mia_spectra) |>
         progressr::with_progress()
       names(queries_results) <-
         rep(names(ions_list)[x], length(combinations))
