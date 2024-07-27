@@ -16,7 +16,7 @@ misc:
   #' The minimal sensitivity. FLOAT
   min_sensitivity: 0.65
   #' The minimal specificity. FLOAT
-  min_specificity: 0.10
+  min_specificity: 0.20
 
 #' MS related parameters.
 ms:
@@ -30,7 +30,7 @@ ms:
   tolerances:
     #' For mass.
     mass:
-      #' Absolute in Dalton.
-      dalton:
-        #' Absolute mass tolerance for MS2 in Dalton. FLOAT
-        ms2: 0.02
+      #' Absolute mass tolerance for MS2 in Dalton. FLOAT
+      dalton: 0.005
+      #' Relative mass tolerance for MS2 in ppm. FLOAT
+      ppm: 20
