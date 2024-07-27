@@ -4,7 +4,7 @@
 \alias{harmonize_mzs}
 \title{Title}
 \usage{
-harmonize_mzs(spectra, dalton)
+harmonize_mzs(spectra, dalton, ppm)
 }
 \arguments{
 \item{spectra}{Spectra}

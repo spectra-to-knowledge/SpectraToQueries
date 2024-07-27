@@ -7,11 +7,11 @@
 #' @export
 #'
 #' @examples NULL
-harmonize_mzs <- function(spectra, dalton) {
+harmonize_mzs <- function(spectra, dalton, ppm) {
   spectra_new <- spectra
   averaged_intensities <- spectra_new |>
     Spectra::peaksData() |>
-    Spectra::combinePeaksData(tolerance = dalton, peaks = "union") |>
+    Spectra::combinePeaksData(tolerance = dalton, ppm = PPM, peaks = "union") |>
     data.frame() |>
     tidytable::pull("mz")
   for (i in seq_along(1:length(spectra_new))) {

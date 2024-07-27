@@ -21,12 +21,13 @@ params <- "inst/params.yaml" |>
 message("Loading parameters")
 mc.cores <- parallel::detectCores()
 BETA <- params$misc$beta
-DALTON <- params$ms$tolerances$mass$dalton$ms2
+DALTON <- params$ms$tolerances$mass$dalton
 DECIMALS <- params$misc$decimals
 INTENSITY_MIN <- params$ms$thresholds$ms2$intensity
 IONS_MAX <- params$misc$max_ions
 N_SKEL_MIN <- params$misc$min_n_skeleton
 N_SPEC_MIN <- params$misc$min_n_spectra
+PPM <- params$ms$tolerances$mass$ppm
 SENSITIVITY_MIN <- params$misc$min_sensitivity
 SPECIFICITY_MIN <- params$misc$min_specificity
 ZERO_VAL <- params$misc$min_total_intensity
@@ -35,10 +36,18 @@ message("Import the spectra and ensure they are normalized.")
 message("Cut the fragments lower than ", INTENSITY_MIN, " off.")
 mia_spectra <- paths$data$source$spectra$mia |>
   MsBackendMgf::readMgf() |>
-  Spectra::Spectra() |>
+  Spectra::Spectra()
+mia_spectra_1 <- mia_spectra |>
   Spectra::filterMsLevel(2L) |>
-  Spectra::reduceSpectra(tolerance = DALTON) |>
-  Spectra::deisotopeSpectra(tolerance = DALTON) |>
+  Spectra::reduceSpectra(tolerance = DALTON, ppm = PPM) |>
+  Spectra::combineSpectra(f = mia_spectra$TITLE) |>
+  Spectra::deisotopeSpectra(tolerance = DALTON, ppm = PPM) |>
+  Spectra::filterPrecursorPeaks(
+    tolerance = DALTON,
+    ppm = PPM,
+    mz = ">="
+  ) |>
+  Spectra::filterEmptySpectra() |>
   Spectra::addProcessing(normalize_peaks()) |>
   Spectra::filterIntensity(intensity = c(INTENSITY_MIN, Inf)) |>
   Spectra::applyProcessing()
@@ -46,30 +55,48 @@ mia_spectra <- paths$data$source$spectra$mia |>
 message(
   "Harmonize m/z values across spectra, given ",
   DALTON,
-  " tolerance."
+  " Da or ",
+  PPM,
+  " ppm tolerance."
 )
 mia_spectra@backend@spectraData$precursorMz <-
   mia_spectra@backend@spectraData$PRECURSOR_MZ |>
   as.numeric()
 mia_spectra_w <- mia_spectra |>
-  harmonize_mzs(dalton = DALTON)
+  harmonize_mzs(dalton = DALTON, ppm = PPM)
 
-message("Calculate neutral losses, given ", DALTON, " tolerance.")
+message(
+  "Calculate neutral losses, given ",
+  DALTON,
+  " Da or ",
+  PPM,
+  " ppm tolerance."
+)
 message("Remove the ones above the precursor.")
 mia_spectra_nl <- mia_spectra_w |>
   Spectra::neutralLoss(Spectra::PrecursorMzParam(
     filterPeaks = c("abovePrecursor"),
     msLevel = 2L,
-    tolerance = DALTON
+    tolerance = DALTON,
+    ppm = PPM
   )) |>
-  Spectra::reduceSpectra(tolerance = DALTON) |>
-  Spectra::deisotopeSpectra(tolerance = DALTON) |>
+  Spectra::reduceSpectra(tolerance = DALTON, ppm = PPM) |>
+  Spectra::combineSpectra(f = mia_spectra$TITLE) |>
+  Spectra::deisotopeSpectra(tolerance = DALTON, ppm = PPM) |>
+  Spectra::filterPrecursorPeaks(
+    tolerance = DALTON,
+    ppm = PPM,
+    mz = ">="
+  ) |>
+  Spectra::filterEmptySpectra() |>
+  Spectra::addProcessing(normalize_peaks()) |>
+  Spectra::filterIntensity(intensity = c(INTENSITY_MIN, Inf)) |>
   Spectra::applyProcessing()
 mia_spectra_w_nl <- mia_spectra_nl |>
-  harmonize_mzs(dalton = DALTON)
+  harmonize_mzs(dalton = DALTON, ppm = PPM)
 
 message("Bin spectra to get a matrix.")
-message("The window is ", DALTON, ".")
+message("The window is ", DALTON, " Da or ", PPM, " ppm tolerance.")
 mia_spectra_binned <- mia_spectra_w |>
   Spectra::bin(binSize = DALTON, zero.rm = FALSE) |>
   Spectra::applyProcessing()

@@ -14,6 +14,7 @@ perform_query <- function(spectra, frags, nls) {
       Spectra::containsMz(
         mz = frags,
         tolerance = DALTON,
+        ppm = PPM,
         which = "all"
       )]
   }
@@ -25,7 +26,8 @@ perform_query <- function(spectra, frags, nls) {
           spectra <- spectra[spectra |>
             Spectra::containsNeutralLoss(
               neutralLoss = nl,
-              tolerance = DALTON
+              tolerance = DALTON,
+              ppm = PPM
             )]
         }
       }
