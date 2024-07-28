@@ -6,17 +6,19 @@ misc:
   #' The number of decimals to keep. INTEGER
   decimals: 4
   #' The maximal number of ions in a query. INTEGER
-  max_ions: 5
+  max_ions: 10
   #' The minimal number of spectra per skeleton. INTEGER
   min_n_skeleton: 5
   #' The minimal number of spectra per fragment. INTEGER
   min_n_spectra: 3
   #' The minimal total intensity of the ions to keep them in the matrix. INTEGER
   min_total_intensity: 0
+  #' The minimal product between sensitivity and specificity. FLOAT
+  min_sensspe: 0.1
   #' The minimal sensitivity. FLOAT
-  min_sensitivity: 0.65
+  min_sensitivity: 0.3
   #' The minimal specificity. FLOAT
-  min_specificity: 0.20
+  min_specificity: 0
 
 #' MS related parameters.
 ms:
@@ -31,6 +33,6 @@ ms:
     #' For mass.
     mass:
       #' Absolute mass tolerance for MS2 in Dalton. FLOAT
-      dalton: 0.005
+      dalton: 0.01
       #' Relative mass tolerance for MS2 in ppm. FLOAT
-      ppm: 20
+      ppm: 25
