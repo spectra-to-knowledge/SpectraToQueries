@@ -28,6 +28,7 @@ IONS_MAX <- params$misc$max_ions
 N_SKEL_MIN <- params$misc$min_n_skeleton
 N_SPEC_MIN <- params$misc$min_n_spectra
 PPM <- params$ms$tolerances$mass$ppm
+SENSPE_MIN <- params$misc$min_sensspe
 SENSITIVITY_MIN <- params$misc$min_sensitivity
 SPECIFICITY_MIN <- params$misc$min_specificity
 ZERO_VAL <- params$misc$min_total_intensity
@@ -175,7 +176,7 @@ message("Extract the best ions to perform a query.")
 # Filter only features which specificity is at least `SPECIFICITY_MIN`.
 # Filter only ions occurring in at least `N_SPEC_MIN` spectra.
 # Filter only groups with at least `N_SKEL_MIN` spectra.
-ions_table_filtered <- ions_table |>
+ions_table_filtered_1 <- ions_table |>
   tidytable::group_by(ion) |>
   tidytable::add_count(name = "count_per_ion") |>
   tidytable::ungroup() |>
@@ -192,15 +193,13 @@ ions_table_filtered <- ions_table |>
   ) |>
   tidytable::filter(ratio_inter >= SPECIFICITY_MIN) |>
   tidytable::filter(ratio_intra >= SENSITIVITY_MIN) |>
-  # tidytable::arrange(tidytable::desc(ratio_intra)) |>
-  # tidytable::arrange(tidytable::desc(ratio_inter)) |>
-  # tidytable::group_by(group) |>
-  # tidytable::slice_head(n = IONS_MAX) |>
-  # tidytable::ungroup() |>
+  tidytable::mutate(senspe = ratio_intra * ratio_inter) |> 
+  tidytable::arrange(tidytable::desc(senspe)) |>
+  tidytable::filter(senspe >= SENSPE_MIN | ratio_intra==1) |>
   tidytable::mutate(value = 1)
 
-# Pivot back again.
-ions_table_final <- ions_table_filtered |>
+ions_table_diagnostic <- ions_table_filtered_1 |> 
+  tidytable::filter(ratio_intra==1) |>
   tidytable::distinct(group, ion, value) |>
   tidytable::pivot_wider(
     names_from = ion,
@@ -208,8 +207,28 @@ ions_table_final <- ions_table_filtered |>
     values_fn = mean
   ) |>
   tibble::column_to_rownames("group")
+  
+# Pivot back again.
+ions_table_final <- ions_table_filtered_1 |>
+  tidytable::group_by(group) |>
+  tidytable::filter(senspe >= SENSPE_MIN & ratio_intra != 1) |>
+  tidytable::slice_head(n = IONS_MAX) |>
+  tidytable::ungroup() |>
+  tidytable::distinct(group, ion, value) |>
+  tidytable::pivot_wider(names_from = ion,
+                         values_from = value,
+                         values_fn = mean) |>
+  tibble::column_to_rownames("group")
 
 # Extract the matching ions per skeleton.
+ions_list_diagnostic <-
+  apply(
+    X = ions_table_diagnostic[, 1:ncol(ions_table_diagnostic)],
+    MARGIN = 1,
+    FUN = function(x) {
+      names(which(x > 0))
+    }
+  )
 ions_list <-
   apply(
     X = ions_table_final[, 1:ncol(ions_table_final)],
@@ -219,22 +238,26 @@ ions_list <-
     }
   )
 
-best_queries <- seq_along(ions_list) |>
+best_queries <- names(ions_list) |>
   lapply(
     FUN = function(x) {
       message("Generate all combinations of queries.")
-      combinations <-
-        generate_combinations(x = ions_list[[x]], max_ions = IONS_MAX)
+      combinations_1 <-
+        generate_combinations(x = ions_list[[x]], max_ions = IONS_MAX) |> 
+        append(NA_character_)
+      
+      combinations <- combinations_1 |> 
+        lapply(FUN = function(c){na.omit(c(ions_list_diagnostic[[x]],c))})
 
       names(combinations) <-
-        rep(names(ions_list)[x], length(combinations))
+        rep(x, length(combinations))
 
       message("Test the queries.")
       queries_results <- seq_along(1:length(combinations)) |>
         perform_list_of_queries_progress(ions_list = combinations, spectra = mia_spectra) |>
         progressr::with_progress()
       names(queries_results) <-
-        rep(names(ions_list)[x], length(combinations))
+        rep(x, length(combinations))
 
       message("Evaluate the performance of the query based on F-score.")
       results_stats <- seq_along(1:length(queries_results)) |>
@@ -263,7 +286,7 @@ best_queries <- seq_along(ions_list) |>
           }
         )
 
-      message("Finished evaluating the query for ", names(ions_list)[x])
+      message("Finished evaluating the query for ", x)
       message("Extract the best query (with ties) based on its F-score.")
       return(
         data.frame(
