@@ -14,7 +14,7 @@ data:
       path: data/source/spectra
       mia: data/source/spectra/export_traitement_python_matchms-squelettes-tries-normalized.mgf
       # mia: data/source/spectra/MIADB-monomers.mgf
-      # mia: data/source/spectra/export_traitement_python_matchms-squelettes-tries-new.mgf
+      # mia: data/source/spectra/export_traitement_python_matchms-squelettes-tries-grouped.mgf
       # mia: data/source/spectra/export_traitement_python_matchms-squelettes-tries.mgf
 inst:
   path: inst
