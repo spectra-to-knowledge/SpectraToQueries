@@ -273,12 +273,8 @@ best_queries <- names(ions_list) |>
                 replacement = ".",
                 fixed = TRUE
               ) == names(queries_results)[result]]) - tp
-            tpfn <- tp + fn
-            tpfp <- tp + fp
-            recall <- tp / tpfn
-            precision <- tp / tpfp
-            rxp <- recall * precision
-            rpp <- recall + precision
+            recall <- tp / (tp + fn)
+            precision <- tp / (tp + fp)
             f_beta <-
               (1 + BETA^2) * (precision * recall) / ((precision * BETA^
                 2) + recall)
