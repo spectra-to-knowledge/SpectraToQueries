@@ -193,13 +193,13 @@ ions_table_filtered_1 <- ions_table |>
   ) |>
   tidytable::filter(ratio_inter >= SPECIFICITY_MIN) |>
   tidytable::filter(ratio_intra >= SENSITIVITY_MIN) |>
-  tidytable::mutate(senspe = ratio_intra * ratio_inter) |> 
+  tidytable::mutate(senspe = ratio_intra * ratio_inter) |>
   tidytable::arrange(tidytable::desc(senspe)) |>
-  tidytable::filter(senspe >= SENSPE_MIN | ratio_intra==1) |>
+  tidytable::filter(senspe >= SENSPE_MIN | ratio_intra == 1) |>
   tidytable::mutate(value = 1)
 
-ions_table_diagnostic <- ions_table_filtered_1 |> 
-  tidytable::filter(ratio_intra==1) |>
+ions_table_diagnostic <- ions_table_filtered_1 |>
+  tidytable::filter(ratio_intra == 1) |>
   tidytable::distinct(group, ion, value) |>
   tidytable::pivot_wider(
     names_from = ion,
@@ -207,7 +207,7 @@ ions_table_diagnostic <- ions_table_filtered_1 |>
     values_fn = mean
   ) |>
   tibble::column_to_rownames("group")
-  
+
 # Pivot back again.
 ions_table_final <- ions_table_filtered_1 |>
   tidytable::group_by(group) |>
@@ -215,9 +215,11 @@ ions_table_final <- ions_table_filtered_1 |>
   tidytable::slice_head(n = IONS_MAX) |>
   tidytable::ungroup() |>
   tidytable::distinct(group, ion, value) |>
-  tidytable::pivot_wider(names_from = ion,
-                         values_from = value,
-                         values_fn = mean) |>
+  tidytable::pivot_wider(
+    names_from = ion,
+    values_from = value,
+    values_fn = mean
+  ) |>
   tibble::column_to_rownames("group")
 
 # Extract the matching ions per skeleton.
@@ -243,11 +245,13 @@ best_queries <- names(ions_list) |>
     FUN = function(x) {
       message("Generate all combinations of queries.")
       combinations_1 <-
-        generate_combinations(x = ions_list[[x]], max_ions = IONS_MAX) |> 
+        generate_combinations(x = ions_list[[x]], max_ions = IONS_MAX) |>
         append(NA_character_)
-      
-      combinations <- combinations_1 |> 
-        lapply(FUN = function(c){na.omit(c(ions_list_diagnostic[[x]],c))})
+
+      combinations <- combinations_1 |>
+        lapply(FUN = function(c) {
+          na.omit(c(ions_list_diagnostic[[x]], c))
+        })
 
       names(combinations) <-
         rep(x, length(combinations))
