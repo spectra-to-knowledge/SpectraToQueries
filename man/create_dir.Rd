@@ -3,6 +3,9 @@
 \name{create_dir}
 \alias{create_dir}
 \title{Create directory}
+\source{
+https://github.com/taxonomicallyinformedannotation/tima/blob/main/R/create_dir.R
+}
 \usage{
 create_dir(export)
 }
@@ -18,4 +21,5 @@ if it does not already exist.
 }
 \examples{
 create_dir(export = "path/to/directory_of_file")
+unlink("path", recursive = TRUE)
 }

@@ -2,9 +2,9 @@
 % Please edit documentation in R/perform_query.R
 \name{perform_query}
 \alias{perform_query}
-\title{Title}
+\title{Perform query}
 \usage{
-perform_query(spectra, frags, nls)
+perform_query(spectra, frags, nls, dalton = 0.01, ppm = 25)
 }
 \arguments{
 \item{spectra}{Spectra}
@@ -12,9 +12,13 @@ perform_query(spectra, frags, nls)
 \item{frags}{Fragments}
 
 \item{nls}{Neutral losses}
+
+\item{dalton}{Dalton}
+
+\item{ppm}{PPM}
 }
 \description{
-Title
+Perform query
 }
 \examples{
 NULL

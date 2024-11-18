@@ -2,7 +2,7 @@
 % Please edit documentation in R/generate_combinations.R
 \name{generate_combinations}
 \alias{generate_combinations}
-\title{Title}
+\title{Generate combinations}
 \usage{
 generate_combinations(x, max_ions)
 }
@@ -10,7 +10,7 @@ generate_combinations(x, max_ions)
 \item{x}{x}
 }
 \description{
-Title
+Generate combinations
 }
 \examples{
 NULL

@@ -1,4 +1,4 @@
-#' Title
+#' @title Fix binned mzs
 #'
 #' @param binned_m binned_matrix
 #' @param original_mzs original mzs
@@ -6,7 +6,6 @@
 #' @param decimals decimals
 #'
 #' @return NULL
-#' @export
 #'
 #' @examples NULL
 fix_binned_mzs <- function(binned_m, original_mzs, dalton, decimals) {
@@ -18,18 +17,16 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, decimals) {
 
   new_m <- binned_m
 
-  for (x in seq_along(1:ncol(new_m))) {
-    i <- colnames(new_m)[x]
+  new_colnames <- sapply(colnames(new_m), function(i) {
     val <- mean(all_mzs[abs(all_mzs - as.numeric(i)) <= dalton])
-    colnames(new_m)[x] <- ifelse(test = !is.nan(val),
-      yes = val,
-      no = i
-    )
-  }
+    if (!is.nan(val)) val else i
+  })
 
-  new_m_new <- new_m %>%
-    data.frame() %>%
-    tidytable::mutate(rowname = row.names(.)) |>
+  colnames(new_m) <- new_colnames
+
+  new_m_new <- new_m |>
+    data.frame() |>
+    tibble::rownames_to_column() |>
     tidytable::pivot_longer(
       cols = -rowname,
       names_to = "name",

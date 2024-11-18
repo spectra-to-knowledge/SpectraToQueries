@@ -2,7 +2,7 @@
 % Please edit documentation in R/fix_binned_mzs.R
 \name{fix_binned_mzs}
 \alias{fix_binned_mzs}
-\title{Title}
+\title{Fix binned mzs}
 \usage{
 fix_binned_mzs(binned_m, original_mzs, dalton, decimals)
 }
@@ -16,7 +16,7 @@ fix_binned_mzs(binned_m, original_mzs, dalton, decimals)
 \item{decimals}{decimals}
 }
 \description{
-Title
+Fix binned mzs
 }
 \examples{
 NULL

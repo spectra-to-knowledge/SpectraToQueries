@@ -1,7 +1,6 @@
-#' Title
+#' @title Normalize peaks
 #'
 #' @return NULL
-#' @export
 #'
 #' @examples NULL
 normalize_peaks <- function() {

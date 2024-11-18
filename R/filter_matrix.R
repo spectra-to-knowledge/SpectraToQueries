@@ -1,10 +1,9 @@
-#' Title
+#' @title Filter matrix
 #'
 #' @param matrix Matrix
 #' @param n N
 #'
 #' @return NULL
-#' @export
 #'
 #' @examples NULL
 filter_matrix <- function(matrix, n) {

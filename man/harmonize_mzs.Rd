@@ -2,7 +2,7 @@
 % Please edit documentation in R/harmonize_mzs.R
 \name{harmonize_mzs}
 \alias{harmonize_mzs}
-\title{Title}
+\title{Harmonize mzs}
 \usage{
 harmonize_mzs(spectra, dalton, ppm)
 }
@@ -10,9 +10,11 @@ harmonize_mzs(spectra, dalton, ppm)
 \item{spectra}{Spectra}
 
 \item{dalton}{Dalton}
+
+\item{ppm}{PPM}
 }
 \description{
-Title
+Harmonize mzs
 }
 \examples{
 NULL

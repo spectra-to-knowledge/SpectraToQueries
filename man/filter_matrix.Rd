@@ -2,7 +2,7 @@
 % Please edit documentation in R/filter_matrix.R
 \name{filter_matrix}
 \alias{filter_matrix}
-\title{Title}
+\title{Filter matrix}
 \usage{
 filter_matrix(matrix, n)
 }
@@ -12,7 +12,7 @@ filter_matrix(matrix, n)
 \item{n}{N}
 }
 \description{
-Title
+Filter matrix
 }
 \examples{
 NULL
