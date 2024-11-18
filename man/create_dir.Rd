@@ -19,7 +19,3 @@ Message indicating the status of directory creation
 This function creates a directory at the specified path
 if it does not already exist.
 }
-\examples{
-create_dir(export = "path/to/directory_of_file")
-unlink("path", recursive = TRUE)
-}

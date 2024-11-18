@@ -7,7 +7,11 @@
 perform_list_of_queries_progress(indices, ions_list, spectra)
 }
 \arguments{
-\item{xs}{}
+\item{indices}{Indices}
+
+\item{ions_list}{Ions list}
+
+\item{spectra}{Spectra}
 }
 \description{
 Perform list of queries (progress)

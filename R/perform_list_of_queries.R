@@ -37,7 +37,9 @@ perform_list_of_queries <- function(index, ions_list, spectra) {
 
 #' @title Perform list of queries (progress)
 #'
-#' @param xs
+#' @param indices Indices
+#' @param ions_list Ions list
+#' @param spectra Spectra
 #'
 #' @return NULL
 #'
