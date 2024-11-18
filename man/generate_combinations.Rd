@@ -9,7 +9,7 @@ generate_combinations(x, max_ions)
 \arguments{
 \item{x}{x}
 
-\item{max_ions}{MAx ions}
+\item{max_ions}{Max ions}
 }
 \description{
 Generate combinations
