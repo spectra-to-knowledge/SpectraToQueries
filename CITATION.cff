@@ -1,0 +1,39 @@
+# --------------------------------------------
+# CITATION file created with {cffr} R package
+# See also: https://docs.ropensci.org/cffr/
+# --------------------------------------------
+ 
+cff-version: 1.2.0
+message: 'To cite package "SpectraToQueries" in publications use:'
+type: software
+license: GPL-3.0-or-later
+title: 'SpectraToQueries: Repository to translate spectra to queries.'
+version: 0.0.0.9000
+abstract: SpectraToQueries provides the infrastructure to translate spectra to queries.
+authors:
+- family-names: Rutz
+  given-names: Adriano
+  email: adafede@gmail.com
+  orcid: https://orcid.org/0000-0003-0443-9902
+preferred-citation:
+  type: manual
+  title: 'SpectraToQueries: Repository to translate spectra to queries.'
+  authors:
+  - family-names: Rutz
+    given-names: Adriano
+    email: adafede@gmail.com
+    orcid: https://orcid.org/0000-0003-0443-9902
+  year: '2024'
+  notes: R package, version 0.0.9000
+repository: https://r-universe.dev
+repository-code: https://github.com/spectra-to-knowledge/SpectraToQueries
+url: https://github.com/spectra-to-knowledge/SpectraToQueries
+contact:
+- family-names: Rutz
+  given-names: Adriano
+  email: adafede@gmail.com
+  orcid: https://orcid.org/0000-0003-0443-9902
+keywords:
+- knowledge extraction
+- spectral information
+- querying system

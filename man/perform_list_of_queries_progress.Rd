@@ -2,7 +2,7 @@
 % Please edit documentation in R/perform_list_of_queries.R
 \name{perform_list_of_queries_progress}
 \alias{perform_list_of_queries_progress}
-\title{Title}
+\title{Perform list of queries (progress)}
 \usage{
 perform_list_of_queries_progress(indices, ions_list, spectra)
 }
@@ -10,7 +10,7 @@ perform_list_of_queries_progress(indices, ions_list, spectra)
 \item{xs}{}
 }
 \description{
-Title
+Perform list of queries (progress)
 }
 \examples{
 NULL

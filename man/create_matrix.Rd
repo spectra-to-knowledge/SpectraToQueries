@@ -2,9 +2,9 @@
 % Please edit documentation in R/create_matrix.R
 \name{create_matrix}
 \alias{create_matrix}
-\title{Title}
+\title{Create matrix}
 \usage{
-create_matrix(spectra, zero_val = ZERO_VAL, name)
+create_matrix(spectra, zero_val = 0, name)
 }
 \arguments{
 \item{spectra}{Spectra}
@@ -14,7 +14,7 @@ create_matrix(spectra, zero_val = ZERO_VAL, name)
 \item{name}{Name}
 }
 \description{
-Title
+Create matrix
 }
 \examples{
 NULL

@@ -1,20 +1,21 @@
-#' Title
+#' @title Perform query
 #'
 #' @param spectra Spectra
 #' @param frags Fragments
 #' @param nls Neutral losses
+#' @param dalton Dalton
+#' @param ppm PPM
 #'
 #' @return NULL
-#' @export
 #'
 #' @examples NULL
-perform_query <- function(spectra, frags, nls) {
+perform_query <- function(spectra, frags, nls, dalton = 0.01, ppm = 25) {
   if (length(frags) != 0) {
     spectra <- spectra[spectra |>
       Spectra::containsMz(
         mz = frags,
-        tolerance = DALTON,
-        ppm = PPM,
+        tolerance = dalton,
+        ppm = ppm,
         which = "all"
       )]
   }
@@ -26,8 +27,8 @@ perform_query <- function(spectra, frags, nls) {
           spectra <- spectra[spectra |>
             Spectra::containsNeutralLoss(
               neutralLoss = nl,
-              tolerance = DALTON,
-              ppm = PPM
+              tolerance = dalton,
+              ppm = ppm
             )]
         }
       }

@@ -1,9 +1,8 @@
-#' Title
+#' @title Generate combinations
 #'
 #' @param x x
 #'
 #' @return NULL
-#' @export
 #'
 #' @examples NULL
 generate_combinations <- function(x, max_ions) {
@@ -13,5 +12,5 @@ generate_combinations <- function(x, max_ions) {
         combn(x, k, simplify = FALSE)
       }
     ) |>
-    purrr::flatten()
+    unlist(recursive = FALSE)
 }

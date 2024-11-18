@@ -2,7 +2,7 @@
 % Please edit documentation in R/perform_list_of_queries.R
 \name{perform_list_of_queries}
 \alias{perform_list_of_queries}
-\title{Title}
+\title{Perform list of queries}
 \usage{
 perform_list_of_queries(index, ions_list, spectra)
 }
@@ -14,7 +14,7 @@ perform_list_of_queries(index, ions_list, spectra)
 \item{spectra}{Spectra}
 }
 \description{
-Title
+Perform list of queries
 }
 \examples{
 NULL

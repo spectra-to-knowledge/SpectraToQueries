@@ -2,12 +2,12 @@
 % Please edit documentation in R/normalize_peaks.R
 \name{normalize_peaks}
 \alias{normalize_peaks}
-\title{Title}
+\title{Normalize peaks}
 \usage{
 normalize_peaks()
 }
 \description{
-Title
+Normalize peaks
 }
 \examples{
 NULL

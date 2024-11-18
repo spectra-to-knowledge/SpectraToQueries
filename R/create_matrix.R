@@ -1,14 +1,13 @@
-#' Title
+#' @title Create matrix
 #'
 #' @param spectra Spectra
 #' @param zero_val Zero value
 #' @param name Name
 #'
 #' @return NULL
-#' @export
 #'
 #' @examples NULL
-create_matrix <- function(spectra, zero_val = ZERO_VAL, name) {
+create_matrix <- function(spectra, zero_val = 0, name) {
   spectra_mat <- do.call(
     BiocGenerics::rbind,
     Spectra::intensity(spectra) |>
