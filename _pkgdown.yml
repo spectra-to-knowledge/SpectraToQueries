@@ -1,0 +1,19 @@
+---
+home:
+  title: SpectraToQueries provides the infrastructure to translate spectra to queries
+  description: SpectraToQueries provides the infrastructure to translate spectra to queries
+
+figure:
+  fig.ext: svg
+
+template:
+  bootstrap: 5
+  light-switch: true
+  opengraph:
+    image:
+      src: man/figures/logo.svg
+      alt: "SpectraToQueries"
+    twitter:
+      creator: "@adafede"
+
+url: https://spectra-to-knowledge.github.io/SpectraToQueries
