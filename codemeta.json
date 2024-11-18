@@ -105,7 +105,7 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocGenerics",
       "name": "BiocGenerics",
-      "version": ">= 0.52.0",
+      "version": ">= 0.48.1",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -131,7 +131,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
-      "version": ">= 1.14.0",
+      "version": ">= 1.10.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -157,7 +157,7 @@
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
-      "version": ">= 1.16.0",
+      "version": ">= 1.12.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -195,7 +195,7 @@
     "SystemRequirements": null
   },
   "keywords": ["knowledgeextraction", "spectralinformation", "queryingsystem"],
-  "fileSize": "67.297KB",
+  "fileSize": "66.874KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

@@ -255,78 +255,68 @@ spectra_to_queries <- function(spectra = NULL,
       }
     )
 
-  best_queries <- names(ions_list) |>
-    lapply(
-      FUN = function(x, beta) {
-        message("Generate all combinations of queries.")
+  message("Generate all combinations of queries.")
+  combinations <- names(ions_list) |>
+    furrr::future_map(
+      .f = function(x, ions_list, max_ions) {
         combinations_1 <-
-          generate_combinations(x = ions_list[[x]], max_ions = ions_max) |>
-          append(NA_character_)
+          generate_combinations(x = ions_list[[x]], max_ions = max_ions)
+      },
+      ions_list = ions_list,
+      max_ions = ions_max
+    )
+  names(combinations) <- names(ions_list)
 
-        combinations <- combinations_1 |>
-          lapply(
-            FUN = function(c) {
-              na.omit(c(ions_list_diagnostic[[x]], c))
-            }
-          )
+  all_combinations <- combinations |>
+    unlist(recursive = FALSE)
+  names(all_combinations) <- names(all_combinations) |>
+    gsub(pattern = "\\d", replacement = "")
 
-        names(combinations) <-
-          rep(x, length(combinations))
+  message("Test the queries.")
+  queries_results <- seq_along(all_combinations) |>
+    perform_list_of_queries_progress(ions_list = all_combinations, spectra = mia_spectra) |>
+    progressr::with_progress(enable = TRUE)
+  names(queries_results) <- names(all_combinations)
 
-        message("Test the queries.")
-        queries_results <- seq_along(seq_along(combinations)) |>
-          perform_list_of_queries_progress(ions_list = combinations, spectra = mia_spectra) |>
-          progressr::with_progress()
-        names(queries_results) <-
-          rep(x, length(combinations))
-
-        message("Evaluate the performance of the query based on F-score.")
-        results_stats <- seq_along(seq_along(queries_results)) |>
-          lapply(
-            FUN = function(result, beta) {
-              tp <- nrow(queries_results[[result]] |>
-                tidytable::filter(target == value))
-              fp <- nrow(queries_results[[result]] |>
-                tidytable::filter(target != value))
-              fn <-
-                length(mia_spectra$SKELETON[mia_spectra$SKELETON |> gsub(
-                  pattern = "+",
-                  replacement = ".",
-                  fixed = TRUE
-                ) == names(queries_results)[result]]) - tp
-              recall <- tp / (tp + fn)
-              precision <- tp / (tp + fp)
-              f_beta <-
-                (1 + beta^2) * (precision * recall) / ((precision * beta^
-                  2) + recall)
-              return(round(f_beta, decimals))
-            },
-            beta = beta
-          )
-
-        message("Finished evaluating the query for ", x)
-        message("Extract the best query (with ties) based on its F-score.")
-        return(
-          data.frame(
-            skeleton = names(combinations),
-            fscore = c(results_stats |> as.character()),
-            ions = I(combinations)
-          ) |>
-            tidytable::bind_rows() |>
-            tidytable::filter(fscore != NaN) |>
-            tidytable::arrange(tidytable::desc(fscore)) |>
-            tidytable::mutate(id = match(fscore, unique(fscore))) |>
-            tidytable::filter(id == 1) |>
-            tidytable::select(-id)
-        )
+  message("Evaluate the performance of the query based on F-score.")
+  results_stats <- seq_along(queries_results) |>
+    furrr::future_map(
+      .f = function(result, beta) {
+        tp <- nrow(queries_results[[result]] |>
+          tidytable::filter(target == value))
+        fp <- nrow(queries_results[[result]] |>
+          tidytable::filter(target != value))
+        fn <-
+          length(mia_spectra$SKELETON[mia_spectra$SKELETON |> gsub(
+            pattern = "+",
+            replacement = ".",
+            fixed = TRUE
+          ) == names(queries_results)[result]]) - tp
+        recall <- tp / (tp + fn)
+        precision <- tp / (tp + fp)
+        f_beta <-
+          (1 + beta^2) * (precision * recall) / ((precision * beta^
+            2) + recall)
+        return(round(f_beta, decimals))
       },
       beta = beta
     )
 
+  best_queries <- data.frame(
+    skeleton = names(all_combinations),
+    fscore = c(results_stats |> as.character()),
+    ions = I(all_combinations)
+  ) |>
+    tidytable::filter(fscore != NaN) |>
+    tidytable::arrange(tidytable::desc(fscore)) |>
+    tidytable::group_by(skeleton) |>
+    tidytable::mutate(id = match(fscore, unique(fscore))) |>
+    tidytable::filter(id == 1) |>
+    tidytable::select(-id)
+
   message("Export the best queries for further use.")
   create_dir(export)
   best_queries |>
-    tidytable::bind_rows() |>
     tidytable::arrange(tidytable::desc(fscore)) |>
     tidytable::fwrite(file = export, sep = "\t")
 }
