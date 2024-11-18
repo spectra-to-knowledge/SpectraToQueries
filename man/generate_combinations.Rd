@@ -8,6 +8,8 @@ generate_combinations(x, max_ions)
 }
 \arguments{
 \item{x}{x}
+
+\item{max_ions}{MAx ions}
 }
 \description{
 Generate combinations

@@ -8,9 +8,6 @@
 #' @return Message indicating the status of directory creation
 #'
 #' @source https://github.com/taxonomicallyinformedannotation/tima/blob/main/R/create_dir.R
-#'
-#' @examples create_dir(export = "path/to/directory_of_file")
-#' unlink("path", recursive = TRUE)
 create_dir <- function(export) {
   ## Check if the export path includes a file name
   if (grepl(
