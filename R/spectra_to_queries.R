@@ -37,14 +37,20 @@ spectra_to_queries <- function(spectra = NULL,
                                specificity_min = 0L,
                                zero_val = 0L) {
   if (is.null(spectra)) {
-    spectra <- "data/source/spectra/export_traitement_python_matchms-squelettes-tries.mgf"
+    message("No spectra given, loading example spectra.")
+    mia_spectra <- readRDS(system.file("extdata", "spectra.rds", package = "SpectraToQueries"))
+  } else {
+    message("Loading spectra.")
+    mia_spectra <- spectra |>
+      MsBackendMgf::readMgf() |>
+      Spectra::Spectra()
   }
 
-  message("Import the spectra and ensure they are normalized.")
-  message("Cut the fragments lower than ", intensity_min, " off.")
-  mia_spectra <- spectra |>
-    MsBackendMgf::readMgf() |>
-    Spectra::Spectra()
+  message(
+    "Cut the fragments lower than ",
+    intensity_min,
+    " and rough preprocessing"
+  )
   mia_spectra_1 <- mia_spectra |>
     Spectra::filterMsLevel(2L) |>
     Spectra::reduceSpectra(tolerance = dalton, ppm = ppm) |>
