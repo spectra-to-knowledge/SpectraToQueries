@@ -26,25 +26,19 @@ perform_query <- function(spectra,
 
   # Return early if spectra is empty after filtering
   if (length(spectra) == 0) {
-    # message("Remaining spectra empty, very early return")
     return(spectra)
   }
 
   if (length(nls) > 0) {
-    # TODO report issue not taking "all" argument for now
-    for (nl in nls) {
-      spectra <- spectra[Spectra::containsNeutralLoss(
-        spectra,
-        neutralLoss = nl,
-        tolerance = dalton,
-        ppm = ppm
-      )]
-      # Return early if spectra becomes empty during the loop
-      if (length(spectra) == 0) {
-        # message("Remaining spectra empty, early return")
-        return(spectra)
-      }
-    }
+    spectra <- spectra[Spectra::containsMz(
+      spectra,
+      mz = (Spectra::precursorMz(spectra) - nls) |>
+        unique() |>
+        sort(),
+      tolerance = dalton,
+      ppm = ppm,
+      which = "all"
+    )]
   }
   return(spectra)
 }

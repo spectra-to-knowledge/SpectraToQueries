@@ -31,20 +31,28 @@ spectra_to_queries <- function(spectra = NULL,
                                ions_max = 10L,
                                n_skel_min = 5L,
                                n_spec_min = 3L,
-                               ppm = 25L,
+                               ppm = 20L,
                                senspe_min = 0.1,
-                               sensitivity_min = 0.3,
+                               sensitivity_min = 0L,
                                specificity_min = 0L,
                                zero_val = 0L) {
   if (is.null(spectra)) {
     message("No spectra given, loading example spectra.")
     mia_spectra <- readRDS(system.file("extdata", "spectra.rds", package = "SpectraToQueries"))
   } else {
-    message("Loading spectra.")
-    mia_spectra <- spectra |>
-      MsBackendMgf::readMgf() |>
-      Spectra::Spectra()
+    if (spectra == system.file("extdata", "spectra_grouped.rds", package = "SpectraToQueries")) {
+      message("Loading grouped spectra.")
+      mia_spectra <- readRDS(spectra)
+    } else {
+      message("Loading spectra.")
+      mia_spectra <- spectra |>
+        MsBackendMgf::readMgf() |>
+        Spectra::Spectra()
+    }
   }
+  mia_spectra@backend@spectraData$precursorMz <-
+    mia_spectra@backend@spectraData$PRECURSOR_MZ |>
+    as.numeric()
 
   message(
     "Cut the fragments lower than ",
@@ -73,9 +81,6 @@ spectra_to_queries <- function(spectra = NULL,
     ppm,
     " ppm tolerance."
   )
-  mia_spectra@backend@spectraData$precursorMz <-
-    mia_spectra@backend@spectraData$PRECURSOR_MZ |>
-    as.numeric()
   mia_spectra_w <- mia_spectra_1 |>
     harmonize_mzs(dalton = dalton, ppm = ppm)
 
@@ -112,7 +117,7 @@ spectra_to_queries <- function(spectra = NULL,
     harmonize_mzs(dalton = dalton, ppm = ppm)
 
   message("Bin spectra to get a matrix.")
-  message("The window is ", dalton, " Da or ", ppm, " ppm tolerance.")
+  message("The window is ", dalton, " Dalton")
   mia_spectra_binned <- mia_spectra_w |>
     Spectra::bin(binSize = dalton, zero.rm = FALSE) |>
     Spectra::applyProcessing()
@@ -126,12 +131,13 @@ spectra_to_queries <- function(spectra = NULL,
   spectra_mat <- mia_spectra_binned |>
     create_matrix(name = mia_spectra_binned$SKELETON) |>
     filter_matrix(n = n_spec_min)
-  message("Fixing mzs")
+  message("Fixing mzs (fragments)")
   spectra_mat <- spectra_mat |>
     fix_binned_mzs(
       original_mzs = mia_spectra_w,
       decimals = decimals,
-      dalton = dalton
+      dalton = dalton,
+      ppm = ppm
     )
   rm(mia_spectra_binned)
 
@@ -142,12 +148,13 @@ spectra_to_queries <- function(spectra = NULL,
   spectra_nl_mat <- mia_spectra_binned_nl |>
     create_matrix(name = mia_spectra_binned_nl$SKELETON) |>
     filter_matrix(n = n_spec_min)
-  message("Fixing mzs")
+  message("Fixing mzs (losses)")
   spectra_nl_mat <- spectra_nl_mat |>
     fix_binned_mzs(
       original_mzs = mia_spectra_w_nl,
       decimals = decimals,
-      dalton = dalton
+      dalton = dalton,
+      ppm = ppm
     )
   rm(mia_spectra_binned_nl)
 
@@ -268,7 +275,12 @@ spectra_to_queries <- function(spectra = NULL,
 
   message("Test the queries.")
   queries_results <- seq_along(all_combinations) |>
-    perform_list_of_queries_progress(ions_list = all_combinations, spectra = mia_spectra) |>
+    perform_list_of_queries_progress(
+      ions_list = all_combinations,
+      spectra = mia_spectra,
+      dalton = dalton,
+      ppm = ppm
+    ) |>
     progressr::with_progress(enable = TRUE)
   names(queries_results) <- names(all_combinations)
 

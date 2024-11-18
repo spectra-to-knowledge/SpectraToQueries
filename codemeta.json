@@ -195,7 +195,7 @@
     "SystemRequirements": null
   },
   "keywords": ["knowledgeextraction", "spectralinformation", "queryingsystem"],
-  "fileSize": "969.305KB",
+  "fileSize": "1369.808KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -215,6 +215,6 @@
   ],
   "releaseNotes": "https://github.com/spectra-to-knowledge/spectra-to-queries/blob/master/NEWS.md",
   "readme": "https://github.com/spectra-to-knowledge/SpectraToQueries/blob/main/README.md",
-  "contIntegration": ["https://github.com/spectra-to-knowledge/SpectraToQueries/actions/workflows/R-CMD-check.yaml", "https://app.codecov.io/gh/adafede/SpectraToQueries"],
+  "contIntegration": ["https://github.com/spectra-to-knowledge/SpectraToQueries/actions/workflows/R-CMD-check.yaml", "https://app.codecov.io/gh/spectra-to-knowledge/SpectraToQueries"],
   "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html#experimental"
 }

@@ -3,15 +3,16 @@
 #' @param binned_m binned_matrix
 #' @param original_mzs original mzs
 #' @param dalton dalton
+#' @param ppm PPM
 #' @param decimals decimals
 #'
 #' @return NULL
 #'
 #' @examples NULL
-fix_binned_mzs <- function(binned_m, original_mzs, dalton, decimals) {
+fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
   all_mzs <- original_mzs |>
     Spectra::peaksData() |>
-    Spectra::combinePeaksData(tolerance = dalton, peaks = "union") |>
+    Spectra::combinePeaksData(tolerance = dalton, ppm = ppm, peaks = "union") |>
     data.frame() |>
     tidytable::pull("mz")
 

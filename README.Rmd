@@ -51,6 +51,8 @@ To generate diagnostic ions queries from your spectra:
 
 ``` r
 SpectraToQueries::spectra_to_queries()
+# For the 'grouped' version
+# SpectraToQueries::spectra_to_queries(spectra = system.file("extdata", "spectra_grouped.rds", package = "SpectraToQueries"), export = "data/interim/queries-grouped.tsv")
 ```
 
 ## Main Citations
