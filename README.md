@@ -1,4 +1,4 @@
-# Spectra to Queries
+# SpectraToQueries
 
 Repository to translate spectra to queries.
 
