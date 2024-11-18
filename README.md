@@ -38,6 +38,14 @@ install.packages(
 )
 ```
 
+## Use
+
+To generate diagnostic ions queries from your spectra:
+
+``` r
+SpectraToQueries::spectra_to_queries()
+```
+
 ## Main Citations
 
 TODO
