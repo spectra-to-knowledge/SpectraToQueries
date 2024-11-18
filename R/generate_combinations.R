@@ -1,7 +1,7 @@
 #' @title Generate combinations
 #'
 #' @param x x
-#' @param max_ions MAx ions
+#' @param max_ions Max ions
 #'
 #' @return NULL
 #'
