@@ -4,7 +4,7 @@
 \alias{fix_binned_mzs}
 \title{Fix binned mzs}
 \usage{
-fix_binned_mzs(binned_m, original_mzs, dalton, decimals)
+fix_binned_mzs(binned_m, original_mzs, dalton, ppm, decimals)
 }
 \arguments{
 \item{binned_m}{binned_matrix}
@@ -12,6 +12,8 @@ fix_binned_mzs(binned_m, original_mzs, dalton, decimals)
 \item{original_mzs}{original mzs}
 
 \item{dalton}{dalton}
+
+\item{ppm}{PPM}
 
 \item{decimals}{decimals}
 }

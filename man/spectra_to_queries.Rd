@@ -14,9 +14,9 @@ spectra_to_queries(
   ions_max = 10L,
   n_skel_min = 5L,
   n_spec_min = 3L,
-  ppm = 25L,
+  ppm = 20L,
   senspe_min = 0.1,
-  sensitivity_min = 0.3,
+  sensitivity_min = 0L,
   specificity_min = 0L,
   zero_val = 0L
 )
