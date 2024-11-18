@@ -257,14 +257,8 @@ spectra_to_queries <- function(spectra = NULL,
 
   message("Generate all combinations of queries.")
   combinations <- names(ions_list) |>
-    furrr::future_map(
-      .f = function(x, ions_list, max_ions) {
-        combinations_1 <-
-          generate_combinations(x = ions_list[[x]], max_ions = max_ions)
-      },
-      ions_list = ions_list,
-      max_ions = ions_max
-    )
+    generate_combinations_progress(ions_list = ions_list, max_ions = ions_max) |>
+    progressr::with_progress(enable = TRUE)
   names(combinations) <- names(ions_list)
 
   all_combinations <- combinations |>
