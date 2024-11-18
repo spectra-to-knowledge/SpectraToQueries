@@ -8,9 +8,9 @@
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![R-CMD-check](https://github.com/spectra-to-knowledge/SpectraToQueries/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/spectra-to-knowledge/SpectraToQueries/actions/workflows/R-CMD-check.yaml)
-[![R-Universe](https://adafede.r-universe.dev/badges/SpectraToQueries)](https://adafede.r-universe.dev/SpectraToQueries)
+[![R-Universe](https://spectra-to-knowledge.r-universe.dev/badges/SpectraToQueries)](https://spectra-to-knowledge.r-universe.dev/SpectraToQueries)
 [![Codecov test
-coverage](https://codecov.io/gh/adafede/SpectraToQueries/graph/badge.svg)](https://app.codecov.io/gh/adafede/SpectraToQueries)
+coverage](https://codecov.io/gh/spectra-to-knowledge/SpectraToQueries/graph/badge.svg)](https://app.codecov.io/gh/spectra-to-knowledge/SpectraToQueries)
 <!-- badges: end -->
 
 Repository to translate spectra to queries.
@@ -31,7 +31,7 @@ with:
 install.packages(
   "SpectraToQueries",
   repos = c(
-    "https://adafede.r-universe.dev",
+    "https://spectra-to-knowledge.r-universe.dev",
     "https://bioc.r-universe.dev",
     "https://cloud.r-project.org"
   )
