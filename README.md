@@ -19,7 +19,12 @@ Repository to translate spectra to queries.
 
 Here is what you *minimally* need:
 
--**A file containing MS/MS spectra with associated skeleton information** (or any other relevant chemical classification) **provided as metadata**. This structure information, stored in the metadata field "skeleton," allows the generation of queries specific to a given skeleton by extracting repetitive skeleton-specific fragmentation patterns. The MIADB file is provided as an example.
+- **A file containing MS/MS spectra with associated skeleton
+  information** (or any other relevant chemical classification)
+  **provided as metadata**. This structure information, stored in the
+  metadata field “skeleton”, allows the generation of queries specific
+  to a given skeleton by extracting repetitive skeleton-specific
+  fragmentation patterns. The MIADB file is provided as an example.
 
 ## Installation
 
