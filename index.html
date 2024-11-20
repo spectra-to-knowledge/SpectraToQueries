@@ -93,28 +93,43 @@
 <div class="section level2">
 <h2 id="use">Use<a class="anchor" aria-label="anchor" href="#use"></a>
 </h2>
-<p>To generate diagnostic ions queries from your spectra:</p>
+<p>To reproduce the example:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">SpectraToQueries</span><span class="fu">::</span><span class="fu"><a href="reference/spectra_to_queries.html">spectra_to_queries</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">## For the 'grouped' version</span></span>
-<span><span class="co"># SpectraToQueries::spectra_to_queries(spectra = system.file("extdata", "spectra_grouped.rds", package = "SpectraToQueries"), export = "data/interim/queries-grouped.tsv")</span></span>
-<span><span class="co">## Showing all parameters</span></span>
-<span><span class="co"># SpectraToQueries::spectra_to_queries(</span></span>
-<span><span class="co">#   spectra = NULL,</span></span>
-<span><span class="co">#   export = "data/interim/queries.tsv",</span></span>
-<span><span class="co">#   beta = 0.5,</span></span>
-<span><span class="co">#   dalton = 0.01,</span></span>
-<span><span class="co">#   decimals = 4L,</span></span>
-<span><span class="co">#   intensity_min = 0L,</span></span>
-<span><span class="co">#   ions_max = 10L,</span></span>
-<span><span class="co">#   n_skel_min = 5L,</span></span>
-<span><span class="co">#   n_spec_min = 3L,</span></span>
-<span><span class="co">#   ppm = 20L,</span></span>
-<span><span class="co">#   senspe_min = 0.1,</span></span>
-<span><span class="co">#   sensitivity_min = 0L,</span></span>
-<span><span class="co">#   specificity_min = 0L,</span></span>
-<span><span class="co">#   zero_val = 0L</span></span>
-<span><span class="co"># )</span></span></code></pre></div>
+<span></span>
+<span><span class="co"># For the 'grouped' version</span></span>
+<span><span class="fu">SpectraToQueries</span><span class="fu">::</span><span class="fu"><a href="reference/spectra_to_queries.html">spectra_to_queries</a></span><span class="op">(</span></span>
+<span>  spectra <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
+<span>    <span class="st">"extdata"</span>,</span>
+<span>    <span class="st">"spectra_grouped.rds"</span>,</span>
+<span>     package <span class="op">=</span> <span class="st">"SpectraToQueries"</span></span>
+<span> <span class="op">)</span>,</span>
+<span> export <span class="op">=</span> <span class="st">"data/interim/queries-grouped.tsv"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>To generate diagnostic ions queries from your spectra:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">SpectraToQueries</span><span class="fu">::</span><span class="fu"><a href="reference/spectra_to_queries.html">spectra_to_queries</a></span><span class="op">(</span></span>
+<span>  spectra <span class="op">=</span> <span class="st">"file.mgf"</span>,</span>
+<span>  export <span class="op">=</span> <span class="st">"path/file.tsv"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Showing all parameters</span></span>
+<span><span class="fu">SpectraToQueries</span><span class="fu">::</span><span class="fu"><a href="reference/spectra_to_queries.html">spectra_to_queries</a></span><span class="op">(</span></span>
+<span>  spectra <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  export <span class="op">=</span> <span class="st">"data/interim/queries.tsv"</span>,</span>
+<span>  beta <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  dalton <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  decimals <span class="op">=</span> <span class="fl">4L</span>,</span>
+<span>  intensity_min <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  ions_max <span class="op">=</span> <span class="fl">10L</span>,</span>
+<span>  n_skel_min <span class="op">=</span> <span class="fl">5L</span>,</span>
+<span>  n_spec_min <span class="op">=</span> <span class="fl">3L</span>,</span>
+<span>  ppm <span class="op">=</span> <span class="fl">20L</span>,</span>
+<span>  senspe_min <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  sensitivity_min <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  specificity_min <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  zero_val <span class="op">=</span> <span class="fl">0L</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="main-citations">Main Citations<a class="anchor" aria-label="anchor" href="#main-citations"></a>
