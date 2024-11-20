@@ -46,14 +46,14 @@ install.packages(
 
 To reproduce the example that uses the Monoterpene Indole 
 Alkaloids Database (.mgf) file by default, which includes 
-the annotation of skeletons for each spectrum :
+the annotation of skeleton for each spectrum :
 
 ``` r
 SpectraToQueries::spectra_to_queries()
 ```
 
 To reproduce the 'grouped' example that uses the MIADB file, 
-which includes an expert-based annotation of 'super skeletons' 
+which includes an expert-based annotation of 'super skeleton' 
 (combinations of skeletons with high structural similarity) 
 for each spectrum:
 
