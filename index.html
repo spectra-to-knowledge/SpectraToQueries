@@ -95,10 +95,10 @@
 </h2>
 <p>To reproduce the example:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">SpectraToQueries</span><span class="fu">::</span><span class="fu"><a href="reference/spectra_to_queries.html">spectra_to_queries</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># For the 'grouped' version</span></span>
-<span><span class="fu">SpectraToQueries</span><span class="fu">::</span><span class="fu"><a href="reference/spectra_to_queries.html">spectra_to_queries</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu">SpectraToQueries</span><span class="fu">::</span><span class="fu"><a href="reference/spectra_to_queries.html">spectra_to_queries</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>To reproduce the ‘grouped’ example:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">SpectraToQueries</span><span class="fu">::</span><span class="fu"><a href="reference/spectra_to_queries.html">spectra_to_queries</a></span><span class="op">(</span></span>
 <span>  spectra <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
 <span>    <span class="st">"extdata"</span>,</span>
 <span>    <span class="st">"spectra_grouped.rds"</span>,</span>
@@ -107,14 +107,14 @@
 <span> export <span class="op">=</span> <span class="st">"data/interim/queries-grouped.tsv"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>To generate diagnostic ions queries from your spectra:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">SpectraToQueries</span><span class="fu">::</span><span class="fu"><a href="reference/spectra_to_queries.html">spectra_to_queries</a></span><span class="op">(</span></span>
-<span>  spectra <span class="op">=</span> <span class="st">"file.mgf"</span>,</span>
-<span>  export <span class="op">=</span> <span class="st">"path/file.tsv"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Showing all parameters</span></span>
-<span><span class="fu">SpectraToQueries</span><span class="fu">::</span><span class="fu"><a href="reference/spectra_to_queries.html">spectra_to_queries</a></span><span class="op">(</span></span>
+<span>  spectra <span class="op">=</span> <span class="st">"yourAwesomeSpectra.mgf"</span>,</span>
+<span>  export <span class="op">=</span> <span class="st">"path/yourEvenBetterResults.tsv"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Showing all parameters:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">SpectraToQueries</span><span class="fu">::</span><span class="fu"><a href="reference/spectra_to_queries.html">spectra_to_queries</a></span><span class="op">(</span></span>
 <span>  spectra <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  export <span class="op">=</span> <span class="st">"data/interim/queries.tsv"</span>,</span>
 <span>  beta <span class="op">=</span> <span class="fl">0.5</span>,</span>
