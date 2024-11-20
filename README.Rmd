@@ -53,8 +53,11 @@ To reproduce the example:
 
 ``` r
 SpectraToQueries::spectra_to_queries()
+```
 
-# For the 'grouped' version
+To reproduce the 'grouped' example:
+
+``` r
 SpectraToQueries::spectra_to_queries(
   spectra = system.file(
     "extdata",
@@ -69,11 +72,14 @@ To generate diagnostic ions queries from your spectra:
 
 ``` r
 SpectraToQueries::spectra_to_queries(
-  spectra = "file.mgf",
-  export = "path/file.tsv"
+  spectra = "yourAwesomeSpectra.mgf",
+  export = "path/yourEvenBetterResults.tsv"
 )
+```
 
-# Showing all parameters
+Showing all parameters:
+
+```r
 SpectraToQueries::spectra_to_queries(
   spectra = NULL,
   export = "data/interim/queries.tsv",
