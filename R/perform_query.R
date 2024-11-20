@@ -20,7 +20,8 @@ perform_query <- function(spectra,
       mz = frags,
       tolerance = dalton,
       ppm = ppm,
-      which = "all"
+      which = "all",
+      BPPARAM = BiocParallel::SerialParam()
     )]
   }
 
@@ -37,7 +38,8 @@ perform_query <- function(spectra,
         sort(),
       tolerance = dalton,
       ppm = ppm,
-      which = "all"
+      which = "all",
+      BPPARAM = BiocParallel::SerialParam()
     )]
   }
   return(spectra)
