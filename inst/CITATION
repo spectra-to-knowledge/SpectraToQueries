@@ -4,7 +4,8 @@ bibentry(
   bibtype  = "Manual",
   title    = "SpectraToQueries: SpectraToQueries provides the infrastructure to translate spectra to queries",
   author   = c(
-    person(given = "Adriano", family = "Rutz", email = "adafede@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0443-9902"))
+    person(given = "Adriano", family = "Rutz", email = "adafede@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0443-9902")),
+    person(given = "Sarah", family = "Szwarc", email = "sarah.szwarc@universite-paris-saclay.fr", role = "ctb", comment = c(ORCID = "0000-0001-6369-5522"))
     ),
   year     = "2024",
   note     = "R package, version 0.0.9000",

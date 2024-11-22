@@ -15,6 +15,10 @@ authors:
   given-names: Adriano
   email: adafede@gmail.com
   orcid: https://orcid.org/0000-0003-0443-9902
+- family-names: Szwarc
+  given-names: Sarah
+  email: sarah.szwarc@universite-paris-saclay.fr
+  orcid: https://orcid.org/0000-0001-6369-5522
 preferred-citation:
   type: manual
   title: 'SpectraToQueries: Repository to translate spectra to queries.'
@@ -23,6 +27,10 @@ preferred-citation:
     given-names: Adriano
     email: adafede@gmail.com
     orcid: https://orcid.org/0000-0003-0443-9902
+  - family-names: Szwarc
+    given-names: Sarah
+    email: sarah.szwarc@universite-paris-saclay.fr
+    orcid: https://orcid.org/0000-0001-6369-5522
   year: '2024'
   notes: R package, version 0.0.9000
 repository: https://r-universe.dev
