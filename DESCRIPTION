@@ -2,13 +2,16 @@ Package: SpectraToQueries
 Title: Spectra to queries
 Version: 0.0.9000
 Authors@R: c(
-    person("Adriano", "Rutz", , "rutz@imsb.biol.ethz.ch", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-0443-9902"))
+    person("Adriano", "Rutz", , "adafede@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-0443-9902")),
+    person("Sarah", "Szwarc", , "sarah.szwarc@universite-paris-saclay.fr", role = "ctb",
+           comment = c(ORCID = "0000-0001-6369-5522"))
   )
-Maintainer: Adriano Rutz <rutz@imsb.biol.ethz.ch>
-Description: SpectraToQueries provides the infrastructure to translate spectra to queries.
+Maintainer: Adriano Rutz <adafede@gmail.com>
+Description: SpectraToQueries provides the infrastructure to translate spectra to queries
 License: GPL (>= 3)
-URL: https://github.com/spectra-to-knowledge/spectra-to-queries
+URL: https://github.com/spectra-to-knowledge/spectra-to-queries,
+    https://spectra-to-knowledge.github.io/SpectraToQueries
 BugReports: https://github.com/spectra-to-knowledge/spectra-to-queries/issues
 Depends:
     R (>= 4.3.0)
