@@ -2,8 +2,9 @@
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "identifier": "SpectraToQueries",
-  "description": "SpectraToQueries provides the infrastructure to translate spectra to queries.",
+  "description": "SpectraToQueries provides the infrastructure to translate spectra to queries",
   "name": "SpectraToQueries: Spectra to queries",
+  "relatedLink": "https://spectra-to-knowledge.github.io/SpectraToQueries",
   "codeRepository": "https://github.com/spectra-to-knowledge/spectra-to-queries",
   "issueTracker": "https://github.com/spectra-to-knowledge/spectra-to-queries/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
@@ -21,6 +22,15 @@
       "familyName": "Rutz",
       "email": "rutz@imsb.biol.ethz.ch",
       "@id": "https://orcid.org/0000-0003-0443-9902"
+    }
+  ],
+  "contributor": [
+    {
+      "@type": "Person",
+      "givenName": "Sarah",
+      "familyName": "Szwarc",
+      "email": "sarah.szwarc@universite-paris-saclay.fr",
+      "@id": "https://orcid.org/0000-0001-6369-5522"
     }
   ],
   "maintainer": [
@@ -208,7 +218,7 @@
     "SystemRequirements": null
   },
   "keywords": ["knowledgeextraction", "spectralinformation", "queryingsystem"],
-  "fileSize": "1371.084KB",
+  "fileSize": "1371.52KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -222,7 +232,7 @@
           "@id": "https://orcid.org/0000-0003-0443-9902"
         }
       ],
-      "name": "SpectraToQueries: SpectraToQueries provides the infrastructure to translate spectra to queries.",
+      "name": "SpectraToQueries: SpectraToQueries provides the infrastructure to translate spectra to queries",
       "description": "R package, version 0.0.9000"
     }
   ],

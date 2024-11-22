@@ -6,18 +6,24 @@
 \alias{SpectraToQueries-package}
 \title{SpectraToQueries: Spectra to queries}
 \description{
-SpectraToQueries provides the infrastructure to translate spectra to queries.
+SpectraToQueries provides the infrastructure to translate spectra to queries
 }
 \seealso{
 Useful links:
 \itemize{
   \item \url{https://github.com/spectra-to-knowledge/spectra-to-queries}
+  \item \url{https://spectra-to-knowledge.github.io/SpectraToQueries}
   \item Report bugs at \url{https://github.com/spectra-to-knowledge/spectra-to-queries/issues}
 }
 
 }
 \author{
 \strong{Maintainer}: Adriano Rutz \email{rutz@imsb.biol.ethz.ch} (\href{https://orcid.org/0000-0003-0443-9902}{ORCID})
+
+Other contributors:
+\itemize{
+  \item Sarah Szwarc \email{sarah.szwarc@universite-paris-saclay.fr} (\href{https://orcid.org/0000-0001-6369-5522}{ORCID}) [contributor]
+}
 
 }
 \keyword{internal}
