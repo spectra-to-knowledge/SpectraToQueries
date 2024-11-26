@@ -43,12 +43,13 @@ fix_binned_mzs <- function(binned_m,
     tidytable::pivot_longer(
       cols = -rowname,
       names_to = "name",
-      values_to = "value"
+      values_to = "value",
+      names_repair = "minimal"
     ) |>
     tidytable::mutate(name = name |>
       gsub(pattern = "\\.[0-9]{1,2}$", replacement = "")) |>
-    tidytable::filter(!name |>
-      grepl(pattern = "V", fixed = TRUE)) |>
+    # tidytable::filter(!name |>
+    #   grepl(pattern = "V", fixed = TRUE)) |>
     tidytable::mutate(
       name = name |>
         gsub(
