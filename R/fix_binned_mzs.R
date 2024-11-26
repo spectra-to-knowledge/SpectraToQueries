@@ -9,10 +9,18 @@
 #' @return NULL
 #'
 #' @examples NULL
-fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
+fix_binned_mzs <- function(binned_m,
+                           original_mzs,
+                           dalton,
+                           ppm,
+                           decimals) {
   all_mzs <- original_mzs |>
     Spectra::peaksData() |>
-    Spectra::combinePeaksData(tolerance = dalton, ppm = ppm, peaks = "union") |>
+    Spectra::combinePeaksData(
+      tolerance = dalton,
+      ppm = ppm,
+      peaks = "union"
+    ) |>
     data.frame() |>
     tidytable::pull("mz")
 
@@ -20,7 +28,11 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
 
   new_colnames <- sapply(colnames(new_m), function(i) {
     val <- mean(all_mzs[abs(all_mzs - as.numeric(i)) <= dalton])
-    if (!is.nan(val)) val else i
+    if (!is.nan(val)) {
+      val
+    } else {
+      i
+    }
   })
 
   colnames(new_m) <- new_colnames
@@ -33,24 +45,24 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
       names_to = "name",
       values_to = "value"
     ) |>
-    tidytable::mutate(name = gsub(
-      pattern = ".[0-9]{1,2}$",
-      replacement = "",
-      x = name
-    )) |>
-    tidytable::mutate(name = round(
-      x = gsub(
-        pattern = "X",
-        replacement = "",
-        x = name,
-        fixed = TRUE
-      ) |>
-        as.numeric(),
-      digits = decimals
+    tidytable::mutate(name = name |>
+      gsub(pattern = "\\.[0-9]{1,2}$", replacement = "")) |>
+    tidytable::filter(!name |>
+      grepl(pattern = "V", fixed = TRUE)) |>
+    tidytable::mutate(
+      name = name |>
+        gsub(
+          pattern = "X",
+          replacement = "",
+          fixed = TRUE
+        ) |>
+        as.numeric() |>
+        round(digits = decimals) |>
+        as.character()
     ) |>
-      as.character()) |>
     tidytable::group_by(rowname, name) |>
     tidytable::summarize(value = sum(value)) |>
+    tidytable::filter(!is.na(name)) |>
     tidytable::pivot_wider(names_from = name, values_from = value) |>
     tibble::column_to_rownames() |>
     as.matrix()
