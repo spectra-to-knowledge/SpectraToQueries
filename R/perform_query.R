@@ -12,8 +12,8 @@
 perform_query <- function(spectra,
                           frags,
                           nls,
-                          dalton = 0.01,
-                          ppm = 25) {
+                          dalton,
+                          ppm) {
   if (length(frags) > 0) {
     spectra <- spectra[Spectra::containsMz(
       spectra,

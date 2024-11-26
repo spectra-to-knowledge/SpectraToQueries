@@ -4,7 +4,7 @@
 \alias{perform_query}
 \title{Perform query}
 \usage{
-perform_query(spectra, frags, nls, dalton = 0.01, ppm = 25)
+perform_query(spectra, frags, nls, dalton, ppm)
 }
 \arguments{
 \item{spectra}{Spectra}

@@ -4,17 +4,9 @@
 \alias{perform_list_of_queries_progress}
 \title{Perform list of queries (progress)}
 \usage{
-perform_list_of_queries_progress(
-  indices,
-  ions_list,
-  spectra,
-  dalton = 0.01,
-  ppm = 25
-)
+perform_list_of_queries_progress(ions_list, spectra, dalton, ppm)
 }
 \arguments{
-\item{indices}{Indices}
-
 \item{ions_list}{Ions list}
 
 \item{spectra}{Spectra}

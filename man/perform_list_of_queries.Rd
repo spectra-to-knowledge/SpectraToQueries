@@ -4,7 +4,7 @@
 \alias{perform_list_of_queries}
 \title{Perform list of queries}
 \usage{
-perform_list_of_queries(index, ions_list, spectra, dalton = 0.01, ppm = 25)
+perform_list_of_queries(index, ions_list, spectra, dalton, ppm)
 }
 \arguments{
 \item{index}{Index}

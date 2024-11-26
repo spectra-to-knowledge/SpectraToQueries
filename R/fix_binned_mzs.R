@@ -44,9 +44,11 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
         replacement = "",
         x = name,
         fixed = TRUE
-      ) |> as.numeric(),
+      ) |>
+        as.numeric(),
       digits = decimals
-    ) |> as.character()) |>
+    ) |>
+      as.character()) |>
     tidytable::group_by(rowname, name) |>
     tidytable::summarize(value = sum(value)) |>
     tidytable::pivot_wider(names_from = name, values_from = value) |>

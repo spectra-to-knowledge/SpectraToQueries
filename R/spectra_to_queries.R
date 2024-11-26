@@ -12,8 +12,8 @@
 #' @param n_skel_min Minimal number of individuals per skeleton. Default to 5
 #' @param n_spec_min Minimal number of individuals where a signal has to be found. Default to 3
 #' @param ppm Tolerance in parts per million Default to 25
-#' @param senspe_min Minimal product of inner and outer ratios. Default to 0.1
-#' @param sensitivity_min Minimal sensitivity. Default to 0.3
+#' @param senspe_min Minimal product of inner and outer ratios. Default to 0
+#' @param sensitivity_min Minimal sensitivity. Default to 0
 #' @param specificity_min Minimal specificity. Default to 0
 #' @param zero_val Zero value for intensity. Default to 0
 #'
@@ -31,8 +31,8 @@ spectra_to_queries <- function(spectra = NULL,
                                ions_max = 10L,
                                n_skel_min = 5L,
                                n_spec_min = 3L,
-                               ppm = 20L,
-                               senspe_min = 0.1,
+                               ppm = 25L,
+                               senspe_min = 0L,
                                sensitivity_min = 0L,
                                specificity_min = 0L,
                                zero_val = 0L) {
@@ -234,6 +234,7 @@ spectra_to_queries <- function(spectra = NULL,
   ions_table_final <- ions_table_filtered_1 |>
     tidytable::group_by(group) |>
     tidytable::filter(senspe >= senspe_min & ratio_intra != 1) |>
+    tidytable::arrange(desc(senspe)) |>
     tidytable::slice_head(n = ions_max) |>
     tidytable::ungroup() |>
     tidytable::distinct(group, ion, value) |>
@@ -261,6 +262,16 @@ spectra_to_queries <- function(spectra = NULL,
         names(which(x > 0))
       }
     )
+  ions_list_diagnostic <- split(
+    colnames(ions_table_diagnostic)[col(ions_table_diagnostic)[ions_table_diagnostic > 0]],
+    row(ions_table_diagnostic)[ions_table_diagnostic > 0]
+  )
+  names(ions_list_diagnostic) <- rownames(ions_table_diagnostic)
+  ions_list <- split(
+    colnames(ions_table_final)[col(ions_table_final)[ions_table_final > 0]],
+    row(ions_table_final)[ions_table_final > 0]
+  )
+  names(ions_list) <- rownames(ions_table_final)
 
   message("Generate all combinations of queries.")
   combinations <- names(ions_list) |>
@@ -268,15 +279,21 @@ spectra_to_queries <- function(spectra = NULL,
     progressr::with_progress(enable = TRUE)
   names(combinations) <- names(ions_list)
 
-  all_combinations <- combinations |>
+  new_combinations <- lapply(names(combinations), function(name) {
+    lapply(combinations[[name]], function(sublist) {
+      unique(c(unlist(sublist), ions_list_diagnostic[[name]])) # Merge and deduplicate
+    })
+  })
+  names(new_combinations) <- names(ions_list)
+
+  all_combinations <- new_combinations |>
     unlist(recursive = FALSE)
   names(all_combinations) <- names(all_combinations) |>
     gsub(pattern = "\\d", replacement = "")
 
   message("Test the queries.")
-  queries_results <- seq_along(all_combinations) |>
+  queries_results <- all_combinations |>
     perform_list_of_queries_progress(
-      ions_list = all_combinations,
       spectra = mia_spectra,
       dalton = dalton,
       ppm = ppm
@@ -293,11 +310,12 @@ spectra_to_queries <- function(spectra = NULL,
         fp <- nrow(queries_results[[result]] |>
           tidytable::filter(target != value))
         fn <-
-          length(mia_spectra$SKELETON[mia_spectra$SKELETON |> gsub(
-            pattern = "+",
-            replacement = ".",
-            fixed = TRUE
-          ) == names(queries_results)[result]]) - tp
+          length(mia_spectra$SKELETON[mia_spectra$SKELETON |>
+            gsub(
+              pattern = "+",
+              replacement = ".",
+              fixed = TRUE
+            ) == names(queries_results)[result]]) - tp
         recall <- tp / (tp + fn)
         precision <- tp / (tp + fp)
         f_beta <-
