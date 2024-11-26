@@ -14,8 +14,8 @@ spectra_to_queries(
   ions_max = 10L,
   n_skel_min = 5L,
   n_spec_min = 3L,
-  ppm = 20L,
-  senspe_min = 0.1,
+  ppm = 25L,
+  senspe_min = 0L,
   sensitivity_min = 0L,
   specificity_min = 0L,
   zero_val = 0L
@@ -42,9 +42,9 @@ spectra_to_queries(
 
 \item{ppm}{Tolerance in parts per million Default to 25}
 
-\item{senspe_min}{Minimal product of inner and outer ratios. Default to 0.1}
+\item{senspe_min}{Minimal product of inner and outer ratios. Default to 0}
 
-\item{sensitivity_min}{Minimal sensitivity. Default to 0.3}
+\item{sensitivity_min}{Minimal sensitivity. Default to 0}
 
 \item{specificity_min}{Minimal specificity. Default to 0}
 

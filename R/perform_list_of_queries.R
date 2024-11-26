@@ -14,8 +14,8 @@
 perform_list_of_queries <- function(index,
                                     ions_list,
                                     spectra,
-                                    dalton = 0.01,
-                                    ppm = 25) {
+                                    dalton,
+                                    ppm) {
   return(tidytable::tidytable(
     target = names(ions_list)[index],
     value = spectra |>
@@ -43,7 +43,6 @@ perform_list_of_queries <- function(index,
 
 #' @title Perform list of queries (progress)
 #'
-#' @param indices Indices
 #' @param ions_list Ions list
 #' @param spectra Spectra
 #' @param dalton Dalton
@@ -52,14 +51,13 @@ perform_list_of_queries <- function(index,
 #' @return NULL
 #'
 #' @examples NULL
-perform_list_of_queries_progress <- function(indices,
-                                             ions_list,
+perform_list_of_queries_progress <- function(ions_list,
                                              spectra,
-                                             dalton = 0.01,
-                                             ppm = 25) {
-  p <- progressr::progressor(along = indices)
+                                             dalton,
+                                             ppm) {
+  p <- progressr::progressor(along = seq_along(ions_list))
   furrr::future_map(
-    .x = indices,
+    .x = seq_along(ions_list),
     ions_list = ions_list,
     spectra = spectra,
     dalton = dalton,
