@@ -7,7 +7,8 @@
 spectra_to_queries(
   spectra = NULL,
   export = "data/interim/queries.tsv",
-  beta = 0.5,
+  beta_1 = 2,
+  beta_2 = 0.5,
   dalton = 0.01,
   decimals = 4L,
   intensity_min = 0L,
@@ -15,9 +16,9 @@ spectra_to_queries(
   n_skel_min = 5L,
   n_spec_min = 3L,
   ppm = 25L,
-  senspe_min = 0L,
-  sensitivity_min = 0L,
-  specificity_min = 0L,
+  f2score_min = 0L,
+  precision_min = 0L,
+  recall_min = 0L,
   zero_val = 0L
 )
 }
@@ -26,7 +27,9 @@ spectra_to_queries(
 
 \item{export}{Export path}
 
-\item{beta}{Beta parameter of the F-score calculation}
+\item{beta_1}{Beta parameter of the single ion F-score calculation}
+
+\item{beta_2}{Beta parameter of the total F-score calculation}
 
 \item{dalton}{Tolerance in Dalton. Default to 0.01}
 
@@ -42,11 +45,11 @@ spectra_to_queries(
 
 \item{ppm}{Tolerance in parts per million Default to 25}
 
-\item{senspe_min}{Minimal product of inner and outer ratios. Default to 0}
+\item{f2score_min}{Minimal single ion F-score. Default to 0}
 
-\item{sensitivity_min}{Minimal sensitivity. Default to 0}
+\item{precision_min}{Minimal single ion precision. Default to 0}
 
-\item{specificity_min}{Minimal specificity. Default to 0}
+\item{recall_min}{Minimal single ion recall. Default to 0}
 
 \item{zero_val}{Zero value for intensity. Default to 0}
 }
