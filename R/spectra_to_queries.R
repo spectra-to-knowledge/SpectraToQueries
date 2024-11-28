@@ -4,7 +4,8 @@
 #'
 #' @param spectra Spectra path
 #' @param export Export path
-#' @param beta Beta parameter of the F-score calculation
+#' @param beta_1 Beta parameter of the single ion F-score calculation
+#' @param beta_2 Beta parameter of the total F-score calculation
 #' @param dalton Tolerance in Dalton. Default to 0.01
 #' @param decimals Number of decimals for rounding. Default to 4
 #' @param intensity_min Minimal intensity. Default to 0
@@ -12,9 +13,9 @@
 #' @param n_skel_min Minimal number of individuals per skeleton. Default to 5
 #' @param n_spec_min Minimal number of individuals where a signal has to be found. Default to 3
 #' @param ppm Tolerance in parts per million Default to 25
-#' @param senspe_min Minimal product of inner and outer ratios. Default to 0
-#' @param sensitivity_min Minimal sensitivity. Default to 0
-#' @param specificity_min Minimal specificity. Default to 0
+#' @param f2score_min Minimal single ion F-score. Default to 0
+#' @param precision_min Minimal single ion precision. Default to 0
+#' @param recall_min Minimal single ion recall. Default to 0
 #' @param zero_val Zero value for intensity. Default to 0
 #'
 #' @return A file with diagnostic query ions
@@ -24,7 +25,8 @@
 #' @examples NULL
 spectra_to_queries <- function(spectra = NULL,
                                export = "data/interim/queries.tsv",
-                               beta = 0.5,
+                               beta_1 = 2,
+                               beta_2 = 0.5,
                                dalton = 0.01,
                                decimals = 4L,
                                intensity_min = 0L,
@@ -32,9 +34,9 @@ spectra_to_queries <- function(spectra = NULL,
                                n_skel_min = 5L,
                                n_spec_min = 3L,
                                ppm = 25L,
-                               senspe_min = 0L,
-                               sensitivity_min = 0L,
-                               specificity_min = 0L,
+                               f2score_min = 0L,
+                               precision_min = 0L,
+                               recall_min = 0L,
                                zero_val = 0L) {
   if (is.null(spectra)) {
     message("No spectra given, loading example spectra.")
@@ -193,11 +195,6 @@ spectra_to_queries <- function(spectra = NULL,
     tidytable::filter(value != 0)
 
   message("Extract the best ions to perform a query.")
-  # Calculate the sensitivity (and specificity) of the features.
-  # Filter only features which sensitivity is at least `sensitivity_min`.
-  # Filter only features which specificity is at least `specificity_min`.
-  # Filter only ions occurring in at least `n_spec_min` spectra.
-  # Filter only groups with at least `n_skel_min` spectra.
   ions_table_filtered_1 <- ions_table |>
     tidytable::group_by(ion) |>
     tidytable::add_count(name = "count_per_ion") |>
@@ -210,18 +207,19 @@ spectra_to_queries <- function(spectra = NULL,
     tidytable::filter(count_per_ion >= n_spec_min) |>
     tidytable::filter(group_count >= n_skel_min) |>
     tidytable::mutate(
-      ratio_inter = count_per_ion_per_group / count_per_ion,
-      ratio_intra = count_per_ion_per_group / group_count
+      precision = count_per_ion_per_group / count_per_ion,
+      recall = count_per_ion_per_group / group_count
     ) |>
-    tidytable::filter(ratio_inter >= specificity_min) |>
-    tidytable::filter(ratio_intra >= sensitivity_min) |>
-    tidytable::mutate(senspe = ratio_intra * ratio_inter) |>
-    tidytable::arrange(tidytable::desc(senspe)) |>
-    tidytable::filter(senspe >= senspe_min | ratio_intra == 1) |>
+    tidytable::filter(precision >= precision_min) |>
+    tidytable::filter(recall >= recall_min) |>
+    tidytable::mutate(f2score = (1 + beta_1^2) * (precision * recall) / ((precision * beta_1^
+      2) + recall)) |>
+    tidytable::arrange(tidytable::desc(f2score)) |>
+    tidytable::filter(f2score >= f2score_min | recall == 1) |>
     tidytable::mutate(value = 1)
 
   ions_table_diagnostic <- ions_table_filtered_1 |>
-    tidytable::filter(ratio_intra == 1) |>
+    tidytable::filter(recall == 1) |>
     tidytable::distinct(group, ion, value) |>
     tidytable::pivot_wider(
       names_from = ion,
@@ -233,8 +231,8 @@ spectra_to_queries <- function(spectra = NULL,
   # Pivot back again.
   ions_table_final <- ions_table_filtered_1 |>
     tidytable::group_by(group) |>
-    tidytable::filter(senspe >= senspe_min & ratio_intra != 1) |>
-    tidytable::arrange(desc(senspe)) |>
+    tidytable::filter(f2score >= f2score_min & recall != 1) |>
+    tidytable::arrange(desc(f2score)) |>
     tidytable::slice_head(n = ions_max) |>
     tidytable::ungroup() |>
     tidytable::distinct(group, ion, value) |>
@@ -267,10 +265,7 @@ spectra_to_queries <- function(spectra = NULL,
     row(ions_table_diagnostic)[ions_table_diagnostic > 0]
   )
   names(ions_list_diagnostic) <- rownames(ions_table_diagnostic)
-  ions_list <- split(
-    colnames(ions_table_final)[col(ions_table_final)[ions_table_final > 0]],
-    row(ions_table_final)[ions_table_final > 0]
-  )
+  ions_list <- split(colnames(ions_table_final)[col(ions_table_final)[ions_table_final > 0]], row(ions_table_final)[ions_table_final > 0])
   names(ions_list) <- rownames(ions_table_final)
 
   message("Generate all combinations of queries.")
@@ -304,7 +299,7 @@ spectra_to_queries <- function(spectra = NULL,
   message("Evaluate the performance of the query based on F-score.")
   results_stats <- seq_along(queries_results) |>
     furrr::future_map(
-      .f = function(result, beta) {
+      .f = function(result, beta_2) {
         tp <- nrow(queries_results[[result]] |>
           tidytable::filter(target == value))
         fp <- nrow(queries_results[[result]] |>
@@ -319,11 +314,11 @@ spectra_to_queries <- function(spectra = NULL,
         recall <- tp / (tp + fn)
         precision <- tp / (tp + fp)
         f_beta <-
-          (1 + beta^2) * (precision * recall) / ((precision * beta^
+          (1 + beta_2^2) * (precision * recall) / ((precision * beta_2^
             2) + recall)
         return(round(f_beta, decimals))
       },
-      beta = beta
+      beta_2 = beta_2
     )
 
   best_queries <- data.frame(
