@@ -47,7 +47,8 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">spectra_to_queries</span><span class="op">(</span></span>
 <span>  spectra <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  export <span class="op">=</span> <span class="st">"data/interim/queries.tsv"</span>,</span>
-<span>  beta <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  beta_1 <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  beta_2 <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  dalton <span class="op">=</span> <span class="fl">0.01</span>,</span>
 <span>  decimals <span class="op">=</span> <span class="fl">4L</span>,</span>
 <span>  intensity_min <span class="op">=</span> <span class="fl">0L</span>,</span>
@@ -55,9 +56,9 @@
 <span>  n_skel_min <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  n_spec_min <span class="op">=</span> <span class="fl">3L</span>,</span>
 <span>  ppm <span class="op">=</span> <span class="fl">25L</span>,</span>
-<span>  senspe_min <span class="op">=</span> <span class="fl">0L</span>,</span>
-<span>  sensitivity_min <span class="op">=</span> <span class="fl">0L</span>,</span>
-<span>  specificity_min <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  f2score_min <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  precision_min <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  recall_min <span class="op">=</span> <span class="fl">0L</span>,</span>
 <span>  zero_val <span class="op">=</span> <span class="fl">0L</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -74,8 +75,12 @@
 <dd><p>Export path</p></dd>
 
 
-<dt id="arg-beta">beta<a class="anchor" aria-label="anchor" href="#arg-beta"></a></dt>
-<dd><p>Beta parameter of the F-score calculation</p></dd>
+<dt id="arg-beta-">beta_1<a class="anchor" aria-label="anchor" href="#arg-beta-"></a></dt>
+<dd><p>Beta parameter of the single ion F-score calculation</p></dd>
+
+
+<dt id="arg-beta-">beta_2<a class="anchor" aria-label="anchor" href="#arg-beta-"></a></dt>
+<dd><p>Beta parameter of the total F-score calculation</p></dd>
 
 
 <dt id="arg-dalton">dalton<a class="anchor" aria-label="anchor" href="#arg-dalton"></a></dt>
@@ -106,16 +111,16 @@
 <dd><p>Tolerance in parts per million Default to 25</p></dd>
 
 
-<dt id="arg-senspe-min">senspe_min<a class="anchor" aria-label="anchor" href="#arg-senspe-min"></a></dt>
-<dd><p>Minimal product of inner and outer ratios. Default to 0</p></dd>
+<dt id="arg-f-score-min">f2score_min<a class="anchor" aria-label="anchor" href="#arg-f-score-min"></a></dt>
+<dd><p>Minimal single ion F-score. Default to 0</p></dd>
 
 
-<dt id="arg-sensitivity-min">sensitivity_min<a class="anchor" aria-label="anchor" href="#arg-sensitivity-min"></a></dt>
-<dd><p>Minimal sensitivity. Default to 0</p></dd>
+<dt id="arg-precision-min">precision_min<a class="anchor" aria-label="anchor" href="#arg-precision-min"></a></dt>
+<dd><p>Minimal single ion precision. Default to 0</p></dd>
 
 
-<dt id="arg-specificity-min">specificity_min<a class="anchor" aria-label="anchor" href="#arg-specificity-min"></a></dt>
-<dd><p>Minimal specificity. Default to 0</p></dd>
+<dt id="arg-recall-min">recall_min<a class="anchor" aria-label="anchor" href="#arg-recall-min"></a></dt>
+<dd><p>Minimal single ion recall. Default to 0</p></dd>
 
 
 <dt id="arg-zero-val">zero_val<a class="anchor" aria-label="anchor" href="#arg-zero-val"></a></dt>
