@@ -270,8 +270,7 @@ spectra_to_queries <- function(spectra = NULL,
 
   message("Generate all combinations of queries.")
   combinations <- names(ions_list) |>
-    generate_combinations_progress(ions_list = ions_list, max_ions = ions_max) |>
-    progressr::with_progress()
+    generate_combinations_progress(ions_list = ions_list, max_ions = ions_max)
   names(combinations) <- names(ions_list)
 
   new_combinations <- lapply(names(combinations), function(name) {
@@ -292,8 +291,7 @@ spectra_to_queries <- function(spectra = NULL,
       spectra = mia_spectra,
       dalton = dalton,
       ppm = ppm
-    ) |>
-    progressr::with_progress()
+    )
   names(queries_results) <- names(all_combinations)
 
   message("Evaluate the performance of the query based on F-score.")
