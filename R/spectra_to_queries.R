@@ -286,7 +286,7 @@ spectra_to_queries <- function(spectra = NULL,
   names(all_combinations) <- names(all_combinations) |>
     gsub(pattern = "\\d", replacement = "")
 
-  message("Test the queries.")
+  message("Test the queries. (This is the longest step)")
   queries_results <- all_combinations |>
     perform_list_of_queries_progress(
       spectra = mia_spectra,
