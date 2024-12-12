@@ -13,7 +13,7 @@
 #' @param n_skel_min Minimal number of individuals per skeleton. Default to 5
 #' @param n_spec_min Minimal number of individuals where a signal has to be found. Default to 3
 #' @param ppm Tolerance in parts per million Default to 25
-#' @param f2score_min Minimal single ion F-score. Default to 0
+#' @param fscore_min Minimal single ion F-score. Default to 0
 #' @param precision_min Minimal single ion precision. Default to 0
 #' @param recall_min Minimal single ion recall. Default to 0
 #' @param zero_val Zero value for intensity. Default to 0
@@ -33,8 +33,8 @@ spectra_to_queries <- function(spectra = NULL,
                                ions_max = 10L,
                                n_skel_min = 5L,
                                n_spec_min = 3L,
-                               ppm = 25L,
-                               f2score_min = 0L,
+                               ppm = 30L,
+                               fscore_min = 0L,
                                precision_min = 0L,
                                recall_min = 0L,
                                zero_val = 0L) {
@@ -212,10 +212,10 @@ spectra_to_queries <- function(spectra = NULL,
     ) |>
     tidytable::filter(precision >= precision_min) |>
     tidytable::filter(recall >= recall_min) |>
-    tidytable::mutate(f2score = (1 + beta_1^2) * (precision * recall) / ((precision * beta_1^
+    tidytable::mutate(fscore = (1 + beta_1^2) * (precision * recall) / ((precision * beta_1^
       2) + recall)) |>
-    tidytable::arrange(tidytable::desc(f2score)) |>
-    tidytable::filter(f2score >= f2score_min | recall == 1) |>
+    tidytable::arrange(tidytable::desc(fscore)) |>
+    tidytable::filter(fscore >= fscore_min | recall == 1) |>
     tidytable::mutate(value = 1)
 
   ions_table_diagnostic <- ions_table_filtered_1 |>
@@ -231,8 +231,8 @@ spectra_to_queries <- function(spectra = NULL,
   # Pivot back again.
   ions_table_final <- ions_table_filtered_1 |>
     tidytable::group_by(group) |>
-    tidytable::filter(f2score >= f2score_min & recall != 1) |>
-    tidytable::arrange(desc(f2score)) |>
+    tidytable::filter(fscore >= fscore_min & recall != 1) |>
+    tidytable::arrange(desc(fscore)) |>
     tidytable::slice_head(n = ions_max) |>
     tidytable::ungroup() |>
     tidytable::distinct(group, ion, value) |>
