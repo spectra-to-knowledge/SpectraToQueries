@@ -15,8 +15,8 @@ spectra_to_queries(
   ions_max = 10L,
   n_skel_min = 5L,
   n_spec_min = 3L,
-  ppm = 25L,
-  f2score_min = 0L,
+  ppm = 30L,
+  fscore_min = 0L,
   precision_min = 0L,
   recall_min = 0L,
   zero_val = 0L
@@ -45,7 +45,7 @@ spectra_to_queries(
 
 \item{ppm}{Tolerance in parts per million Default to 25}
 
-\item{f2score_min}{Minimal single ion F-score. Default to 0}
+\item{fscore_min}{Minimal single ion F-score. Default to 0}
 
 \item{precision_min}{Minimal single ion precision. Default to 0}
 
