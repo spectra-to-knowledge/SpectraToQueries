@@ -7,7 +7,7 @@
 spectra_to_queries(
   spectra = NULL,
   export = "data/interim/queries.tsv",
-  beta_1 = 2,
+  beta_1 = 1,
   beta_2 = 0.5,
   dalton = 0.01,
   decimals = 4L,
