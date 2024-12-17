@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/spectra-to-knowledge/spectra-to-queries",
   "issueTracker": "https://github.com/spectra-to-knowledge/spectra-to-queries/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.9000",
+  "version": "0.0.0.9000",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -218,7 +218,7 @@
     "SystemRequirements": null
   },
   "keywords": ["knowledgeextraction", "spectralinformation", "queryingsystem"],
-  "fileSize": "1372.624KB",
+  "fileSize": "1372.626KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
