@@ -64,6 +64,6 @@ perform_list_of_queries_progress <- function(ions_list,
     ions_list = ions_list,
     spectra = spectra,
     dalton = dalton,
-    ppm = ppm,
+    ppm = ppm
   )
 }
