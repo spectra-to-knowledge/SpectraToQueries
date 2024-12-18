@@ -8,7 +8,7 @@
 #' @examples NULL
 generate_combinations <- function(x, max_ions) {
   1:min(length(x), max_ions) |>
-    furrr::future_map(
+    purrr::map(
       .f = function(k) {
         combn(x, k, simplify = FALSE)
       }
@@ -26,14 +26,13 @@ generate_combinations <- function(x, max_ions) {
 #'
 #' @examples NULL
 generate_combinations_progress <- function(indices, ions_list, max_ions) {
-  p <- progressr::progressor(along = indices)
-  furrr::future_map(
+  purrr::map(
+    .progress = TRUE,
     .x = indices,
-    ions_list = ions_list,
-    max_ions = max_ions,
     .f = function(x, ions_list, max_ions) {
-      p()
       generate_combinations(x = ions_list[[x]], max_ions = max_ions)
-    }
+    },
+    ions_list = ions_list,
+    max_ions = max_ions
   )
 }

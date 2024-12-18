@@ -273,8 +273,8 @@ spectra_to_queries <- function(spectra = NULL,
     generate_combinations_progress(ions_list = ions_list, max_ions = ions_max)
   names(combinations) <- names(ions_list)
 
-  new_combinations <- lapply(names(combinations), function(name) {
-    lapply(combinations[[name]], function(sublist) {
+  new_combinations <- purrr::map(names(combinations), function(name) {
+    purrr::map(combinations[[name]], function(sublist) {
       unique(c(unlist(sublist), ions_list_diagnostic[[name]])) # Merge and deduplicate
     })
   })
@@ -296,7 +296,7 @@ spectra_to_queries <- function(spectra = NULL,
 
   message("Evaluate the performance of the query based on F-score.")
   results_stats <- seq_along(queries_results) |>
-    furrr::future_map(
+    purrr::map(
       .f = function(result, beta_2) {
         tp <- nrow(queries_results[[result]] |>
           tidytable::filter(target == value))
