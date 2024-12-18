@@ -15,8 +15,8 @@ on:
 permissions: read-all
 
 jobs:
-  cascade-test:
-    name: cascade-${{ matrix.os }}
+  SpectraToQueries-test:
+    name: SpectraToQueries-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
