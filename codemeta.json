@@ -139,19 +139,6 @@
     },
     "4": {
       "@type": "SoftwareApplication",
-      "identifier": "furrr",
-      "name": "furrr",
-      "version": ">= 0.3.1",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=furrr"
-    },
-    "5": {
-      "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
       "version": ">= 1.10.0",
@@ -163,20 +150,20 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
     },
-    "6": {
+    "5": {
       "@type": "SoftwareApplication",
-      "identifier": "progressr",
-      "name": "progressr",
-      "version": ">= 0.15.1",
+      "identifier": "purrr",
+      "name": "purrr",
+      "version": ">= 1.0.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
         "name": "Comprehensive R Archive Network (CRAN)",
         "url": "https://cran.r-project.org"
       },
-      "sameAs": "https://CRAN.R-project.org/package=progressr"
+      "sameAs": "https://CRAN.R-project.org/package=purrr"
     },
-    "7": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -189,11 +176,11 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "8": {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
-      "version": ">= 0.11.2",
+      "version": ">= 0.11.1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -202,7 +189,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "9": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "tibble",
       "name": "tibble",
@@ -218,7 +205,7 @@
     "SystemRequirements": null
   },
   "keywords": ["knowledgeextraction", "spectralinformation", "queryingsystem"],
-  "fileSize": "1372.626KB",
+  "fileSize": "1372.499KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

@@ -55,16 +55,15 @@ perform_list_of_queries_progress <- function(ions_list,
                                              spectra,
                                              dalton,
                                              ppm) {
-  p <- progressr::progressor(along = seq_along(ions_list))
-  furrr::future_map(
+  purrr::map(
+    .progress = TRUE,
     .x = seq_along(ions_list),
+    .f = function(index, ions_list, spectra, dalton, ppm) {
+      perform_list_of_queries(index, ions_list, spectra, dalton, ppm)
+    },
     ions_list = ions_list,
     spectra = spectra,
     dalton = dalton,
     ppm = ppm,
-    .f = function(index, ions_list, spectra, dalton, ppm) {
-      p()
-      perform_list_of_queries(index, ions_list, spectra, dalton, ppm)
-    }
   )
 }
