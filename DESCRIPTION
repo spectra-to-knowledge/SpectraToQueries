@@ -21,7 +21,7 @@ Imports:
     MsBackendMgf (>= 1.10.0),
     purrr (>= 1.0.2),
     Spectra (>= 1.12.0),
-    tidytable (>= 0.11.1),
+    tidytable (>= 0.11.2),
     tibble (>= 3.2.1)
 Suggests: 
     BiocManager,
