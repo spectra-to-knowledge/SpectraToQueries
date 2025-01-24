@@ -2,9 +2,15 @@ Package: SpectraToQueries
 Title: Spectra to queries
 Version: 0.0.0.9000
 Authors@R: c(
-    person("Adriano", "Rutz", , "adafede@gmail.com", role = c("aut", "cre"),
+    person(given = "Adriano",
+           family = "Rutz", 
+           email = "adafede@gmail.com",
+           role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-0443-9902")),
-    person("Sarah", "Szwarc", , "sarah.szwarc@universite-paris-saclay.fr", role = "ctb",
+    person(given = "Sarah", 
+           family = "Szwarc",
+           email = "sarah.szwarc@universite-paris-saclay.fr",
+           role = "ctb",
            comment = c(ORCID = "0000-0001-6369-5522"))
   )
 Maintainer: Adriano Rutz <adafede@gmail.com>
