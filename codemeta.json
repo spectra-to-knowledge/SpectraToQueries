@@ -115,7 +115,7 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocGenerics",
       "name": "BiocGenerics",
-      "version": ">= 0.48.1",
+      "version": ">= 0.52.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -128,7 +128,7 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocParallel",
       "name": "BiocParallel",
-      "version": ">= 1.36.0",
+      "version": ">= 1.40.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -141,7 +141,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
-      "version": ">= 1.10.0",
+      "version": ">= 1.14.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -167,7 +167,7 @@
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
-      "version": ">= 1.12.0",
+      "version": ">= 1.16.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -180,7 +180,7 @@
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
-      "version": ">= 0.11.1",
+      "version": ">= 0.11.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -205,7 +205,7 @@
     "SystemRequirements": null
   },
   "keywords": ["knowledgeextraction", "spectralinformation", "queryingsystem"],
-  "fileSize": "1372.499KB",
+  "fileSize": "1372.612KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -223,7 +223,6 @@
       "description": "R package, version 0.0.9000"
     }
   ],
-  "releaseNotes": "https://github.com/spectra-to-knowledge/spectra-to-queries/blob/master/NEWS.md",
   "readme": "https://github.com/spectra-to-knowledge/SpectraToQueries/blob/main/README.md",
   "contIntegration": ["https://github.com/spectra-to-knowledge/SpectraToQueries/actions/workflows/R-CMD-check.yaml", "https://app.codecov.io/gh/spectra-to-knowledge/SpectraToQueries"],
   "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html#experimental"
