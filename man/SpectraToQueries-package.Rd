@@ -6,7 +6,7 @@
 \alias{SpectraToQueries-package}
 \title{SpectraToQueries: Spectra to queries}
 \description{
-SpectraToQueries provides the infrastructure to translate spectra to queries
+SpectraToQueries provides the infrastructure to translate spectra to queries.
 }
 \seealso{
 Useful links:

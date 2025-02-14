@@ -189,7 +189,7 @@ spectra_to_queries <- function(spectra = NULL,
     )) |>
     tidytable::group_by(group) |>
     tidytable::add_count(name = "group_count") |>
-    tidytable::pivot_longer(cols = !starts_with("group"), names_to = "ion") |>
+    tidytable::pivot_longer(cols = !tidytable::starts_with("group"), names_to = "ion") |>
     tidytable::filter(value != 0)
 
   message("Extract the best ions to perform a query.")
@@ -230,7 +230,7 @@ spectra_to_queries <- function(spectra = NULL,
   ions_table_final <- ions_table_filtered_1 |>
     tidytable::group_by(group) |>
     tidytable::filter(fscore >= fscore_min & recall != 1) |>
-    tidytable::arrange(desc(fscore)) |>
+    tidytable::arrange(tidytable::desc(fscore)) |>
     tidytable::slice_head(n = ions_max) |>
     tidytable::ungroup() |>
     tidytable::distinct(group, ion, value) |>

@@ -10,7 +10,7 @@ generate_combinations <- function(x, max_ions) {
   1:min(length(x), max_ions) |>
     purrr::map(
       .f = function(k) {
-        combn(x, k, simplify = FALSE)
+        utils::combn(x, k, simplify = FALSE)
       }
     ) |>
     unlist(recursive = FALSE)

@@ -14,7 +14,7 @@ Authors@R: c(
            comment = c(ORCID = "0000-0001-6369-5522"))
   )
 Maintainer: Adriano Rutz <adafede@gmail.com>
-Description: SpectraToQueries provides the infrastructure to translate spectra to queries
+Description: SpectraToQueries provides the infrastructure to translate spectra to queries.
 License: GPL (>= 3)
 URL: https://github.com/spectra-to-knowledge/spectra-to-queries,
     https://spectra-to-knowledge.github.io/SpectraToQueries
@@ -31,7 +31,6 @@ Imports:
     tibble (>= 3.2.1)
 Suggests: 
     BiocManager,
-    knitr,
     R.utils,
     spelling,
     testthat
@@ -53,6 +52,7 @@ Collate:
     'filter_matrix.R'
     'fix_binned_mzs.R'
     'generate_combinations.R'
+    'globals.R'
     'harmonize_mzs.R'
     'normalize_peaks.R'
     'perform_query.R'
