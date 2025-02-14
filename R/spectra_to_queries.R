@@ -41,16 +41,14 @@ spectra_to_queries <- function(spectra = NULL,
   if (is.null(spectra)) {
     message("No spectra given, loading example spectra.")
     mia_spectra <- readRDS(system.file("extdata", "spectra.rds", package = "SpectraToQueries"))
+  } else if (spectra == system.file("extdata", "spectra_grouped.rds", package = "SpectraToQueries")) {
+    message("Loading grouped spectra.")
+    mia_spectra <- readRDS(spectra)
   } else {
-    if (spectra == system.file("extdata", "spectra_grouped.rds", package = "SpectraToQueries")) {
-      message("Loading grouped spectra.")
-      mia_spectra <- readRDS(spectra)
-    } else {
-      message("Loading spectra.")
-      mia_spectra <- spectra |>
-        MsBackendMgf::readMgf() |>
-        Spectra::Spectra()
-    }
+    message("Loading spectra.")
+    mia_spectra <- spectra |>
+      MsBackendMgf::readMgf() |>
+      Spectra::Spectra()
   }
   mia_spectra@backend@spectraData$precursorMz <-
     mia_spectra@backend@spectraData$PRECURSOR_MZ |>
