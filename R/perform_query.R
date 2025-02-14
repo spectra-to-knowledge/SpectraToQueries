@@ -31,11 +31,12 @@ perform_query <- function(spectra,
   }
 
   if (length(nls) > 0) {
+    mzs <- (Spectra::precursorMz(spectra) - nls) |>
+      unique() |>
+      sort()
     spectra <- spectra[Spectra::containsMz(
       spectra,
-      mz = (Spectra::precursorMz(spectra) - nls) |>
-        unique() |>
-        sort(),
+      mz = mzs,
       tolerance = dalton,
       ppm = ppm,
       which = "all",

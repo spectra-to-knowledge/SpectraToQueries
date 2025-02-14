@@ -244,17 +244,19 @@ spectra_to_queries <- function(spectra = NULL,
     tibble::column_to_rownames("group")
 
   # Extract the matching ions per skeleton.
+  list_diagnostic <- ions_table_diagnostic[, seq_len(ncol(ions_table_diagnostic))]
   ions_list_diagnostic <-
     apply(
-      X = ions_table_diagnostic[, seq_len(ncol(ions_table_diagnostic))],
+      X = list_diagnostic,
       MARGIN = 1,
       FUN = function(x) {
         names(which(x > 0))
       }
     )
+  list_final <- ions_table_final[, seq_len(ncol(ions_table_final))]
   ions_list <-
     apply(
-      X = ions_table_final[, seq_len(ncol(ions_table_final))],
+      X = list_final,
       MARGIN = 1,
       FUN = function(x) {
         names(which(x > 0))
@@ -273,11 +275,15 @@ spectra_to_queries <- function(spectra = NULL,
     generate_combinations_progress(ions_list = ions_list, max_ions = ions_max)
   names(combinations) <- names(ions_list)
 
-  new_combinations <- purrr::map(names(combinations), function(name) {
-    purrr::map(combinations[[name]], function(sublist) {
-      unique(c(unlist(sublist), ions_list_diagnostic[[name]])) # Merge and deduplicate
-    })
-  })
+  new_combinations <- purrr::map(
+    .x = names(combinations),
+    .f = function(name) {
+      x <- combinations[[name]]
+      purrr::map(.x = x, function(sublist) {
+        unique(c(unlist(sublist), ions_list_diagnostic[[name]])) # Merge and deduplicate
+      })
+    }
+  )
   names(new_combinations) <- names(ions_list)
 
   all_combinations <- new_combinations |>
@@ -295,7 +301,8 @@ spectra_to_queries <- function(spectra = NULL,
   names(queries_results) <- names(all_combinations)
 
   message("Evaluate the performance of the query based on F-score.")
-  results_stats <- seq_along(queries_results) |>
+  results_stats <- queries_results |>
+    seq_along() |>
     purrr::map(
       .f = function(result, beta_2) {
         tp <- nrow(queries_results[[result]] |>
