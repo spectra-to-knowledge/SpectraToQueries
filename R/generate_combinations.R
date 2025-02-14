@@ -29,8 +29,9 @@ generate_combinations_progress <- function(indices, ions_list, max_ions) {
   purrr::map(
     .progress = TRUE,
     .x = indices,
-    .f = function(x, ions_list, max_ions) {
-      generate_combinations(x = ions_list[[x]], max_ions = max_ions)
+    .f = function(index, ions_list, max_ions) {
+      x <- ions_list[[index]]
+      generate_combinations(x = x, max_ions = max_ions)
     },
     ions_list = ions_list,
     max_ions = max_ions
