@@ -13,12 +13,16 @@
 #' @examples NULL
 perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
   target <- names(ions_list)[index]
-  frags <- ions_list[[index]][ions_list[[index]] |>
-    grepl(pattern = "frag")] |>
+  frags <- ions_list[[index]][
+    ions_list[[index]] |>
+      grepl(pattern = "frag")
+  ] |>
     gsub(pattern = "_frag", replacement = "") |>
     as.numeric()
-  nls <- ions_list[[index]][ions_list[[index]] |>
-    grepl(pattern = "nl")] |>
+  nls <- ions_list[[index]][
+    ions_list[[index]] |>
+      grepl(pattern = "nl")
+  ] |>
     gsub(pattern = "_nl", replacement = "") |>
     as.numeric()
   value <- spectra |>

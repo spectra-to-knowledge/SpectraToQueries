@@ -23,25 +23,38 @@
 #' @export
 #'
 #' @examples NULL
-spectra_to_queries <- function(spectra = NULL,
-                               export = "data/interim/queries.tsv",
-                               beta_1 = 1,
-                               beta_2 = 0.5,
-                               dalton = 0.01,
-                               decimals = 4L,
-                               intensity_min = 0L,
-                               ions_max = 10L,
-                               n_skel_min = 5L,
-                               n_spec_min = 3L,
-                               ppm = 30L,
-                               fscore_min = 0L,
-                               precision_min = 0L,
-                               recall_min = 0L,
-                               zero_val = 0L) {
+spectra_to_queries <- function(
+  spectra = NULL,
+  export = "data/interim/queries.tsv",
+  beta_1 = 1,
+  beta_2 = 0.5,
+  dalton = 0.01,
+  decimals = 4L,
+  intensity_min = 0L,
+  ions_max = 10L,
+  n_skel_min = 5L,
+  n_spec_min = 3L,
+  ppm = 30L,
+  fscore_min = 0L,
+  precision_min = 0L,
+  recall_min = 0L,
+  zero_val = 0L
+) {
   if (is.null(spectra)) {
     message("No spectra given, loading example spectra.")
-    mia_spectra <- readRDS(system.file("extdata", "spectra.rds", package = "SpectraToQueries"))
-  } else if (spectra == system.file("extdata", "spectra_grouped.rds", package = "SpectraToQueries")) {
+    mia_spectra <- readRDS(system.file(
+      "extdata",
+      "spectra.rds",
+      package = "SpectraToQueries"
+    ))
+  } else if (
+    spectra ==
+      system.file(
+        "extdata",
+        "spectra_grouped.rds",
+        package = "SpectraToQueries"
+      )
+  ) {
     message("Loading grouped spectra.")
     mia_spectra <- readRDS(spectra)
   } else {
@@ -170,26 +183,42 @@ spectra_to_queries <- function(spectra = NULL,
     tibble::rownames_to_column(var = "group")
   rownames(merged_mat) <- tmp$group
   colnames(merged_mat) <-
-    c(paste0(round(
-      colnames(spectra_mat) |>
-        as.numeric(), decimals
-    ), "_frag"), paste0(round(
-      colnames(spectra_nl_mat) |>
-        as.numeric(), decimals
-    ), "_nl"))
+    c(
+      paste0(
+        round(
+          colnames(spectra_mat) |>
+            as.numeric(),
+          decimals
+        ),
+        "_frag"
+      ),
+      paste0(
+        round(
+          colnames(spectra_nl_mat) |>
+            as.numeric(),
+          decimals
+        ),
+        "_nl"
+      )
+    )
 
   message("Count the number of members per skeleton and pivot the matrix.")
   ions_table <- merged_mat |>
     as.data.frame() |>
     tibble::rownames_to_column(var = "group") |>
-    tidytable::mutate(group = gsub(
-      pattern = "\\.[0-9]{1,3}",
-      replacement = "",
-      x = group
-    )) |>
+    tidytable::mutate(
+      group = gsub(
+        pattern = "\\.[0-9]{1,3}",
+        replacement = "",
+        x = group
+      )
+    ) |>
     tidytable::group_by(group) |>
     tidytable::add_count(name = "group_count") |>
-    tidytable::pivot_longer(cols = !tidytable::starts_with("group"), names_to = "ion") |>
+    tidytable::pivot_longer(
+      cols = !tidytable::starts_with("group"),
+      names_to = "ion"
+    ) |>
     tidytable::filter(value != 0)
 
   message("Extract the best ions to perform a query.")
@@ -210,8 +239,11 @@ spectra_to_queries <- function(spectra = NULL,
     ) |>
     tidytable::filter(precision >= precision_min) |>
     tidytable::filter(recall >= recall_min) |>
-    tidytable::mutate(fscore = (1 + beta_1^2) * (precision * recall) / ((precision * beta_1^
-      2) + recall)) |>
+    tidytable::mutate(
+      fscore = (1 + beta_1^2) *
+        (precision * recall) /
+        ((precision * beta_1^2) + recall)
+    ) |>
     tidytable::arrange(tidytable::desc(fscore)) |>
     tidytable::filter(fscore >= fscore_min | recall == 1) |>
     tidytable::mutate(value = 1)
@@ -242,7 +274,9 @@ spectra_to_queries <- function(spectra = NULL,
     tibble::column_to_rownames("group")
 
   # Extract the matching ions per skeleton.
-  list_diagnostic <- ions_table_diagnostic[, seq_len(ncol(ions_table_diagnostic))]
+  list_diagnostic <- ions_table_diagnostic[, seq_len(ncol(
+    ions_table_diagnostic
+  ))]
   ions_list_diagnostic <-
     apply(
       X = list_diagnostic,
@@ -261,11 +295,16 @@ spectra_to_queries <- function(spectra = NULL,
       }
     )
   ions_list_diagnostic <- split(
-    colnames(ions_table_diagnostic)[col(ions_table_diagnostic)[ions_table_diagnostic > 0]],
+    colnames(ions_table_diagnostic)[col(ions_table_diagnostic)[
+      ions_table_diagnostic > 0
+    ]],
     row(ions_table_diagnostic)[ions_table_diagnostic > 0]
   )
   names(ions_list_diagnostic) <- rownames(ions_table_diagnostic)
-  ions_list <- split(colnames(ions_table_final)[col(ions_table_final)[ions_table_final > 0]], row(ions_table_final)[ions_table_final > 0])
+  ions_list <- split(
+    colnames(ions_table_final)[col(ions_table_final)[ions_table_final > 0]],
+    row(ions_table_final)[ions_table_final > 0]
+  )
   names(ions_list) <- rownames(ions_table_final)
 
   message("Generate all combinations of queries.")
@@ -303,22 +342,31 @@ spectra_to_queries <- function(spectra = NULL,
     seq_along() |>
     purrr::map(
       .f = function(result, beta_2) {
-        tp <- nrow(queries_results[[result]] |>
-          tidytable::filter(target == value))
-        fp <- nrow(queries_results[[result]] |>
-          tidytable::filter(target != value))
+        tp <- nrow(
+          queries_results[[result]] |>
+            tidytable::filter(target == value)
+        )
+        fp <- nrow(
+          queries_results[[result]] |>
+            tidytable::filter(target != value)
+        )
         fn <-
-          length(mia_spectra$SKELETON[mia_spectra$SKELETON |>
-            gsub(
-              pattern = "+",
-              replacement = ".",
-              fixed = TRUE
-            ) == names(queries_results)[result]]) - tp
+          length(mia_spectra$SKELETON[
+            mia_spectra$SKELETON |>
+              gsub(
+                pattern = "+",
+                replacement = ".",
+                fixed = TRUE
+              ) ==
+              names(queries_results)[result]
+          ]) -
+          tp
         recall <- tp / (tp + fn)
         precision <- tp / (tp + fp)
         f_beta <-
-          (1 + beta_2^2) * (precision * recall) / ((precision * beta_2^
-            2) + recall)
+          (1 + beta_2^2) *
+          (precision * recall) /
+          ((precision * beta_2^2) + recall)
         return(round(f_beta, decimals))
       },
       beta_2 = beta_2

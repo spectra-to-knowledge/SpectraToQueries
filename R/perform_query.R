@@ -9,11 +9,7 @@
 #' @return NULL
 #'
 #' @examples NULL
-perform_query <- function(spectra,
-                          frags,
-                          nls,
-                          dalton,
-                          ppm) {
+perform_query <- function(spectra, frags, nls, dalton, ppm) {
   if (length(frags) > 0) {
     spectra <- spectra[Spectra::containsMz(
       spectra,

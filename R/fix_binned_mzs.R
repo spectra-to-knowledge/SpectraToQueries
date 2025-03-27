@@ -9,11 +9,7 @@
 #' @return NULL
 #'
 #' @examples NULL
-fix_binned_mzs <- function(binned_m,
-                           original_mzs,
-                           dalton,
-                           ppm,
-                           decimals) {
+fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
   all_mzs <- original_mzs |>
     Spectra::peaksData() |>
     Spectra::combinePeaksData(
@@ -46,8 +42,10 @@ fix_binned_mzs <- function(binned_m,
       values_to = "value",
       names_repair = "minimal"
     ) |>
-    tidytable::mutate(name = name |>
-      gsub(pattern = "\\.[0-9]{1,2}$", replacement = "")) |>
+    tidytable::mutate(
+      name = name |>
+        gsub(pattern = "\\.[0-9]{1,2}$", replacement = "")
+    ) |>
     # tidytable::filter(!name |>
     #   grepl(pattern = "V", fixed = TRUE)) |>
     tidytable::mutate(
