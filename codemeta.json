@@ -2,7 +2,7 @@
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "identifier": "SpectraToQueries",
-  "description": "SpectraToQueries provides the infrastructure to translate spectra to queries",
+  "description": "SpectraToQueries provides the infrastructure to translate spectra to queries.",
   "name": "SpectraToQueries: Spectra to queries",
   "relatedLink": "https://spectra-to-knowledge.github.io/SpectraToQueries",
   "codeRepository": "https://github.com/spectra-to-knowledge/spectra-to-queries",
@@ -14,7 +14,7 @@
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.4.2 (2024-10-31)",
+  "runtimePlatform": "R version 4.4.3 (2025-02-28)",
   "author": [
     {
       "@type": "Person",
@@ -54,18 +54,6 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=BiocManager"
-    },
-    {
-      "@type": "SoftwareApplication",
-      "identifier": "knitr",
-      "name": "knitr",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=knitr"
     },
     {
       "@type": "SoftwareApplication",
@@ -115,7 +103,7 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocGenerics",
       "name": "BiocGenerics",
-      "version": ">= 0.52.0",
+      "version": ">= 0.48.1",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -128,7 +116,7 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocParallel",
       "name": "BiocParallel",
-      "version": ">= 1.40.0",
+      "version": ">= 1.36.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -141,7 +129,7 @@
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
-      "version": ">= 1.14.0",
+      "version": ">= 1.10.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -167,7 +155,7 @@
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
-      "version": ">= 1.16.0",
+      "version": ">= 1.12.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -204,8 +192,8 @@
     },
     "SystemRequirements": null
   },
-  "keywords": ["knowledgeextraction", "spectralinformation", "queryingsystem"],
-  "fileSize": "1372.612KB",
+  "keywords": ["knowledgeExtraction", "spectralInformation", "queryingSystem"],
+  "fileSize": "1370.958KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -223,6 +211,7 @@
       "description": "R package, version 0.0.9000"
     }
   ],
+  "releaseNotes": "https://github.com/spectra-to-knowledge/spectra-to-queries/blob/master/NEWS.md",
   "readme": "https://github.com/spectra-to-knowledge/SpectraToQueries/blob/main/README.md",
   "contIntegration": ["https://github.com/spectra-to-knowledge/SpectraToQueries/actions/workflows/R-CMD-check.yaml", "https://app.codecov.io/gh/spectra-to-knowledge/SpectraToQueries"],
   "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html#experimental"

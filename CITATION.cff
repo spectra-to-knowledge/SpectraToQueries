@@ -42,6 +42,6 @@ contact:
   email: adafede@gmail.com
   orcid: https://orcid.org/0000-0003-0443-9902
 keywords:
-- knowledge extraction
-- spectral information
-- querying system
+- knowledgeExtraction
+- spectralInformation
+- queryingSystem
