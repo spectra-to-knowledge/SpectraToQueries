@@ -40,8 +40,8 @@ LazyData: true
 ByteCompile: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-biocViews: knowledge extraction, spectral information, querying system
-X-schema.org-keywords: knowledge extraction, spectral information, querying system
+biocViews: knowledgeExtraction, spectralInformation, queryingSystem
+X-schema.org-keywords: knowledgeExtraction, spectralInformation, queryingSystem
 Language: en-US
 Collate: 
     'SpectraToQueries-package.R'
