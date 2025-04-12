@@ -1,6 +1,6 @@
 Package: SpectraToQueries
 Title: Spectra to queries
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: c(
     person(given = "Adriano",
            family = "Rutz", 
@@ -20,13 +20,13 @@ URL: https://github.com/spectra-to-knowledge/spectra-to-queries,
     https://spectra-to-knowledge.github.io/SpectraToQueries
 BugReports: https://github.com/spectra-to-knowledge/spectra-to-queries/issues
 Depends:
-    R (>= 4.3.0)
+    R (>= 4.4.0)
 Imports:
-    BiocGenerics (>= 0.48.1),
-    BiocParallel (>= 1.36.0),
-    MsBackendMgf (>= 1.10.0),
+    BiocGenerics (>= 0.52.0),
+    BiocParallel (>= 1.40.2),
+    MsBackendMgf (>= 1.14.0),
     purrr (>= 1.0.2),
-    Spectra (>= 1.12.0),
+    Spectra (>= 1.16.1),
     tidytable (>= 0.11.2),
     tibble (>= 3.2.1)
 Suggests: 
