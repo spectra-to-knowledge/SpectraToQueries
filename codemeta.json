@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/spectra-to-knowledge/spectra-to-queries",
   "issueTracker": "https://github.com/spectra-to-knowledge/spectra-to-queries/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.0.9000",
+  "version": "0.0.0.9001",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -193,11 +193,11 @@
     "SystemRequirements": null
   },
   "keywords": ["knowledgeExtraction", "spectralInformation", "queryingSystem"],
-  "fileSize": "1370.958KB",
+  "fileSize": "1373.633KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
-      "datePublished": "2024",
+      "datePublished": "2025",
       "author": [
         {
           "@type": "Person",
@@ -208,7 +208,155 @@
         }
       ],
       "name": "SpectraToQueries: SpectraToQueries provides the infrastructure to translate spectra to queries",
-      "description": "R package, version 0.0.9000"
+      "description": "R package, version 0.0.9001"
+    },
+    {
+      "@type": "ScholarlyArticle",
+      "datePublished": "2025",
+      "author": [
+        {
+          "@type": "Person",
+          "givenName": "Sarah",
+          "familyName": "Szwarc",
+          "@id": "https://orcid.org/0000-0001-6369-5522"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Adriano",
+          "familyName": "Rutz",
+          "@id": "https://orcid.org/0000-0003-0443-9902"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Kyungha",
+          "familyName": "Lee"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Yassine",
+          "familyName": "Mejri"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Olivier",
+          "familyName": "Bonnet"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Hazrina",
+          "familyName": "Hazni"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Adrien",
+          "familyName": "Jagora"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Rany B",
+          "familyName": "Mbeng Obame"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Noh",
+          "familyName": "Jin Kyoung"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Elvis",
+          "familyName": "Otogo N'Nang"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Stephenie C",
+          "familyName": "Alaribe"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Khalijah",
+          "familyName": "Awang"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Guillaume",
+          "familyName": "Bernadat"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Young Hae",
+          "familyName": "Choi"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Vincent",
+          "familyName": "Courdavault"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Michel",
+          "familyName": "Frederich"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Thomas",
+          "familyName": "Gaslonde"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Florian",
+          "familyName": "Huber"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Toh-Seok",
+          "familyName": "Kam"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Yun Yee",
+          "familyName": "Low"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Erwan",
+          "familyName": "Poupon"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Justin J J",
+          "familyName": "van der Hooft"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Kyo Bin",
+          "familyName": "Kang"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Pierre",
+          "familyName": "Le Pogam"
+        },
+        {
+          "@type": "Person",
+          "givenName": "Mehdi A",
+          "familyName": "Beniddir",
+          "@id": "https://orcid.org/0000-0003-2153-4290"
+        }
+      ],
+      "name": "Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids",
+      "identifier": "10.1186/s13321-025-01009-0",
+      "url": "https://doi.org/10.1186/s13321-025-01009-0",
+      "@id": "https://doi.org/10.1186/s13321-025-01009-0",
+      "sameAs": "https://doi.org/10.1186/s13321-025-01009-0",
+      "isPartOf": {
+        "@type": "PublicationIssue",
+        "datePublished": "2025",
+        "isPartOf": {
+          "@type": ["PublicationVolume", "Periodical"],
+          "volumeNumber": "17",
+          "name": "J. Cheminform."
+        }
+      }
     }
   ],
   "releaseNotes": "https://github.com/spectra-to-knowledge/spectra-to-queries/blob/master/NEWS.md",

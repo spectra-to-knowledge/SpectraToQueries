@@ -8,7 +8,7 @@ message: 'To cite package "SpectraToQueries" in publications use:'
 type: software
 license: GPL-3.0-or-later
 title: 'SpectraToQueries: Repository to translate spectra to queries.'
-version: 0.0.0.9000
+version: 0.0.0.9001
 abstract: SpectraToQueries provides the infrastructure to translate spectra to queries
 authors:
 - family-names: Rutz
@@ -31,8 +31,8 @@ preferred-citation:
     given-names: Sarah
     email: sarah.szwarc@universite-paris-saclay.fr
     orcid: https://orcid.org/0000-0001-6369-5522
-  year: '2024'
-  notes: R package, version 0.0.9000
+  year: '2025'
+  notes: R package, version 0.0.9001
 repository: https://r-universe.dev
 repository-code: https://github.com/spectra-to-knowledge/SpectraToQueries
 url: https://spectra-to-knowledge.github.io/SpectraToQueries
@@ -45,3 +45,73 @@ keywords:
 - knowledgeExtraction
 - spectralInformation
 - queryingSystem
+references:
+- type: article
+  title: "Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids"
+  authors:
+  - family-names: Szwarc
+    given-names: Sarah
+    orcid: https://orcid.org/0000-0001-6369-5522
+  - family-names: Rutz
+    given-names: Adriano
+    orcid: https://orcid.org/0000-0003-0443-9902
+  - family-names: Lee
+    given-names: Kyungha
+  - family-names: Mejri
+    given-names: Yassine
+  - family-names: Bonnet
+    given-names: Olivier
+  - family-names: Hazni
+    given-names: Hazrina
+  - family-names: Jagora
+    given-names: Adrien
+  - family-names: Mbeng Obame
+    given-names: Rany B
+  - family-names: Jin Kyoung
+    given-names: Noh
+  - family-names: Otogo N'Nang
+    given-names: Elvis
+  - family-names: Alaribe
+    given-names: Stephenie C
+  - family-names: Awang
+    given-names: Khalijah
+  - family-names: Bernadat
+    given-names: Guillaume
+  - family-names: Choi
+    given-names: Young Hae
+  - family-names: Courdavault
+    given-names: Vincent
+  - family-names: Frederich
+    given-names: Michel
+  - family-names: Gaslonde
+    given-names: Thomas
+  - family-names: Huber
+    given-names: Florian
+  - family-names: Kam
+    given-names: Toh-Seok
+  - family-names: Low
+    given-names: Yun Yee
+  - family-names: Poupon
+    given-names: Erwan
+  - family-names: van der Hooft
+    given-names: Justin J J
+  - family-names: Kang
+    given-names: Kyo Bin
+  - family-names: Le Pogam
+    given-names: Pierre
+  - family-names: Beniddir
+    given-names: Mehdi A
+    orcid: https://orcid.org/0000-0003-2153-4290
+  journal: Frontiers in Plant Science
+  year: '2025'
+  volume: '17'
+  url: https://doi.org/10.3389/fpls.2019.01329
+  keywords:
+  - Expert knowledge
+  - MS/MS
+  - Monoterpene indole alkaloids
+  - Query
+  - Scaffold
+  - Similarity
+  doi: 10.1186/s13321-025-01009-0
+  issn: 1758-2946
