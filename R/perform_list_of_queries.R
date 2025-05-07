@@ -26,7 +26,7 @@ perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
     gsub(pattern = "_nl", replacement = "") |>
     as.numeric()
   value <- spectra |>
-    perform_query(frags = frags, nls = nls, dalton, ppm) |>
+    perform_query(frags = frags, nls = nls, dalton = dalton, ppm = ppm) |>
     Spectra::spectraData() |>
     tidytable::pull(SKELETON) |>
     gsub(
