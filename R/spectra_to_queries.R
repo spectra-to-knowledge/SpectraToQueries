@@ -61,7 +61,8 @@ spectra_to_queries <- function(
     message("Loading spectra.")
     mia_spectra <- spectra |>
       MsBackendMgf::readMgf() |>
-      Spectra::Spectra()
+      Spectra::Spectra() |>
+      Spectra::setBackend(Spectra::MsBackendMemory())
   }
   mia_spectra@backend@spectraData$precursorMz <-
     mia_spectra@backend@spectraData$PRECURSOR_MZ |>
