@@ -7,6 +7,52 @@ bibentry(
     person(given = "Adriano", family = "Rutz", email = "adafede@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0443-9902")),
     person(given = "Sarah", family = "Szwarc", email = "sarah.szwarc@universite-paris-saclay.fr", role = "ctb", comment = c(ORCID = "0000-0001-6369-5522"))
     ),
-  year     = "2024",
-  note     = "R package, version 0.0.9000",
+  year     = "2025",
+  note     = "R package, version 0.0.9001",
+)
+
+bibentry(
+  bibtype  = "Article",
+  title    = "Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids",
+  author   = c(
+    person(given = "Sarah", family = "Szwarc", comment = c(ORCID = "0000-0001-6369-5522")),
+    person(given = "Adriano", family = "Rutz", comment = c(ORCID = "0000-0003-0443-9902")),
+    person(given = "Kyungha", family = "Lee"),
+    person(given = "Yassine", family = "Mejri"),
+    person(given = "Olivier", family = "Bonnet"),
+    person(given = "Hazrina", family = "Hazni"),
+    person(given = "Adrien", family = "Jagora"),
+    person(given = "Rany B", family = "Mbeng Obame"),
+    person(given = "Noh", family = "Jin Kyoung"),
+    person(given = "Elvis", family = "Otogo N'Nang"),
+    person(given = "Stephenie C", family = "Alaribe"),
+    person(given = "Khalijah", family = "Awang"),
+    person(given = "Guillaume", family = "Bernadat"),
+    person(given = "Young Hae", family = "Choi"),
+    person(given = "Vincent", family = "Courdavault"),
+    person(given = "Michel", family = "Frederich"),
+    person(given = "Thomas", family = "Gaslonde"),
+    person(given = "Florian", family = "Huber"),
+    person(given = "Toh-Seok", family = "Kam"),
+    person(given = "Yun Yee", family = "Low"),
+    person(given = "Erwan", family = "Poupon"),
+    person(given = "Justin J J", family = "van der Hooft"),
+    person(given = "Kyo Bin", family = "Kang"),
+    person(given = "Pierre", family = "Le Pogam"),
+    person(given = "Mehdi A", family = "Beniddir", comment = c(ORCID = "0000-0003-2153-4290"))
+    ),
+  journal  = "J. Cheminform.",
+  year     = "2025",
+  volume   = "17",
+  url      = "https://doi.org/10.1186/s13321-025-01009-0",
+  language = "en",
+  keywords = "Expert knowledge, MS/MS, Monoterpene indole alkaloids, Query, Scaffold, Similarity",
+  doi      = "10.1186/s13321-025-01009-0",
+  issn     = "1758-2946",
+  pmc      = "PMC12039057",
+  pmid     = "40296170",
+  qid      = "Q134267957",
+  textVersion = paste(
+  "Szwarc, S., Rutz, A., Lee, K. et al. Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids. J Cheminform 17, 62 (2025). https://doi.org/10.1186/s13321-025-01009-0. doi:10.1186/s13321-025-01009-0. issn:1758-2946. pmc:PMC12039057. pmid:40296170. qid:Q134267957."
+  )
 )

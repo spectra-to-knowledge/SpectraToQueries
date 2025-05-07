@@ -99,7 +99,9 @@ SpectraToQueries::spectra_to_queries(
 
 ## Main Citations
 
-TODO
+Translating community-wide spectral library into actionable chemical
+knowledge: a proof of concept with monoterpene indole alkaloids:
+<https://doi.org/10.1186/s13321-025-01009-0>
 
 ### Others
 
