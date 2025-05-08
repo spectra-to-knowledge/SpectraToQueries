@@ -11,15 +11,15 @@ spectra_to_queries(
   beta_2 = 0.5,
   dalton = 0.01,
   decimals = 4L,
-  intensity_min = 0L,
+  intensity_min = 0,
   ions_max = 10L,
   n_skel_min = 5L,
   n_spec_min = 3L,
-  ppm = 30L,
-  fscore_min = 0L,
+  ppm = 30,
+  fscore_min = 0,
   precision_min = 0L,
-  recall_min = 0L,
-  zero_val = 0L
+  recall_min = 0,
+  zero_val = 0
 )
 }
 \arguments{
@@ -27,31 +27,31 @@ spectra_to_queries(
 
 \item{export}{Export path}
 
-\item{beta_1}{Beta parameter of the single ion F-score calculation}
+\item{beta_1}{Beta parameter of the single ion F-score calculation. Default to 1.0}
 
-\item{beta_2}{Beta parameter of the total F-score calculation}
+\item{beta_2}{Beta parameter of the total F-score calculation. Default to 0.5}
 
 \item{dalton}{Tolerance in Dalton. Default to 0.01}
 
-\item{decimals}{Number of decimals for rounding. Default to 4}
+\item{decimals}{Number of decimals for rounding. Default to 4L}
 
-\item{intensity_min}{Minimal intensity. Default to 0}
+\item{intensity_min}{Minimal intensity. Default to 0.0}
 
-\item{ions_max}{Maximal number of ions in the query. Default to 10}
+\item{ions_max}{Maximal number of ions in the query. Default to 10L}
 
-\item{n_skel_min}{Minimal number of individuals per skeleton. Default to 5}
+\item{n_skel_min}{Minimal number of individuals per skeleton. Default to 5L}
 
-\item{n_spec_min}{Minimal number of individuals where a signal has to be found. Default to 3}
+\item{n_spec_min}{Minimal number of individuals where a signal has to be found. Default to 3L}
 
-\item{ppm}{Tolerance in parts per million Default to 25}
+\item{ppm}{Tolerance in parts per million Default to 30.0}
 
-\item{fscore_min}{Minimal single ion F-score. Default to 0}
+\item{fscore_min}{Minimal single ion F-score. Default to 0.0}
 
-\item{precision_min}{Minimal single ion precision. Default to 0}
+\item{precision_min}{Minimal single ion precision. Default to 0.0}
 
-\item{recall_min}{Minimal single ion recall. Default to 0}
+\item{recall_min}{Minimal single ion recall. Default to 0.0}
 
-\item{zero_val}{Zero value for intensity. Default to 0}
+\item{zero_val}{Zero value for intensity. Default to 0.0}
 }
 \value{
 A file with diagnostic query ions

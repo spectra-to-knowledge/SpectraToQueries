@@ -82,18 +82,19 @@ Showing all parameters:
 SpectraToQueries::spectra_to_queries(
   spectra = NULL,
   export = "data/interim/queries.tsv",
-  beta = 0.5,
+  beta_1 = 1.0,
+  beta_2 = 0.5,
   dalton = 0.01,
   decimals = 4L,
-  intensity_min = 0L,
+  intensity_min = 0.0,
   ions_max = 10L,
   n_skel_min = 5L,
   n_spec_min = 3L,
-  ppm = 20L,
-  senspe_min = 0.1,
-  sensitivity_min = 0L,
-  specificity_min = 0L,
-  zero_val = 0L
+  ppm = 30.0,
+  fscore_min = 0.0,
+  precision_min = .0L,
+  recall_min = 0.0,
+  zero_val = 0.0
 )
 ```
 
