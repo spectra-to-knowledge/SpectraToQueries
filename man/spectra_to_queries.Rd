@@ -17,7 +17,7 @@ spectra_to_queries(
   n_spec_min = 3L,
   ppm = 30,
   fscore_min = 0,
-  precision_min = 0L,
+  precision_min = 0,
   recall_min = 0,
   zero_val = 0
 )
