@@ -4,19 +4,19 @@
 #'
 #' @param spectra Spectra path
 #' @param export Export path
-#' @param beta_1 Beta parameter of the single ion F-score calculation
-#' @param beta_2 Beta parameter of the total F-score calculation
+#' @param beta_1 Beta parameter of the single ion F-score calculation. Default to 1.0
+#' @param beta_2 Beta parameter of the total F-score calculation. Default to 0.5
 #' @param dalton Tolerance in Dalton. Default to 0.01
-#' @param decimals Number of decimals for rounding. Default to 4
-#' @param intensity_min Minimal intensity. Default to 0
-#' @param ions_max Maximal number of ions in the query. Default to 10
-#' @param n_skel_min Minimal number of individuals per skeleton. Default to 5
-#' @param n_spec_min Minimal number of individuals where a signal has to be found. Default to 3
-#' @param ppm Tolerance in parts per million Default to 25
-#' @param fscore_min Minimal single ion F-score. Default to 0
-#' @param precision_min Minimal single ion precision. Default to 0
-#' @param recall_min Minimal single ion recall. Default to 0
-#' @param zero_val Zero value for intensity. Default to 0
+#' @param decimals Number of decimals for rounding. Default to 4L
+#' @param intensity_min Minimal intensity. Default to 0.0
+#' @param ions_max Maximal number of ions in the query. Default to 10L
+#' @param n_skel_min Minimal number of individuals per skeleton. Default to 5L
+#' @param n_spec_min Minimal number of individuals where a signal has to be found. Default to 3L
+#' @param ppm Tolerance in parts per million Default to 30.0
+#' @param fscore_min Minimal single ion F-score. Default to 0.0
+#' @param precision_min Minimal single ion precision. Default to 0.0
+#' @param recall_min Minimal single ion recall. Default to 0.0
+#' @param zero_val Zero value for intensity. Default to 0.0
 #'
 #' @return A file with diagnostic query ions
 #'
@@ -26,19 +26,19 @@
 spectra_to_queries <- function(
   spectra = NULL,
   export = "data/interim/queries.tsv",
-  beta_1 = 1,
+  beta_1 = 1.0,
   beta_2 = 0.5,
   dalton = 0.01,
   decimals = 4L,
-  intensity_min = 0L,
+  intensity_min = 0.0,
   ions_max = 10L,
   n_skel_min = 5L,
   n_spec_min = 3L,
-  ppm = 30L,
-  fscore_min = 0L,
-  precision_min = 0L,
-  recall_min = 0L,
-  zero_val = 0L
+  ppm = 30.0,
+  fscore_min = 0.0,
+  precision_min = .0L,
+  recall_min = 0.0,
+  zero_val = 0.0
 ) {
   if (is.null(spectra)) {
     message("No spectra given, loading example spectra.")
