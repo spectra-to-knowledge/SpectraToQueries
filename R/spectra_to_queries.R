@@ -36,7 +36,7 @@ spectra_to_queries <- function(
   n_spec_min = 3L,
   ppm = 30.0,
   fscore_min = 0.0,
-  precision_min = .0L,
+  precision_min = 0.0,
   recall_min = 0.0,
   zero_val = 0.0
 ) {
