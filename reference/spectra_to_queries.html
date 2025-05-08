@@ -51,15 +51,15 @@
 <span>  beta_2 <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  dalton <span class="op">=</span> <span class="fl">0.01</span>,</span>
 <span>  decimals <span class="op">=</span> <span class="fl">4L</span>,</span>
-<span>  intensity_min <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  intensity_min <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  ions_max <span class="op">=</span> <span class="fl">10L</span>,</span>
 <span>  n_skel_min <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  n_spec_min <span class="op">=</span> <span class="fl">3L</span>,</span>
-<span>  ppm <span class="op">=</span> <span class="fl">30L</span>,</span>
-<span>  fscore_min <span class="op">=</span> <span class="fl">0L</span>,</span>
+<span>  ppm <span class="op">=</span> <span class="fl">30</span>,</span>
+<span>  fscore_min <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  precision_min <span class="op">=</span> <span class="fl">0L</span>,</span>
-<span>  recall_min <span class="op">=</span> <span class="fl">0L</span>,</span>
-<span>  zero_val <span class="op">=</span> <span class="fl">0L</span></span>
+<span>  recall_min <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  zero_val <span class="op">=</span> <span class="fl">0</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -76,11 +76,11 @@
 
 
 <dt id="arg-beta-">beta_1<a class="anchor" aria-label="anchor" href="#arg-beta-"></a></dt>
-<dd><p>Beta parameter of the single ion F-score calculation</p></dd>
+<dd><p>Beta parameter of the single ion F-score calculation. Default to 1.0</p></dd>
 
 
 <dt id="arg-beta-">beta_2<a class="anchor" aria-label="anchor" href="#arg-beta-"></a></dt>
-<dd><p>Beta parameter of the total F-score calculation</p></dd>
+<dd><p>Beta parameter of the total F-score calculation. Default to 0.5</p></dd>
 
 
 <dt id="arg-dalton">dalton<a class="anchor" aria-label="anchor" href="#arg-dalton"></a></dt>
@@ -88,43 +88,43 @@
 
 
 <dt id="arg-decimals">decimals<a class="anchor" aria-label="anchor" href="#arg-decimals"></a></dt>
-<dd><p>Number of decimals for rounding. Default to 4</p></dd>
+<dd><p>Number of decimals for rounding. Default to 4L</p></dd>
 
 
 <dt id="arg-intensity-min">intensity_min<a class="anchor" aria-label="anchor" href="#arg-intensity-min"></a></dt>
-<dd><p>Minimal intensity. Default to 0</p></dd>
+<dd><p>Minimal intensity. Default to 0.0</p></dd>
 
 
 <dt id="arg-ions-max">ions_max<a class="anchor" aria-label="anchor" href="#arg-ions-max"></a></dt>
-<dd><p>Maximal number of ions in the query. Default to 10</p></dd>
+<dd><p>Maximal number of ions in the query. Default to 10L</p></dd>
 
 
 <dt id="arg-n-skel-min">n_skel_min<a class="anchor" aria-label="anchor" href="#arg-n-skel-min"></a></dt>
-<dd><p>Minimal number of individuals per skeleton. Default to 5</p></dd>
+<dd><p>Minimal number of individuals per skeleton. Default to 5L</p></dd>
 
 
 <dt id="arg-n-spec-min">n_spec_min<a class="anchor" aria-label="anchor" href="#arg-n-spec-min"></a></dt>
-<dd><p>Minimal number of individuals where a signal has to be found. Default to 3</p></dd>
+<dd><p>Minimal number of individuals where a signal has to be found. Default to 3L</p></dd>
 
 
 <dt id="arg-ppm">ppm<a class="anchor" aria-label="anchor" href="#arg-ppm"></a></dt>
-<dd><p>Tolerance in parts per million Default to 25</p></dd>
+<dd><p>Tolerance in parts per million Default to 30.0</p></dd>
 
 
 <dt id="arg-fscore-min">fscore_min<a class="anchor" aria-label="anchor" href="#arg-fscore-min"></a></dt>
-<dd><p>Minimal single ion F-score. Default to 0</p></dd>
+<dd><p>Minimal single ion F-score. Default to 0.0</p></dd>
 
 
 <dt id="arg-precision-min">precision_min<a class="anchor" aria-label="anchor" href="#arg-precision-min"></a></dt>
-<dd><p>Minimal single ion precision. Default to 0</p></dd>
+<dd><p>Minimal single ion precision. Default to 0.0</p></dd>
 
 
 <dt id="arg-recall-min">recall_min<a class="anchor" aria-label="anchor" href="#arg-recall-min"></a></dt>
-<dd><p>Minimal single ion recall. Default to 0</p></dd>
+<dd><p>Minimal single ion recall. Default to 0.0</p></dd>
 
 
 <dt id="arg-zero-val">zero_val<a class="anchor" aria-label="anchor" href="#arg-zero-val"></a></dt>
-<dd><p>Zero value for intensity. Default to 0</p></dd>
+<dd><p>Zero value for intensity. Default to 0.0</p></dd>
 
 </dl></div>
     <div class="section level2">
