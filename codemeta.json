@@ -7,7 +7,7 @@
   "relatedLink": "https://spectra-to-knowledge.github.io/SpectraToQueries",
   "codeRepository": "https://github.com/spectra-to-knowledge/spectra-to-queries",
   "issueTracker": "https://github.com/spectra-to-knowledge/spectra-to-queries/issues",
-  "license": "https://spdx.org/licenses/GPL-3.0",
+  "license": "https://spdx.org/licenses/AGPL-3.0",
   "version": "0.0.0.9001",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
@@ -193,7 +193,7 @@
     "SystemRequirements": null
   },
   "keywords": ["knowledgeExtraction", "spectralInformation", "queryingSystem"],
-  "fileSize": "1373.804KB",
+  "fileSize": "1373.82KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
