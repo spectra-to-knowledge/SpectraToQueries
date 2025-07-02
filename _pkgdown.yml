@@ -13,7 +13,5 @@ template:
     image:
       src: man/figures/logo.svg
       alt: "SpectraToQueries"
-    twitter:
-      creator: "@adafede"
 
 url: https://spectra-to-knowledge.github.io/SpectraToQueries
