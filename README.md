@@ -1,5 +1,6 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+<!-- README.md is generated from README.qmd. Please edit that file -->
 
 # SpectraToQueries <img src='https://raw.githubusercontent.com/spectra-to-knowledge/SpectraToQueries/main/man/figures/logo.svg' align="right" height="139" />
 
@@ -8,7 +9,6 @@
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![R-CMD-check](https://github.com/spectra-to-knowledge/SpectraToQueries/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/spectra-to-knowledge/SpectraToQueries/actions/workflows/R-CMD-check.yaml)
-[![R-Universe](https://spectra-to-knowledge.r-universe.dev/badges/SpectraToQueries)](https://spectra-to-knowledge.r-universe.dev/SpectraToQueries)
 [![Codecov test
 coverage](https://codecov.io/gh/spectra-to-knowledge/SpectraToQueries/graph/badge.svg)](https://app.codecov.io/gh/spectra-to-knowledge/SpectraToQueries)
 <!-- badges: end -->
@@ -19,12 +19,12 @@ Repository to translate spectra to queries.
 
 Here is what you *minimally* need:
 
-- **A file containing MS/MS spectra with associated skeleton
-  information** (or any other relevant chemical classification)
-  **provided as metadata**. This structure information, stored in the
-  metadata field “skeleton”, allows the generation of queries specific
-  to a given skeleton by extracting repetitive skeleton-specific
-  fragmentation patterns. The MIADB file is provided as an example.
+-   **A file containing MS/MS spectra with associated skeleton
+    information** (or any other relevant chemical classification)
+    **provided as metadata**. This structure information, stored in the
+    metadata field “skeleton”, allows the generation of queries specific
+    to a given skeleton by extracting repetitive skeleton-specific
+    fragmentation patterns. The MIADB file is provided as an example.
 
 ## Installation
 
@@ -106,5 +106,5 @@ knowledge: a proof of concept with monoterpene indole alkaloids:
 
 ### Others
 
-- The *RforMassSpectrometry* packages suite:
-  <https://doi.org/10.3390/metabo12020173>
+-   The *RforMassSpectrometry* packages suite:
+    <https://doi.org/10.3390/metabo12020173>
