@@ -50,3 +50,6 @@ rsconnect/
 
 # MacOS
 .DS_Store
+altdoc/freeze.rds
+_quarto/*
+!_quarto/_freeze/

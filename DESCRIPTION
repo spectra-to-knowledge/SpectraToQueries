@@ -30,10 +30,11 @@ Imports:
     tidytable (>= 0.11.2),
     tibble (>= 3.2.1)
 Suggests: 
-    BiocManager,
-    R.utils,
-    spelling,
-    testthat
+    altdoc (>= 0.5.0),
+    BiocManager (>= 1.30.25),
+    R.utils (>= 2.13.0),
+    spelling (>= 2.3.1),
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
