@@ -8,8 +8,8 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![R-CMD-check](https://github.com/spectra-to-knowledge/SpectraToQueries/actions/workflows/R-CMD-check/badge.svg)](https://github.com/spectra-to-knowledge/SpectraToQueries/actions/workflows/R-CMD-check)
-[![r-universe badge](https://spectra-to-knowledge.r-universe.dev/SpectraToQueries/badges/version?&color=green&style=flat)](https://spectra-to-knowledge.r-universe.dev/SpectraToQueries)
+[![R-CMD-check](https://github.com/spectra-to-knowledge/SpectraToQueries/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/spectra-to-knowledge/SpectraToQueries/actions/workflows/R-CMD-check.yaml)
+[![r-universe badge](https://spectra-to-knowledge.r-universe.dev/SpectraToQueries/badges/version?&color=blue&style=classic)](https://spectra-to-knowledge.r-universe.dev/SpectraToQueries)
 [![Codecov test
 coverage](https://codecov.io/gh/spectra-to-knowledge/SpectraToQueries/graph/badge.svg)](https://app.codecov.io/gh/spectra-to-knowledge/SpectraToQueries)
 <!-- badges: end -->
