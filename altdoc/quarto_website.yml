@@ -16,8 +16,6 @@ website:
     logo-alt: SpectraToQueries logo
     search: true
     left:
-      # - text: Functions
-      #   href: ./man
       - text: News
         file: $ALTDOC_NEWS
       - text: License
@@ -31,9 +29,10 @@ website:
 
 format:
   html:
+    grid:
+      body-width: 1200px
     respect-user-color-scheme: true
     toc: true
     theme:
       light: flatly
       dark: darkly
-    # number-sections: false
