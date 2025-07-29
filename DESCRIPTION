@@ -25,10 +25,10 @@ Imports:
     BiocGenerics (>= 0.52.0),
     BiocParallel (>= 1.40.2),
     MsBackendMgf (>= 1.14.0),
-    purrr (>= 1.0.2),
+    purrr (>= 1.1.0),
     Spectra (>= 1.16.1),
     tidytable (>= 0.11.2),
-    tibble (>= 3.2.1)
+    tibble (>= 3.3.0)
 Suggests: 
     altdoc (>= 0.5.0),
     BiocManager (>= 1.30.25),
