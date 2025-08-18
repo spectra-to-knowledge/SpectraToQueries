@@ -16,6 +16,9 @@ on:
 
 name: Update CITATION.cff
 
+permissions:
+  contents: write
+
 jobs:
   update-citation-cff:
     runs-on: macos-latest
