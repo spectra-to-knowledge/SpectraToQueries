@@ -33,6 +33,7 @@ Suggests:
     altdoc (>= 0.5.0),
     BiocManager (>= 1.30.25),
     BiocVersion (>= 3.20.0),
+    grateful (>= 0.2.12),
     R.utils (>= 2.13.0),
     spelling (>= 2.3.1),
     testthat (>= 3.0.0)
