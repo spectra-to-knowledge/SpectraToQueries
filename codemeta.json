@@ -71,6 +71,32 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "BiocVersion",
+      "name": "BiocVersion",
+      "version": ">= 3.20.0",
+      "provider": {
+        "@id": "https://www.bioconductor.org",
+        "@type": "Organization",
+        "name": "Bioconductor",
+        "url": "https://www.bioconductor.org"
+      },
+      "sameAs": "https://bioconductor.org/packages/release/bioc/html/BiocVersion.html"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "grateful",
+      "name": "grateful",
+      "version": ">= 0.2.12",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=grateful"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "R.utils",
       "name": "R.utils",
       "version": ">= 2.13.0",
@@ -209,8 +235,8 @@
     },
     "SystemRequirements": null
   },
-  "keywords": ["knowledgeExtraction", "spectralInformation", "queryingSystem"],
-  "fileSize": "1373.949KB",
+  "keywords": ["knowledgeExtraction", "spectralInformation", "queryingSystem", "knowledge-extraction", "spectral-library", "tandem-ms", "monoterpene-indole-alkaloids", "querying-system", "spectral-information"],
+  "fileSize": "2295.732KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
