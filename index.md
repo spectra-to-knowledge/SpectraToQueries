@@ -117,7 +117,7 @@ knowledge: a proof of concept with monoterpene indole alkaloids:
 | BiocVersion | 3.21.1 | Morgan (2024) |
 | knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
 | MsBackendMgf | 1.16.0 | Gatto, Rainer, and Gibb (2025) |
-| pkgload | 1.4.0 | Wickham et al. (2024) |
+| pkgload | 1.4.1 | Wickham et al. (2025) |
 | rmarkdown | 2.29 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2024) |
 | Spectra | 1.18.2 | Rainer et al. (2022) |
 | testthat | 3.2.3 | Wickham (2011) |
@@ -221,7 +221,7 @@ Source Software* 4 (43): 1686. <https://doi.org/10.21105/joss.01686>.
 
 <div id="ref-pkgload" class="csl-entry">
 
-Wickham, Hadley, Winston Chang, Jim Hester, and Lionel Henry. 2024.
+Wickham, Hadley, Winston Chang, Jim Hester, and Lionel Henry. 2025.
 *<span class="nocase">pkgload</span>: Simulate Package Installation and
 Attach*. <https://github.com/r-lib/pkgload>.
 
