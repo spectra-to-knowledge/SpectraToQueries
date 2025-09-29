@@ -340,11 +340,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#perform-list-of-queries-progress" id="toc-perform-list-of-queries-progress" class="nav-link active" data-scroll-target="#perform-list-of-queries-progress">Perform list of queries (progress)</a>
+  <li><a href="#generate-combinations-with-progress" id="toc-generate-combinations-with-progress" class="nav-link active" data-scroll-target="#generate-combinations-with-progress">Generate combinations with progress</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
   <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
+  <li><a href="#value" id="toc-value" class="nav-link" data-scroll-target="#value">Value</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   </ul>
@@ -357,11 +358,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<section id="perform-list-of-queries-progress" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="perform-list-of-queries-progress">Perform list of queries (progress)</h2>
+<section id="generate-combinations-with-progress" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="generate-combinations-with-progress">Generate combinations with progress</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>Perform list of queries (progress)</p>
+<p>Generate combinations with progress</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -376,7 +377,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <code id="indices">indices</code>
 </td>
 <td>
-Indices
+Vector of indices to process
 </td>
 </tr>
 <tr>
@@ -384,7 +385,7 @@ Indices
 <code id="ions_list">ions_list</code>
 </td>
 <td>
-Ions list
+List of ions for each index
 </td>
 </tr>
 <tr>
@@ -392,10 +393,14 @@ Ions list
 <code id="max_ions">max_ions</code>
 </td>
 <td>
-Max ions
+Maximum number of ions in combinations
 </td>
 </tr>
 </tbody></table>
+</section>
+<section id="value" class="level3">
+<h3 class="anchored" data-anchor-id="value">Value</h3>
+<p>List of all combinations for each index</p>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>

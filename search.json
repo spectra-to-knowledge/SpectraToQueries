@@ -11,28 +11,28 @@
     "href": "man/perform_list_of_queries.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Perform list of queries\n\n\n\nperform_list_of_queries(index, ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nindex\n\n\nIndex\n\n\n\n\nions_list\n\n\nIons list\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\ndalton\n\n\nDalton\n\n\n\n\nppm\n\n\nPPM\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Perform list of queries\n\n\n\nperform_list_of_queries(index, ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nindex\n\n\nIndex of the ion list to process\n\n\n\n\nions_list\n\n\nList of ions for queries\n\n\n\n\nspectra\n\n\nSpectra object to search\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nData frame with target and value columns\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/perform_list_of_queries.html#perform-list-of-queries",
     "href": "man/perform_list_of_queries.html#perform-list-of-queries",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Perform list of queries\n\n\n\nperform_list_of_queries(index, ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nindex\n\n\nIndex\n\n\n\n\nions_list\n\n\nIons list\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\ndalton\n\n\nDalton\n\n\n\n\nppm\n\n\nPPM\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Perform list of queries\n\n\n\nperform_list_of_queries(index, ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nindex\n\n\nIndex of the ion list to process\n\n\n\n\nions_list\n\n\nList of ions for queries\n\n\n\n\nspectra\n\n\nSpectra object to search\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nData frame with target and value columns\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/generate_combinations_progress.html",
     "href": "man/generate_combinations_progress.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Perform list of queries (progress)\n\n\n\ngenerate_combinations_progress(indices, ions_list, max_ions)\n\n\n\n\n\n\n\nindices\n\n\nIndices\n\n\n\n\nions_list\n\n\nIons list\n\n\n\n\nmax_ions\n\n\nMax ions\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Generate combinations with progress\n\n\n\ngenerate_combinations_progress(indices, ions_list, max_ions)\n\n\n\n\n\n\n\nindices\n\n\nVector of indices to process\n\n\n\n\nions_list\n\n\nList of ions for each index\n\n\n\n\nmax_ions\n\n\nMaximum number of ions in combinations\n\n\n\n\n\n\nList of all combinations for each index\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
-    "objectID": "man/generate_combinations_progress.html#perform-list-of-queries-progress",
-    "href": "man/generate_combinations_progress.html#perform-list-of-queries-progress",
+    "objectID": "man/generate_combinations_progress.html#generate-combinations-with-progress",
+    "href": "man/generate_combinations_progress.html#generate-combinations-with-progress",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Perform list of queries (progress)\n\n\n\ngenerate_combinations_progress(indices, ions_list, max_ions)\n\n\n\n\n\n\n\nindices\n\n\nIndices\n\n\n\n\nions_list\n\n\nIons list\n\n\n\n\nmax_ions\n\n\nMax ions\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Generate combinations with progress\n\n\n\ngenerate_combinations_progress(indices, ions_list, max_ions)\n\n\n\n\n\n\n\nindices\n\n\nVector of indices to process\n\n\n\n\nions_list\n\n\nList of ions for each index\n\n\n\n\nmax_ions\n\n\nMaximum number of ions in combinations\n\n\n\n\n\n\nList of all combinations for each index\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/create_dir.html",
@@ -53,14 +53,14 @@
     "href": "man/generate_combinations.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Generate combinations\n\n\n\ngenerate_combinations(x, max_ions)\n\n\n\n\n\n\n\nx\n\n\nx\n\n\n\n\nmax_ions\n\n\nMax ions\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Generate combinations\n\n\n\ngenerate_combinations(x, max_ions)\n\n\n\n\n\n\n\nx\n\n\nVector of elements to combine\n\n\n\n\nmax_ions\n\n\nMaximum number of ions in combinations\n\n\n\n\n\n\nList of all combinations\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/generate_combinations.html#generate-combinations",
     "href": "man/generate_combinations.html#generate-combinations",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Generate combinations\n\n\n\ngenerate_combinations(x, max_ions)\n\n\n\n\n\n\n\nx\n\n\nx\n\n\n\n\nmax_ions\n\n\nMax ions\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Generate combinations\n\n\n\ngenerate_combinations(x, max_ions)\n\n\n\n\n\n\n\nx\n\n\nVector of elements to combine\n\n\n\n\nmax_ions\n\n\nMaximum number of ions in combinations\n\n\n\n\n\n\nList of all combinations\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/normalize_peaks.html",
@@ -81,21 +81,21 @@
     "href": "man/fix_binned_mzs.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Fix binned mzs\n\n\n\nfix_binned_mzs(binned_m, original_mzs, dalton, ppm, decimals)\n\n\n\n\n\n\n\nbinned_m\n\n\nbinned_matrix\n\n\n\n\noriginal_mzs\n\n\noriginal mzs\n\n\n\n\ndalton\n\n\ndalton\n\n\n\n\nppm\n\n\nPPM\n\n\n\n\ndecimals\n\n\ndecimals\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Fix binned mzs\n\n\n\nfix_binned_mzs(binned_m, original_mzs, dalton, ppm, decimals)\n\n\n\n\n\n\n\nbinned_m\n\n\nBinned matrix\n\n\n\n\noriginal_mzs\n\n\nOriginal m/z values from spectra\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\ndecimals\n\n\nNumber of decimal places for rounding\n\n\n\n\n\n\nMatrix with corrected m/z column names\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/fix_binned_mzs.html#fix-binned-mzs",
     "href": "man/fix_binned_mzs.html#fix-binned-mzs",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Fix binned mzs\n\n\n\nfix_binned_mzs(binned_m, original_mzs, dalton, ppm, decimals)\n\n\n\n\n\n\n\nbinned_m\n\n\nbinned_matrix\n\n\n\n\noriginal_mzs\n\n\noriginal mzs\n\n\n\n\ndalton\n\n\ndalton\n\n\n\n\nppm\n\n\nPPM\n\n\n\n\ndecimals\n\n\ndecimals\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Fix binned mzs\n\n\n\nfix_binned_mzs(binned_m, original_mzs, dalton, ppm, decimals)\n\n\n\n\n\n\n\nbinned_m\n\n\nBinned matrix\n\n\n\n\noriginal_mzs\n\n\nOriginal m/z values from spectra\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\ndecimals\n\n\nNumber of decimal places for rounding\n\n\n\n\n\n\nMatrix with corrected m/z column names\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "index.html",
     "href": "index.html",
     "title": "SpectraToQueries ",
     "section": "",
-    "text": "Repository to translate spectra to queries.\n\n\nHere is what you minimally need:\n\nA file containing MS/MS spectra with associated skeleton information (or any other relevant chemical classification) provided as metadata. This structure information, stored in the metadata field “skeleton”, allows the generation of queries specific to a given skeleton by extracting repetitive skeleton-specific fragmentation patterns. The MIADB file is provided as an example.\n\n\n\n\nAs the package is not (yet) available on CRAN, you will need to install with:\ninstall.packages(\n  \"SpectraToQueries\",\n  repos = c(\n    \"https://spectra-to-knowledge.r-universe.dev\",\n    \"https://bioc.r-universe.dev\",\n    \"https://cloud.r-project.org\"\n  )\n)\n\n\n\nTo reproduce the example that uses the Monoterpene Indole Alkaloids Database (.mgf) file by default, which includes the annotation of spectral skeletons:\nSpectraToQueries::spectra_to_queries()\nTo reproduce the “grouped” example that uses the MIADB file, which includes an expert-based annotation of spectral “super skeletons” (combination of skeletons exhibiting a high structural similarity):\nSpectraToQueries::spectra_to_queries(\n  spectra = system.file(\n    \"extdata\",\n    \"spectra_grouped.rds\",\n    package = \"SpectraToQueries\"\n  ),\n  export = \"data/interim/queries-grouped.tsv\"\n)\nTo generate diagnostic ions queries from your spectra:\nSpectraToQueries::spectra_to_queries(\n  spectra = \"yourAwesomeSpectra.mgf\",\n  export = \"path/yourEvenBetterResults.tsv\"\n)\nShowing all parameters:\nSpectraToQueries::spectra_to_queries(\n  spectra = NULL,\n  export = \"data/interim/queries.tsv\",\n  beta_1 = 1.0,\n  beta_2 = 0.5,\n  dalton = 0.01,\n  decimals = 4L,\n  intensity_min = 0.0,\n  ions_max = 10L,\n  n_skel_min = 5L,\n  n_spec_min = 3L,\n  ppm = 30.0,\n  fscore_min = 0.0,\n  precision_min = 0.0,\n  recall_min = 0.0,\n  zero_val = 0.0\n)\n\n\n\nTranslating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids: https://doi.org/10.1186/s13321-025-01009-0\n\n\n\n\n\n\n\n\nPackage\nVersion\nCitation\n\n\n\n\nbase\n4.5.1\nR Core Team (2025)\n\n\nBiocGenerics\n0.54.0\nHuber et al. (2015)\n\n\nBiocManager\n1.30.26\nMorgan and Ramos (2025)\n\n\nBiocParallel\n1.42.1\nMorgan et al. (2025)\n\n\nBiocVersion\n3.21.1\nMorgan (2024)\n\n\nknitr\n1.50\nXie (2014); Xie (2015); Xie (2025)\n\n\nMsBackendMgf\n1.16.0\nGatto, Rainer, and Gibb (2025)\n\n\npkgload\n1.4.1\nWickham et al. (2025)\n\n\nrmarkdown\n2.29\nXie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2024)\n\n\nSpectra\n1.18.2\nRainer et al. (2022)\n\n\ntestthat\n3.2.3\nWickham (2011)\n\n\ntidytable\n0.11.2\nFairbanks (2024)\n\n\ntidyverse\n2.0.0\nWickham et al. (2019)"
+    "text": "Repository to translate spectra to queries.\n\n\nHere is what you minimally need:\n\nA file containing MS/MS spectra with associated skeleton information (or any other relevant chemical classification) provided as metadata. This structure information, stored in the metadata field “skeleton”, allows the generation of queries specific to a given skeleton by extracting repetitive skeleton-specific fragmentation patterns. The MIADB file is provided as an example.\n\n\n\n\nAs the package is not (yet) available on CRAN, you will need to install with:\ninstall.packages(\n  \"SpectraToQueries\",\n  repos = c(\n    \"https://spectra-to-knowledge.r-universe.dev\",\n    \"https://bioc.r-universe.dev\",\n    \"https://cloud.r-project.org\"\n  )\n)\n\n\n\nTo reproduce the example that uses the Monoterpene Indole Alkaloids Database (.mgf) file by default, which includes the annotation of spectral skeletons:\nSpectraToQueries::spectra_to_queries()\nTo reproduce the “grouped” example that uses the MIADB file, which includes an expert-based annotation of spectral “super skeletons” (combination of skeletons exhibiting a high structural similarity):\nSpectraToQueries::spectra_to_queries(\n  spectra = system.file(\n    \"extdata\",\n    \"spectra_grouped.rds\",\n    package = \"SpectraToQueries\"\n  ),\n  export = \"data/interim/queries-grouped.tsv\"\n)\nTo generate diagnostic ions queries from your spectra:\nSpectraToQueries::spectra_to_queries(\n  spectra = \"yourAwesomeSpectra.mgf\",\n  export = \"path/yourEvenBetterResults.tsv\"\n)\nShowing all parameters:\nSpectraToQueries::spectra_to_queries(\n  spectra = NULL,\n  export = \"data/interim/queries.tsv\",\n  beta_1 = 1.0,\n  beta_2 = 0.5,\n  dalton = 0.01,\n  decimals = 4L,\n  intensity_min = 0.0,\n  ions_max = 10L,\n  n_skel_min = 5L,\n  n_spec_min = 3L,\n  ppm = 30.0,\n  fscore_min = 0.0,\n  precision_min = 0.0,\n  recall_min = 0.0,\n  zero_val = 0.0\n)\n\n\n\nTranslating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids: https://doi.org/10.1186/s13321-025-01009-0\n\n\n\n\n\n\n\n\nPackage\nVersion\nCitation\n\n\n\n\nbase\n4.5.1\nR Core Team (2025)\n\n\nBiocGenerics\n0.54.0\nHuber et al. (2015)\n\n\nBiocManager\n1.30.26\nMorgan and Ramos (2025)\n\n\nBiocParallel\n1.42.1\nMorgan et al. (2025)\n\n\nBiocVersion\n3.21.1\nMorgan (2024)\n\n\nknitr\n1.50\nXie (2014); Xie (2015); Xie (2025)\n\n\nMsBackendMgf\n1.16.0\nGatto, Rainer, and Gibb (2025)\n\n\npkgload\n1.4.1\nWickham et al. (2025)\n\n\nrmarkdown\n2.30\nXie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025)\n\n\nSpectra\n1.18.2\nRainer et al. (2022)\n\n\ntestthat\n3.2.3\nWickham (2011)\n\n\ntidytable\n0.11.2\nFairbanks (2024)\n\n\ntidyverse\n2.0.0\nWickham et al. (2019)"
   },
   {
     "objectID": "index.html#requirements",
@@ -130,7 +130,7 @@
     "href": "index.html#additional-software-credits",
     "title": "SpectraToQueries ",
     "section": "",
-    "text": "Package\nVersion\nCitation\n\n\n\n\nbase\n4.5.1\nR Core Team (2025)\n\n\nBiocGenerics\n0.54.0\nHuber et al. (2015)\n\n\nBiocManager\n1.30.26\nMorgan and Ramos (2025)\n\n\nBiocParallel\n1.42.1\nMorgan et al. (2025)\n\n\nBiocVersion\n3.21.1\nMorgan (2024)\n\n\nknitr\n1.50\nXie (2014); Xie (2015); Xie (2025)\n\n\nMsBackendMgf\n1.16.0\nGatto, Rainer, and Gibb (2025)\n\n\npkgload\n1.4.1\nWickham et al. (2025)\n\n\nrmarkdown\n2.29\nXie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2024)\n\n\nSpectra\n1.18.2\nRainer et al. (2022)\n\n\ntestthat\n3.2.3\nWickham (2011)\n\n\ntidytable\n0.11.2\nFairbanks (2024)\n\n\ntidyverse\n2.0.0\nWickham et al. (2019)"
+    "text": "Package\nVersion\nCitation\n\n\n\n\nbase\n4.5.1\nR Core Team (2025)\n\n\nBiocGenerics\n0.54.0\nHuber et al. (2015)\n\n\nBiocManager\n1.30.26\nMorgan and Ramos (2025)\n\n\nBiocParallel\n1.42.1\nMorgan et al. (2025)\n\n\nBiocVersion\n3.21.1\nMorgan (2024)\n\n\nknitr\n1.50\nXie (2014); Xie (2015); Xie (2025)\n\n\nMsBackendMgf\n1.16.0\nGatto, Rainer, and Gibb (2025)\n\n\npkgload\n1.4.1\nWickham et al. (2025)\n\n\nrmarkdown\n2.30\nXie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025)\n\n\nSpectra\n1.18.2\nRainer et al. (2022)\n\n\ntestthat\n3.2.3\nWickham (2011)\n\n\ntidytable\n0.11.2\nFairbanks (2024)\n\n\ntidyverse\n2.0.0\nWickham et al. (2019)"
   },
   {
     "objectID": "LICENSE.html",
@@ -172,14 +172,14 @@
     "href": "man/perform_query.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Perform query\n\n\n\nperform_query(spectra, frags, nls, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\nfrags\n\n\nFragments\n\n\n\n\nnls\n\n\nNeutral losses\n\n\n\n\ndalton\n\n\nDalton\n\n\n\n\nppm\n\n\nPPM\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Perform query\n\n\n\nperform_query(spectra, frags, nls, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra object\n\n\n\n\nfrags\n\n\nFragment masses to search for\n\n\n\n\nnls\n\n\nNeutral losses to search for\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nFiltered spectra object\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/perform_query.html#perform-query",
     "href": "man/perform_query.html#perform-query",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Perform query\n\n\n\nperform_query(spectra, frags, nls, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\nfrags\n\n\nFragments\n\n\n\n\nnls\n\n\nNeutral losses\n\n\n\n\ndalton\n\n\nDalton\n\n\n\n\nppm\n\n\nPPM\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Perform query\n\n\n\nperform_query(spectra, frags, nls, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra object\n\n\n\n\nfrags\n\n\nFragment masses to search for\n\n\n\n\nnls\n\n\nNeutral losses to search for\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nFiltered spectra object\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/spectra_to_queries.html",
@@ -200,55 +200,55 @@
     "href": "man/harmonize_mzs.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Harmonize mzs\n\n\n\nharmonize_mzs(spectra, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\ndalton\n\n\nDalton\n\n\n\n\nppm\n\n\nPPM\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Harmonize mzs\n\n\n\nharmonize_mzs(spectra, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra object\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nSpectra object with harmonized m/z values\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/harmonize_mzs.html#harmonize-mzs",
     "href": "man/harmonize_mzs.html#harmonize-mzs",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Harmonize mzs\n\n\n\nharmonize_mzs(spectra, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\ndalton\n\n\nDalton\n\n\n\n\nppm\n\n\nPPM\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Harmonize mzs\n\n\n\nharmonize_mzs(spectra, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra object\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nSpectra object with harmonized m/z values\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/perform_list_of_queries_progress.html",
     "href": "man/perform_list_of_queries_progress.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Perform list of queries (progress)\n\n\n\nperform_list_of_queries_progress(ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nions_list\n\n\nIons list\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\ndalton\n\n\nDalton\n\n\n\n\nppm\n\n\nPPM\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Perform list of queries (progress)\n\n\n\nperform_list_of_queries_progress(ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nions_list\n\n\nList of ion combinations for queries\n\n\n\n\nspectra\n\n\nSpectra object to search\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nList of query results\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/perform_list_of_queries_progress.html#perform-list-of-queries-progress",
     "href": "man/perform_list_of_queries_progress.html#perform-list-of-queries-progress",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Perform list of queries (progress)\n\n\n\nperform_list_of_queries_progress(ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nions_list\n\n\nIons list\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\ndalton\n\n\nDalton\n\n\n\n\nppm\n\n\nPPM\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Perform list of queries (progress)\n\n\n\nperform_list_of_queries_progress(ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nions_list\n\n\nList of ion combinations for queries\n\n\n\n\nspectra\n\n\nSpectra object to search\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nList of query results\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/filter_matrix.html",
     "href": "man/filter_matrix.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Filter matrix\n\n\n\nfilter_matrix(matrix, n)\n\n\n\n\n\n\n\nmatrix\n\n\nMatrix\n\n\n\n\nn\n\n\nN\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Filter matrix\n\n\n\nfilter_matrix(matrix, n)\n\n\n\n\n\n\n\nmatrix\n\n\nMatrix to filter\n\n\n\n\nn\n\n\nMinimum number of non-zero values per column\n\n\n\n\n\n\nFiltered matrix with columns having at least n non-zero values\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/filter_matrix.html#filter-matrix",
     "href": "man/filter_matrix.html#filter-matrix",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Filter matrix\n\n\n\nfilter_matrix(matrix, n)\n\n\n\n\n\n\n\nmatrix\n\n\nMatrix\n\n\n\n\nn\n\n\nN\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Filter matrix\n\n\n\nfilter_matrix(matrix, n)\n\n\n\n\n\n\n\nmatrix\n\n\nMatrix to filter\n\n\n\n\nn\n\n\nMinimum number of non-zero values per column\n\n\n\n\n\n\nFiltered matrix with columns having at least n non-zero values\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/create_matrix.html",
     "href": "man/create_matrix.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Create matrix\n\n\n\ncreate_matrix(spectra, zero_val = 0, name)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\nzero_val\n\n\nZero value\n\n\n\n\nname\n\n\nName\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Create matrix\n\n\n\ncreate_matrix(spectra, zero_val = 0, name)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\nzero_val\n\n\nZero value\n\n\n\n\nname\n\n\nName\n\n\n\n\n\n\nA matrix with spectra intensity data\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/create_matrix.html#create-matrix",
     "href": "man/create_matrix.html#create-matrix",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Create matrix\n\n\n\ncreate_matrix(spectra, zero_val = 0, name)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\nzero_val\n\n\nZero value\n\n\n\n\nname\n\n\nName\n\n\n\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Create matrix\n\n\n\ncreate_matrix(spectra, zero_val = 0, name)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\nzero_val\n\n\nZero value\n\n\n\n\nname\n\n\nName\n\n\n\n\n\n\nA matrix with spectra intensity data\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   }
 ]

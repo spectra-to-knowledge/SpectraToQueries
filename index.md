@@ -118,7 +118,7 @@ knowledge: a proof of concept with monoterpene indole alkaloids:
 | knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
 | MsBackendMgf | 1.16.0 | Gatto, Rainer, and Gibb (2025) |
 | pkgload | 1.4.1 | Wickham et al. (2025) |
-| rmarkdown | 2.29 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2024) |
+| rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
 | Spectra | 1.18.2 | Rainer et al. (2022) |
 | testthat | 3.2.3 | Wickham (2011) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
@@ -127,10 +127,10 @@ knowledge: a proof of concept with monoterpene indole alkaloids:
 <div id="refs" class="references csl-bib-body hanging-indent"
 entry-spacing="0">
 
-<div id="ref-rmarkdown2024" class="csl-entry">
+<div id="ref-rmarkdown2025" class="csl-entry">
 
 Allaire, JJ, Yihui Xie, Christophe Dervieux, Jonathan McPherson, Javier
-Luraschi, Kevin Ushey, Aron Atkins, et al. 2024.
+Luraschi, Kevin Ushey, Aron Atkins, et al. 2025.
 *<span class="nocase">rmarkdown</span>: Dynamic Documents for r*.
 <https://github.com/rstudio/rmarkdown>.
 
