@@ -50,21 +50,23 @@ perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
 perform_list_of_queries_progress <- function(ions_list, spectra, dalton, ppm) {
   # Determine if parallel processing would be beneficial
   n_queries <- length(ions_list)
-  use_parallel <- n_queries > 1000L # Use parallel for more than 10 queries
+  use_parallel <- (n_queries > 1000L && .Platform$OS.type != "windows")
 
   if (use_parallel) {
     # Use parallel processing if beneficial
     message("Using parallel processing for ", n_queries, " queries.")
+    param <- BiocParallel::MulticoreParam(
+      workers = max(1, parallel::detectCores() - 1),
+      progressbar = TRUE
+    )
     BiocParallel::bplapply(
       X = seq_along(ions_list),
       FUN = function(index) {
         perform_list_of_queries(index, ions_list, spectra, dalton, ppm)
       },
-      BPPARAM = BiocParallel::bpparam(),
-      BPOPTIONS = BiocParallel::bpoptions(progressbar = TRUE)
+      BPPARAM = param
     )
   } else {
-    # Fall back to sequential processing with progress
     purrr::map(
       .progress = TRUE,
       .x = seq_along(ions_list),
