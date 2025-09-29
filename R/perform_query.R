@@ -15,18 +15,31 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
     return(spectra)
   }
 
+  normalize_idx <- function(idx, n) {
+    # Spectra::containsMz can return logical vector or matrix
+    if (is.matrix(idx)) {
+      idx <- as.vector(idx)
+    }
+    # Ensure length matches spectra
+    if (length(idx) != n) {
+      idx <- rep(FALSE, n)
+    }
+    idx
+  }
+
   # Filter by fragments if any are specified
   if (length(frags) > 0) {
-    spectra <- spectra[Spectra::containsMz(
+    idx <- Spectra::containsMz(
       spectra,
       mz = frags,
       tolerance = dalton,
       ppm = ppm,
       which = "all",
       BPPARAM = BiocParallel::SerialParam()
-    )]
+    )
 
     # Early return if no spectra remain after fragment filtering
+    spectra <- spectra[normalize_idx(idx, length(spectra))]
     if (length(spectra) == 0) {
       return(spectra)
     }
@@ -37,14 +50,15 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
     mzs <- (Spectra::precursorMz(spectra) - nls) |>
       unique() |>
       sort()
-    spectra <- spectra[Spectra::containsMz(
+    idx <- Spectra::containsMz(
       spectra,
       mz = mzs,
       tolerance = dalton,
       ppm = ppm,
       which = "all",
       BPPARAM = BiocParallel::SerialParam()
-    )]
+    )
+    spectra <- spectra[normalize_idx(idx, length(spectra))]
   }
 
   return(spectra)
