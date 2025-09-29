@@ -1,19 +1,34 @@
 #' @title Generate combinations
 #'
-#' @param x x
-#' @param max_ions Max ions
+#' @param x Vector of elements to combine
+#' @param max_ions Maximum number of ions in combinations
 #'
-#' @return NULL
+#' @return List of all combinations
 #'
 #' @examples NULL
 generate_combinations <- function(x, max_ions) {
-  1:min(length(x), max_ions) |>
-    purrr::map(
-      .f = function(k) {
-        utils::combn(x, k, simplify = FALSE)
-      }
-    ) |>
-    unlist(recursive = FALSE)
+  n <- length(x)
+  if (n == 0) {
+    return(list())
+  }
+  
+  max_k <- min(n, max_ions)
+  
+  # Pre-allocate result list with estimated size
+  estimated_size <- sum(choose(n, seq_len(max_k)))
+  result <- vector("list", estimated_size)
+  idx <- 1L
+  
+  # Generate combinations more efficiently
+  for (k in seq_len(max_k)) {
+    combs <- utils::combn(x, k, simplify = FALSE)
+    n_combs <- length(combs)
+    result[idx:(idx + n_combs - 1L)] <- combs
+    idx <- idx + n_combs
+  }
+  
+  # Trim to actual size
+  result[seq_len(idx - 1L)]
 }
 
 #' @title Perform list of queries (progress)

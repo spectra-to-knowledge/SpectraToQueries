@@ -174,34 +174,32 @@ spectra_to_queries <- function(
 
   message("Create a matrix containing fragments and neutral losses.")
   message("Round the values to ", decimals, ".")
-  merged_mat <- cbind(spectra_mat, spectra_nl_mat) |>
-    as.matrix()
-  colnames(merged_mat) <- NULL
+  
+  # Pre-calculate column names to avoid redundant operations
+  frag_names <- paste0(
+    round(as.numeric(colnames(spectra_mat)), decimals),
+    "_frag"
+  )
+  nl_names <- paste0(
+    round(as.numeric(colnames(spectra_nl_mat)), decimals),
+    "_nl"
+  )
+  
+  # Merge matrices more efficiently
+  merged_mat <- cbind(spectra_mat, spectra_nl_mat)
+  
+  # Filter zero columns
   zeros <- colSums(merged_mat) <= zero_val
-  merged_mat <- merged_mat[, !zeros]
-  tmp <- merged_mat |>
-    as.data.frame() |>
-    tibble::rownames_to_column(var = "group")
-  rownames(merged_mat) <- tmp$group
-  colnames(merged_mat) <-
-    c(
-      paste0(
-        round(
-          colnames(spectra_mat) |>
-            as.numeric(),
-          decimals
-        ),
-        "_frag"
-      ),
-      paste0(
-        round(
-          colnames(spectra_nl_mat) |>
-            as.numeric(),
-          decimals
-        ),
-        "_nl"
-      )
-    )
+  if (any(!zeros)) {
+    merged_mat <- merged_mat[, !zeros, drop = FALSE]
+    # Update column names for non-zero columns
+    all_names <- c(frag_names, nl_names)
+    colnames(merged_mat) <- all_names[!zeros]
+  } else {
+    # Handle edge case where all columns are zeros
+    merged_mat <- matrix(0, nrow = nrow(merged_mat), ncol = 0)
+    colnames(merged_mat) <- character(0)
+  }
 
   message("Count the number of members per skeleton and pivot the matrix.")
   ions_table <- merged_mat |>
@@ -274,27 +272,7 @@ spectra_to_queries <- function(
     ) |>
     tibble::column_to_rownames("group")
 
-  # Extract the matching ions per skeleton.
-  list_diagnostic <- ions_table_diagnostic[, seq_len(ncol(
-    ions_table_diagnostic
-  ))]
-  ions_list_diagnostic <-
-    apply(
-      X = list_diagnostic,
-      MARGIN = 1,
-      FUN = function(x) {
-        names(which(x > 0))
-      }
-    )
-  list_final <- ions_table_final[, seq_len(ncol(ions_table_final))]
-  ions_list <-
-    apply(
-      X = list_final,
-      MARGIN = 1,
-      FUN = function(x) {
-        names(which(x > 0))
-      }
-    )
+  # Extract the matching ions per skeleton more efficiently
   ions_list_diagnostic <- split(
     colnames(ions_table_diagnostic)[col(ions_table_diagnostic)[
       ions_table_diagnostic > 0
@@ -302,6 +280,7 @@ spectra_to_queries <- function(
     row(ions_table_diagnostic)[ions_table_diagnostic > 0]
   )
   names(ions_list_diagnostic) <- rownames(ions_table_diagnostic)
+  
   ions_list <- split(
     colnames(ions_table_final)[col(ions_table_final)[ions_table_final > 0]],
     row(ions_table_final)[ions_table_final > 0]
