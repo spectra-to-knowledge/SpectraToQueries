@@ -7,15 +7,18 @@
 fix_binned_mzs(binned_m, original_mzs, dalton, ppm, decimals)
 }
 \arguments{
-\item{binned_m}{binned_matrix}
+\item{binned_m}{Binned matrix}
 
-\item{original_mzs}{original mzs}
+\item{original_mzs}{Original m/z values from spectra}
 
-\item{dalton}{dalton}
+\item{dalton}{Tolerance in Dalton}
 
-\item{ppm}{PPM}
+\item{ppm}{Tolerance in parts per million}
 
-\item{decimals}{decimals}
+\item{decimals}{Number of decimal places for rounding}
+}
+\value{
+Matrix with corrected m/z column names
 }
 \description{
 Fix binned mzs

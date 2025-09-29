@@ -1,14 +1,16 @@
 #' @title Harmonize mzs
 #'
-#' @param spectra Spectra
-#' @param dalton Dalton
-#' @param ppm PPM
+#' @param spectra Spectra object
+#' @param dalton Tolerance in Dalton
+#' @param ppm Tolerance in parts per million
 #'
-#' @return NULL
+#' @return Spectra with harmonized m/z values
 #'
 #' @examples NULL
 harmonize_mzs <- function(spectra, dalton, ppm) {
   spectra_new <- spectra
+
+  # Averaged m/z values from combined spectra
   averaged_intensities <- spectra_new |>
     Spectra::peaksData() |>
     Spectra::combinePeaksData(tolerance = dalton, ppm = ppm, peaks = "union") |>
@@ -25,7 +27,9 @@ harmonize_mzs <- function(spectra, dalton, ppm) {
         mzs[j] <- averaged_intensities[matching_index]
       }
     }
+
     spectra_new@backend@peaksData[[i]][, 1] <- mzs
   }
+
   return(spectra_new)
 }

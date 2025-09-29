@@ -1,12 +1,12 @@
 #' @title Fix binned mzs
 #'
-#' @param binned_m binned_matrix
-#' @param original_mzs original mzs
-#' @param dalton dalton
-#' @param ppm PPM
-#' @param decimals decimals
+#' @param binned_m Binned matrix
+#' @param original_mzs Original m/z values from spectra
+#' @param dalton Tolerance in Dalton
+#' @param ppm Tolerance in parts per million
+#' @param decimals Number of decimal places for rounding
 #'
-#' @return NULL
+#' @return Matrix with corrected m/z column names
 #'
 #' @examples NULL
 fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
@@ -20,20 +20,27 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
     data.frame() |>
     tidytable::pull("mz")
 
-  new_m <- binned_m
+  # Vectorized calculation of new column names
+  old_colnames <- as.numeric(colnames(binned_m))
 
-  new_colnames <- sapply(colnames(new_m), function(i) {
-    val <- mean(all_mzs[abs(all_mzs - as.numeric(i)) <= dalton])
-    if (!is.nan(val)) {
-      val
+  # Pre-allocate result vector
+  new_colnames <- numeric(length(old_colnames))
+
+  for (i in seq_along(old_colnames)) {
+    # Find matching m/z values within tolerance
+    within_tolerance <- abs(all_mzs - old_colnames[i]) <= dalton
+    if (any(within_tolerance)) {
+      new_colnames[i] <- mean(all_mzs[within_tolerance])
     } else {
-      i
+      new_colnames[i] <- old_colnames[i]
     }
-  })
+  }
 
+  # Update column names
+  new_m <- binned_m
   colnames(new_m) <- new_colnames
 
-  new_m_new <- new_m |>
+  result_matrix <- new_m |>
     data.frame() |>
     tibble::rownames_to_column() |>
     tidytable::pivot_longer(
@@ -66,5 +73,5 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
     tibble::column_to_rownames() |>
     as.matrix()
 
-  return(new_m_new)
+  return(result_matrix)
 }

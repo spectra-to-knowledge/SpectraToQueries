@@ -1,9 +1,9 @@
 #' @title Generate combinations
 #'
-#' @param x x
-#' @param max_ions Max ions
+#' @param x Vector of elements to combine
+#' @param max_ions Maximum number of ions in combinations
 #'
-#' @return NULL
+#' @return List of all combinations
 #'
 #' @examples NULL
 generate_combinations <- function(x, max_ions) {
@@ -16,24 +16,45 @@ generate_combinations <- function(x, max_ions) {
     unlist(recursive = FALSE)
 }
 
-#' @title Perform list of queries (progress)
+
+#' @title Generate combinations with progress
 #'
-#' @param indices Indices
-#' @param ions_list Ions list
-#' @param max_ions Max ions
+#' @param indices Vector of indices to process
+#' @param ions_list List of ions for each index
+#' @param max_ions Maximum number of ions in combinations
 #'
-#' @return NULL
+#' @return List of all combinations for each index
 #'
 #' @examples NULL
 generate_combinations_progress <- function(indices, ions_list, max_ions) {
-  purrr::map(
-    .progress = TRUE,
-    .x = indices,
-    .f = function(index, ions_list, max_ions) {
-      x <- ions_list[[index]]
-      generate_combinations(x = x, max_ions = max_ions)
-    },
-    ions_list = ions_list,
-    max_ions = max_ions
-  )
+  n_indices <- length(indices)
+  use_parallel <- n_indices > 10L # Use parallel for larger sets
+
+  if (use_parallel) {
+    # Use parallel processing if beneficial
+    message(
+      "Using parallel processing for combination generation with ",
+      n_indices,
+      " groups."
+    )
+    BiocParallel::bplapply(
+      X = indices,
+      FUN = function(index) {
+        x <- ions_list[[index]]
+        generate_combinations(x = x, max_ions = max_ions)
+      },
+      BPPARAM = BiocParallel::bpparam(),
+      BPOPTIONS = BiocParallel::bpoptions(progressbar = TRUE)
+    )
+  } else {
+    # Fall back to sequential processing with progress
+    purrr::map(
+      .progress = TRUE,
+      .x = indices,
+      .f = function(index) {
+        x <- ions_list[[index]]
+        generate_combinations(x = x, max_ions = max_ions)
+      }
+    )
+  }
 }

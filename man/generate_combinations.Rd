@@ -7,9 +7,12 @@
 generate_combinations(x, max_ions)
 }
 \arguments{
-\item{x}{x}
+\item{x}{Vector of elements to combine}
 
-\item{max_ions}{Max ions}
+\item{max_ions}{Maximum number of ions in combinations}
+}
+\value{
+List of all combinations
 }
 \description{
 Generate combinations
