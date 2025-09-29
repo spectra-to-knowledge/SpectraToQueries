@@ -174,34 +174,32 @@ spectra_to_queries <- function(
 
   message("Create a matrix containing fragments and neutral losses.")
   message("Round the values to ", decimals, ".")
-  merged_mat <- cbind(spectra_mat, spectra_nl_mat) |>
-    as.matrix()
-  colnames(merged_mat) <- NULL
+
+  # Pre-calculate column names to avoid redundant operations
+  frag_names <- paste0(
+    round(as.numeric(colnames(spectra_mat)), decimals),
+    "_frag"
+  )
+  nl_names <- paste0(
+    round(as.numeric(colnames(spectra_nl_mat)), decimals),
+    "_nl"
+  )
+
+  # Merge matrices
+  merged_mat <- cbind(spectra_mat, spectra_nl_mat)
+
+  # Filter zero columns
   zeros <- colSums(merged_mat) <= zero_val
-  merged_mat <- merged_mat[, !zeros]
-  tmp <- merged_mat |>
-    as.data.frame() |>
-    tibble::rownames_to_column(var = "group")
-  rownames(merged_mat) <- tmp$group
-  colnames(merged_mat) <-
-    c(
-      paste0(
-        round(
-          colnames(spectra_mat) |>
-            as.numeric(),
-          decimals
-        ),
-        "_frag"
-      ),
-      paste0(
-        round(
-          colnames(spectra_nl_mat) |>
-            as.numeric(),
-          decimals
-        ),
-        "_nl"
-      )
-    )
+  if (any(!zeros)) {
+    merged_mat <- merged_mat[, !zeros, drop = FALSE]
+    # Update column names for non-zero columns
+    all_names <- c(frag_names, nl_names)
+    colnames(merged_mat) <- all_names[!zeros]
+  } else {
+    # Handle edge case where all columns are zeros
+    merged_mat <- matrix(0, nrow = nrow(merged_mat), ncol = 0)
+    colnames(merged_mat) <- character(0)
+  }
 
   message("Count the number of members per skeleton and pivot the matrix.")
   ions_table <- merged_mat |>
@@ -221,6 +219,10 @@ spectra_to_queries <- function(
       names_to = "ion"
     ) |>
     tidytable::filter(value != 0)
+
+  # Clean up large matrices to free memory
+  rm(merged_mat, spectra_mat, spectra_nl_mat)
+  gc() # Force garbage collection
 
   message("Extract the best ions to perform a query.")
   ions_table_filtered_1 <- ions_table |>
@@ -274,27 +276,7 @@ spectra_to_queries <- function(
     ) |>
     tibble::column_to_rownames("group")
 
-  # Extract the matching ions per skeleton.
-  list_diagnostic <- ions_table_diagnostic[, seq_len(ncol(
-    ions_table_diagnostic
-  ))]
-  ions_list_diagnostic <-
-    apply(
-      X = list_diagnostic,
-      MARGIN = 1,
-      FUN = function(x) {
-        names(which(x > 0))
-      }
-    )
-  list_final <- ions_table_final[, seq_len(ncol(ions_table_final))]
-  ions_list <-
-    apply(
-      X = list_final,
-      MARGIN = 1,
-      FUN = function(x) {
-        names(which(x > 0))
-      }
-    )
+  # Extract the matching ions per skeleton
   ions_list_diagnostic <- split(
     colnames(ions_table_diagnostic)[col(ions_table_diagnostic)[
       ions_table_diagnostic > 0
@@ -302,6 +284,7 @@ spectra_to_queries <- function(
     row(ions_table_diagnostic)[ions_table_diagnostic > 0]
   )
   names(ions_list_diagnostic) <- rownames(ions_table_diagnostic)
+
   ions_list <- split(
     colnames(ions_table_final)[col(ions_table_final)[ions_table_final > 0]],
     row(ions_table_final)[ions_table_final > 0]
@@ -313,21 +296,35 @@ spectra_to_queries <- function(
     generate_combinations_progress(ions_list = ions_list, max_ions = ions_max)
   names(combinations) <- names(ions_list)
 
-  new_combinations <- purrr::map(
-    .x = names(combinations),
-    .f = function(name) {
-      x <- combinations[[name]]
-      purrr::map(.x = x, function(sublist) {
-        unique(c(unlist(sublist), ions_list_diagnostic[[name]])) # Merge and deduplicate
-      })
-    }
-  )
+  # Combination merging
+  message("Merging diagnostic ions with combinations.")
+  new_combinations <- vector("list", length(combinations))
   names(new_combinations) <- names(ions_list)
 
-  all_combinations <- new_combinations |>
-    unlist(recursive = FALSE)
-  names(all_combinations) <- names(all_combinations) |>
-    gsub(pattern = "\\d", replacement = "")
+  for (name in names(combinations)) {
+    x <- combinations[[name]]
+    diagnostic_ions <- ions_list_diagnostic[[name]]
+
+    if (length(diagnostic_ions) > 0) {
+      # Pre-combine diagnostic ions to avoid repeated operations
+      new_combinations[[name]] <- lapply(x, function(sublist) {
+        unique(c(unlist(sublist), diagnostic_ions))
+      })
+    } else {
+      new_combinations[[name]] <- x
+    }
+  }
+
+  # Free memory from intermediate objects
+  rm(combinations, ions_list, ions_list_diagnostic)
+  gc()
+
+  all_combinations <- unlist(new_combinations, recursive = FALSE)
+  names(all_combinations) <- gsub("\\d+$", "", names(all_combinations))
+
+  # Clean up
+  rm(new_combinations)
+  gc()
 
   message("Test the queries. (This is the longest step)")
   queries_results <- all_combinations |>

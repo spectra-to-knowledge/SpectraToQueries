@@ -7,15 +7,18 @@
 perform_query(spectra, frags, nls, dalton, ppm)
 }
 \arguments{
-\item{spectra}{Spectra}
+\item{spectra}{Spectra object}
 
-\item{frags}{Fragments}
+\item{frags}{Fragment masses to search for}
 
-\item{nls}{Neutral losses}
+\item{nls}{Neutral losses to search for}
 
-\item{dalton}{Dalton}
+\item{dalton}{Tolerance in Dalton}
 
-\item{ppm}{PPM}
+\item{ppm}{Tolerance in parts per million}
+}
+\value{
+Filtered spectra object
 }
 \description{
 Perform query

@@ -7,13 +7,16 @@
 perform_list_of_queries_progress(ions_list, spectra, dalton, ppm)
 }
 \arguments{
-\item{ions_list}{Ions list}
+\item{ions_list}{List of ion combinations for queries}
 
-\item{spectra}{Spectra}
+\item{spectra}{Spectra object to search}
 
-\item{dalton}{Dalton}
+\item{dalton}{Tolerance in Dalton}
 
-\item{ppm}{PPM}
+\item{ppm}{Tolerance in parts per million}
+}
+\value{
+List of query results
 }
 \description{
 Perform list of queries (progress)

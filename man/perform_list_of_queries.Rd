@@ -7,15 +7,18 @@
 perform_list_of_queries(index, ions_list, spectra, dalton, ppm)
 }
 \arguments{
-\item{index}{Index}
+\item{index}{Index of the ion list to process}
 
-\item{ions_list}{Ions list}
+\item{ions_list}{List of ions for queries}
 
-\item{spectra}{Spectra}
+\item{spectra}{Spectra object to search}
 
-\item{dalton}{Dalton}
+\item{dalton}{Tolerance in Dalton}
 
-\item{ppm}{PPM}
+\item{ppm}{Tolerance in parts per million}
+}
+\value{
+Data frame with target and value columns
 }
 \description{
 Perform list of queries

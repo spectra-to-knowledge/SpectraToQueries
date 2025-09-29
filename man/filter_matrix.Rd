@@ -7,9 +7,12 @@
 filter_matrix(matrix, n)
 }
 \arguments{
-\item{matrix}{Matrix}
+\item{matrix}{Matrix to filter}
 
-\item{n}{N}
+\item{n}{Minimum number of non-zero values per column}
+}
+\value{
+Filtered matrix with columns having at least n non-zero values
 }
 \description{
 Filter matrix

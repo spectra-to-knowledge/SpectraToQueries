@@ -2,19 +2,22 @@
 % Please edit documentation in R/generate_combinations.R
 \name{generate_combinations_progress}
 \alias{generate_combinations_progress}
-\title{Perform list of queries (progress)}
+\title{Generate combinations with progress}
 \usage{
 generate_combinations_progress(indices, ions_list, max_ions)
 }
 \arguments{
-\item{indices}{Indices}
+\item{indices}{Vector of indices to process}
 
-\item{ions_list}{Ions list}
+\item{ions_list}{List of ions for each index}
 
-\item{max_ions}{Max ions}
+\item{max_ions}{Maximum number of ions in combinations}
+}
+\value{
+List of all combinations for each index
 }
 \description{
-Perform list of queries (progress)
+Generate combinations with progress
 }
 \examples{
 NULL

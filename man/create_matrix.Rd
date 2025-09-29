@@ -13,6 +13,9 @@ create_matrix(spectra, zero_val = 0, name)
 
 \item{name}{Name}
 }
+\value{
+A matrix with spectra intensity data
+}
 \description{
 Create matrix
 }
