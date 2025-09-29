@@ -39,24 +39,37 @@ perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
 
 #' @title Perform list of queries (progress)
 #'
-#' @param ions_list Ions list
-#' @param spectra Spectra
-#' @param dalton Dalton
-#' @param ppm PPM
+#' @param ions_list List of ion combinations for queries
+#' @param spectra Spectra object to search
+#' @param dalton Tolerance in Dalton  
+#' @param ppm Tolerance in parts per million
 #'
-#' @return NULL
+#' @return List of query results
 #'
 #' @examples NULL
 perform_list_of_queries_progress <- function(ions_list, spectra, dalton, ppm) {
-  purrr::map(
-    .progress = TRUE,
-    .x = seq_along(ions_list),
-    .f = function(index, ions_list, spectra, dalton, ppm) {
-      perform_list_of_queries(index, ions_list, spectra, dalton, ppm)
-    },
-    ions_list = ions_list,
-    spectra = spectra,
-    dalton = dalton,
-    ppm = ppm
-  )
+  # Determine if parallel processing would be beneficial
+  n_queries <- length(ions_list)
+  use_parallel <- n_queries > 10  # Use parallel for more than 10 queries
+  
+  if (use_parallel && requireNamespace("BiocParallel", quietly = TRUE)) {
+    # Use parallel processing if available and beneficial
+    message("Using parallel processing for ", n_queries, " queries.")
+    BiocParallel::bplapply(
+      X = seq_along(ions_list),
+      FUN = function(index) {
+        perform_list_of_queries(index, ions_list, spectra, dalton, ppm)
+      },
+      BPPARAM = BiocParallel::bpparam()
+    )
+  } else {
+    # Fall back to sequential processing with progress
+    purrr::map(
+      .progress = TRUE,
+      .x = seq_along(ions_list),
+      .f = function(index) {
+        perform_list_of_queries(index, ions_list, spectra, dalton, ppm)
+      }
+    )
+  }
 }

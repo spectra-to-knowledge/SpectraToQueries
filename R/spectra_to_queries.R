@@ -220,6 +220,10 @@ spectra_to_queries <- function(
     ) |>
     tidytable::filter(value != 0)
 
+  # Clean up large matrices to free memory
+  rm(merged_mat, spectra_mat, spectra_nl_mat)
+  gc()  # Force garbage collection
+
   message("Extract the best ions to perform a query.")
   ions_table_filtered_1 <- ions_table |>
     tidytable::group_by(ion) |>
@@ -292,21 +296,36 @@ spectra_to_queries <- function(
     generate_combinations_progress(ions_list = ions_list, max_ions = ions_max)
   names(combinations) <- names(ions_list)
 
-  new_combinations <- purrr::map(
-    .x = names(combinations),
-    .f = function(name) {
-      x <- combinations[[name]]
-      purrr::map(.x = x, function(sublist) {
-        unique(c(unlist(sublist), ions_list_diagnostic[[name]])) # Merge and deduplicate
-      })
-    }
-  )
+  # More efficient combination merging
+  message("Merging diagnostic ions with combinations.")
+  new_combinations <- vector("list", length(combinations))
   names(new_combinations) <- names(ions_list)
+  
+  for (name in names(combinations)) {
+    x <- combinations[[name]]
+    diagnostic_ions <- ions_list_diagnostic[[name]]
+    
+    if (length(diagnostic_ions) > 0) {
+      # Pre-combine diagnostic ions to avoid repeated operations
+      new_combinations[[name]] <- lapply(x, function(sublist) {
+        unique(c(unlist(sublist), diagnostic_ions))
+      })
+    } else {
+      new_combinations[[name]] <- x
+    }
+  }
+  
+  # Free memory from intermediate objects
+  rm(combinations, ions_list, ions_list_diagnostic)
+  gc()
 
-  all_combinations <- new_combinations |>
-    unlist(recursive = FALSE)
-  names(all_combinations) <- names(all_combinations) |>
-    gsub(pattern = "\\d", replacement = "")
+  # More efficient unlistening
+  all_combinations <- unlist(new_combinations, recursive = FALSE)
+  names(all_combinations) <- gsub("\\d+$", "", names(all_combinations))
+  
+  # Clean up
+  rm(new_combinations)
+  gc()
 
   message("Test the queries. (This is the longest step)")
   queries_results <- all_combinations |>
