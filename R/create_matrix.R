@@ -9,7 +9,10 @@
 #' @examples NULL
 create_matrix <- function(spectra, zero_val = 0, name) {
   # Get intensity data
-  intensity_list <- Spectra::intensity(spectra)
+  intensity_list <- Spectra::intensity(
+    spectra,
+    BPPARAM = BiocParallel::SerialParam()
+  )
 
   # Pre-allocate matrix
   n_spectra <- length(intensity_list)
@@ -25,7 +28,10 @@ create_matrix <- function(spectra, zero_val = 0, name) {
   zeros <- colSums(spectra_mat) <= zero_val
   if (any(!zeros)) {
     spectra_mat <- spectra_mat[, !zeros, drop = FALSE]
-    colnames(spectra_mat) <- Spectra::mz(spectra)[[1L]][!zeros]
+    colnames(spectra_mat) <- Spectra::mz(
+      spectra,
+      BPPARAM = BiocParallel::SerialParam()
+    )[[1L]][!zeros]
   } else {
     # Handle edge case where all columns are zeros
     spectra_mat <- matrix(0, nrow = n_spectra, ncol = 0)

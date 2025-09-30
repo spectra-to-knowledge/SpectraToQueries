@@ -11,11 +11,14 @@
 #' @examples NULL
 fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
   all_mzs <- original_mzs |>
-    Spectra::peaksData() |>
+    Spectra::peaksData(
+      BPPARAM = BiocParallel::SerialParam()
+    ) |>
     Spectra::combinePeaksData(
       tolerance = dalton,
       ppm = ppm,
-      peaks = "union"
+      peaks = "union",
+      BPPARAM = BiocParallel::SerialParam()
     ) |>
     data.frame() |>
     tidytable::pull("mz")
