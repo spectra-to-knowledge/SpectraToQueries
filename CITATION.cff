@@ -195,6 +195,21 @@ references:
   doi: 10.18129/B9.bioc.MsBackendMgf
   version: '>= 1.14.0'
 - type: software
+  title: progress
+  abstract: 'progress: Terminal Progress Bars'
+  notes: Imports
+  url: https://github.com/r-lib/progress#readme
+  repository: https://CRAN.R-project.org/package=progress
+  authors:
+  - family-names: Csárdi
+    given-names: Gábor
+    email: csardi.gabor@gmail.com
+  - family-names: FitzJohn
+    given-names: Rich
+  year: '2025'
+  doi: 10.32614/CRAN.package.progress
+  version: '>= 1.2.3'
+- type: software
   title: purrr
   abstract: 'purrr: Functional Programming Tools'
   notes: Imports
