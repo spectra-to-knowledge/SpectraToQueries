@@ -11,7 +11,7 @@
 #' @examples NULL
 perform_query <- function(spectra, frags, nls, dalton, ppm) {
   # Filter by fragments if specified
-  if (length(frags) > 0) {
+  if (length(frags) > 0L) {
     idx <- Spectra::containsMz(
       spectra,
       mz = frags,
@@ -29,16 +29,16 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
     if (length(idx) == length(spectra)) {
       spectra <- spectra[idx]
     } else {
-      return(spectra[FALSE]) # return empty
+      return(spectra[FALSE]) # empty
     }
 
-    if (length(spectra) == 0) {
+    if (length(spectra) == 0L) {
       return(spectra)
     }
   }
 
   # Filter by neutral losses if specified
-  if (length(nls) > 0) {
+  if (length(nls) > 0L) {
     mzs <- sort(unique(Spectra::precursorMz(spectra) - nls))
 
     idx <- Spectra::containsMz(
@@ -57,11 +57,11 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
     if (length(idx) == length(spectra)) {
       spectra <- spectra[idx]
     } else {
-      spectra <- spectra[FALSE] # return empty
+      return(spectra[FALSE])
     }
   }
 
-  return(spectra)
+  spectra
 }
 
 #' @title Perform list of queries
@@ -106,14 +106,16 @@ perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
 
   spectra_data <- result_spectra |>
     Spectra::spectraData()
-  if (nrow(spectra_data) > 0 && "SKELETON" %in% names(spectra_data)) {
+
+  value <- character(0)
+  if (nrow(spectra_data) > 0L && "SKELETON" %in% names(spectra_data)) {
     value <- spectra_data$SKELETON
-    if (length(value) > 0) {
+    if (length(value) > 0L) {
       value <- gsub("+", ".", value, fixed = TRUE)
     }
   }
 
-  return(tidytable::tidytable(target = target, value = value))
+  tidytable::tidytable(target = target, value = value)
 }
 
 #' @title Perform list of queries (progress)
@@ -133,7 +135,9 @@ perform_list_of_queries_progress <- function(ions_list, spectra, dalton, ppm) {
   results <- vector("list", n_queries)
 
   for (i in seq_len(n_queries)) {
-    if (i == 1 || i %% max(100, floor(n_queries / 10)) == 0 || i == n_queries) {
+    if (
+      i == 1L || i %% max(100L, floor(n_queries / 10)) == 0L || i == n_queries
+    ) {
       message(sprintf(
         "Progress: %d/%d (%.1f%%)",
         i,
@@ -142,8 +146,7 @@ perform_list_of_queries_progress <- function(ions_list, spectra, dalton, ppm) {
       ))
     }
 
-    result <- perform_list_of_queries(i, ions_list, spectra, dalton, ppm)
-    results[[i]] <- result
+    results[[i]] <- perform_list_of_queries(i, ions_list, spectra, dalton, ppm)
   }
 
   message("Processing complete!")
