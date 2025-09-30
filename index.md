@@ -110,14 +110,13 @@ knowledge: a proof of concept with monoterpene indole alkaloids:
 
 | Package | Version | Citation |
 |:---|:---|:---|
-| base | 4.5.1 | R Core Team (2025a) |
+| base | 4.5.1 | R Core Team (2025) |
 | BiocGenerics | 0.54.0 | Huber et al. (2015) |
 | BiocManager | 1.30.26 | Morgan and Ramos (2025) |
 | BiocParallel | 1.42.1 | Morgan et al. (2025) |
 | BiocVersion | 3.21.1 | Morgan (2024) |
 | knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
 | MsBackendMgf | 1.16.0 | Gatto, Rainer, and Gibb (2025) |
-| parallel | 4.5.1 | R Core Team (2025b) |
 | pkgload | 1.4.1 | Wickham et al. (2025) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
 | Spectra | 1.18.2 | Rainer et al. (2022) |
@@ -188,16 +187,8 @@ Facilities for Parallel Evaluation*.
 
 <div id="ref-base" class="csl-entry">
 
-R Core Team. 2025a. *R: A Language and Environment for Statistical
+R Core Team. 2025. *R: A Language and Environment for Statistical
 Computing*. Vienna, Austria: R Foundation for Statistical Computing.
-<https://www.R-project.org/>.
-
-</div>
-
-<div id="ref-parallel" class="csl-entry">
-
-———. 2025b. *R: A Language and Environment for Statistical Computing*.
-Vienna, Austria: R Foundation for Statistical Computing.
 <https://www.R-project.org/>.
 
 </div>
