@@ -10,6 +10,11 @@
 #'
 #' @examples NULL
 perform_query <- function(spectra, frags, nls, dalton, ppm) {
+  # Early return if no spectra to search
+  if (length(spectra) == 0L) {
+    return(spectra)
+  }
+
   # Filter by fragments if specified
   if (length(frags) > 0L) {
     idx <- Spectra::containsMz(
@@ -21,17 +26,19 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
       BPPARAM = BiocParallel::SerialParam()
     )
 
+    # Normalize to vector
     if (is.matrix(idx)) {
       idx <- as.vector(idx)
     }
 
-    # Subset if valid index
-    if (length(idx) == length(spectra)) {
-      spectra <- spectra[idx]
-    } else {
-      return(spectra[FALSE]) # empty
+    # Validate and subset
+    if (length(idx) != length(spectra)) {
+      return(spectra[FALSE])
     }
 
+    spectra <- spectra[idx]
+
+    # Early return if empty
     if (length(spectra) == 0L) {
       return(spectra)
     }
@@ -39,7 +46,9 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
 
   # Filter by neutral losses if specified
   if (length(nls) > 0L) {
-    mzs <- sort(unique(Spectra::precursorMz(spectra) - nls))
+    # Calculate neutral loss m/z values
+    precursor_mz <- Spectra::precursorMz(spectra)
+    mzs <- sort(unique(precursor_mz - nls))
 
     idx <- Spectra::containsMz(
       spectra,
@@ -50,15 +59,17 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
       BPPARAM = BiocParallel::SerialParam()
     )
 
+    # Normalize to vector
     if (is.matrix(idx)) {
       idx <- as.vector(idx)
     }
 
-    if (length(idx) == length(spectra)) {
-      spectra <- spectra[idx]
-    } else {
+    # Validate and subset
+    if (length(idx) != length(spectra)) {
       return(spectra[FALSE])
     }
+
+    spectra <- spectra[idx]
   }
 
   spectra
@@ -76,6 +87,7 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
 #'
 #' @examples NULL
 perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
+  # Get and validate target name
   target <- names(ions_list)[index]
   if (is.null(target) || is.na(target) || target == "") {
     target <- paste0("query_", index)
@@ -83,12 +95,20 @@ perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
 
   ions <- ions_list[[index]]
 
-  # Extract frags and nls
+  # Extract fragments and neutral losses
   is_frag <- grepl("_frag$", ions)
   is_nl <- grepl("_nl$", ions)
 
-  frags <- as.numeric(sub("_frag$", "", ions[is_frag]))
-  nls <- as.numeric(sub("_nl$", "", ions[is_nl]))
+  frags <- if (any(is_frag)) {
+    as.numeric(sub("_frag$", "", ions[is_frag]))
+  } else {
+    numeric(0)
+  }
+  nls <- if (any(is_nl)) {
+    as.numeric(sub("_nl$", "", ions[is_nl]))
+  } else {
+    numeric(0)
+  }
 
   # Perform query
   result_spectra <- perform_query(
@@ -99,20 +119,24 @@ perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
     ppm = ppm
   )
 
-  # Early return if no spectra remain
+  # Early return if no results
   if (length(result_spectra) == 0L) {
     return(tidytable::tidytable(target = target, value = character(0)))
   }
 
+  # Extract skeleton values
   spectra_data <- result_spectra |>
     Spectra::spectraData()
 
-  value <- character(0)
-  if (nrow(spectra_data) > 0L && "SKELETON" %in% names(spectra_data)) {
-    value <- spectra_data$SKELETON
-    if (length(value) > 0L) {
-      value <- gsub("+", ".", value, fixed = TRUE)
+  value <- if (nrow(spectra_data) > 0L && "SKELETON" %in% names(spectra_data)) {
+    skeleton <- spectra_data$SKELETON
+    if (length(skeleton) > 0L) {
+      gsub("+", ".", skeleton, fixed = TRUE)
+    } else {
+      character(0)
     }
+  } else {
+    character(0)
   }
 
   tidytable::tidytable(target = target, value = value)
@@ -132,12 +156,15 @@ perform_list_of_queries_progress <- function(ions_list, spectra, dalton, ppm) {
   n_queries <- length(ions_list)
   message("Processing ", n_queries, " queries...")
 
-  results <- vector("list", n_queries)
+  # Pre-allocate with correct length
+  results <- vector("list", length = n_queries)
+
+  # Calculate progress interval once
+  progress_interval <- max(100L, floor(n_queries / 10L))
 
   for (i in seq_len(n_queries)) {
-    if (
-      i == 1L || i %% max(100L, floor(n_queries / 10)) == 0L || i == n_queries
-    ) {
+    # Progress reporting
+    if (i == 1L || i %% progress_interval == 0L || i == n_queries) {
       message(sprintf(
         "Progress: %d/%d (%.1f%%)",
         i,
