@@ -15,7 +15,7 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
     return(spectra)
   }
 
-  # Filter by fragments if specified
+  # --- Filter by fragments ---
   if (length(frags) > 0L) {
     idx <- Spectra::containsMz(
       spectra,
@@ -26,16 +26,14 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
       BPPARAM = BiocParallel::SerialParam()
     )
 
-    # Normalize to vector
+    # Normalize to logical vector safely
     if (is.matrix(idx)) {
       idx <- as.vector(idx)
     }
+    idx <- as.logical(idx)
+    idx[is.na(idx)] <- FALSE
 
-    # Validate and subset
-    if (length(idx) != length(spectra)) {
-      return(spectra[FALSE])
-    }
-
+    # Subset safely
     spectra <- spectra[idx]
 
     # Early return if empty
@@ -44,10 +42,16 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
     }
   }
 
-  # Filter by neutral losses if specified
+  # --- Filter by neutral losses ---
   if (length(nls) > 0L) {
-    # Calculate neutral loss m/z values
     precursor_mz <- Spectra::precursorMz(spectra)
+
+    # Handle NA precursor m/z
+    precursor_mz <- precursor_mz[!is.na(precursor_mz)]
+    if (length(precursor_mz) == 0L) {
+      return(spectra[FALSE])
+    }
+
     mzs <- sort(unique(precursor_mz - nls))
 
     idx <- Spectra::containsMz(
@@ -59,16 +63,14 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
       BPPARAM = BiocParallel::SerialParam()
     )
 
-    # Normalize to vector
+    # Normalize to logical vector safely
     if (is.matrix(idx)) {
       idx <- as.vector(idx)
     }
+    idx <- as.logical(idx)
+    idx[is.na(idx)] <- FALSE
 
-    # Validate and subset
-    if (length(idx) != length(spectra)) {
-      return(spectra[FALSE])
-    }
-
+    # Subset safely
     spectra <- spectra[idx]
   }
 
@@ -154,7 +156,7 @@ perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
 #' @examples NULL
 perform_list_of_queries_progress <- function(ions_list, spectra, dalton, ppm) {
   purrr::map(
-    .progress = interactive(),
+    .progress = TRUE,
     .x = seq_along(ions_list),
     .f = function(index) {
       perform_list_of_queries(index, ions_list, spectra, dalton, ppm)
