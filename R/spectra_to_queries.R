@@ -24,22 +24,21 @@
 #'
 #' @examples NULL
 spectra_to_queries <- function(
-  spectra = NULL,
-  export = "data/interim/queries.tsv",
-  beta_1 = 1.0,
-  beta_2 = 0.5,
-  dalton = 0.01,
-  decimals = 4L,
-  intensity_min = 0.0,
-  ions_max = 10L,
-  n_skel_min = 5L,
-  n_spec_min = 3L,
-  ppm = 30.0,
-  fscore_min = 0.0,
-  precision_min = 0.0,
-  recall_min = 0.0,
-  zero_val = 0.0
-) {
+    spectra = NULL,
+    export = "data/interim/queries.tsv",
+    beta_1 = 1.0,
+    beta_2 = 0.5,
+    dalton = 0.01,
+    decimals = 4L,
+    intensity_min = 0.0,
+    ions_max = 10L,
+    n_skel_min = 5L,
+    n_spec_min = 3L,
+    ppm = 30.0,
+    fscore_min = 0.0,
+    precision_min = 0.0,
+    recall_min = 0.0,
+    zero_val = 0.0) {
   if (is.null(spectra)) {
     message("No spectra given, loading example spectra.")
     mia_spectra <- readRDS(system.file(
@@ -384,8 +383,8 @@ spectra_to_queries <- function(
         precision <- tp / (tp + fp)
         f_beta <-
           (1 + beta_2^2) *
-          (precision * recall) /
-          ((precision * beta_2^2) + recall)
+            (precision * recall) /
+            ((precision * beta_2^2) + recall)
         return(round(f_beta, decimals))
       },
       beta_2 = beta_2
@@ -403,9 +402,16 @@ spectra_to_queries <- function(
     tidytable::filter(id == 1) |>
     tidytable::select(-id)
 
+  final_queries <- best_queries |>
+    tidytable::group_by(skeleton, fscore) |>
+    tidytable::summarize(
+      combined_ions = combine_ions_minimal(ions),
+      .groups = "drop"
+    )
+
   message("Export the best queries for further use.")
   create_dir(export)
-  best_queries |>
+  final_queries |>
     tidytable::arrange(tidytable::desc(fscore)) |>
     tidytable::fwrite(file = export, sep = "\t")
 }
