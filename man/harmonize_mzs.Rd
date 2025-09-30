@@ -14,7 +14,7 @@ harmonize_mzs(spectra, dalton, ppm)
 \item{ppm}{Tolerance in parts per million}
 }
 \value{
-Spectra object with harmonized m/z values
+Spectra with harmonized m/z values
 }
 \description{
 Harmonize mzs

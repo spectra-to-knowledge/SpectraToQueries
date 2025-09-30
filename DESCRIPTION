@@ -56,6 +56,5 @@ Collate:
     'globals.R'
     'harmonize_mzs.R'
     'normalize_peaks.R'
-    'perform_query.R'
     'perform_list_of_queries.R'
     'spectra_to_queries.R'
