@@ -49,6 +49,7 @@ X-schema.org-keywords: knowledgeExtraction, spectralInformation, queryingSystem
 Language: en-US
 Collate: 
     'SpectraToQueries-package.R'
+    'combine_ions_minimal.R'
     'create_dir.R'
     'create_matrix.R'
     'filter_matrix.R'
