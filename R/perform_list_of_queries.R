@@ -9,13 +9,22 @@
 #'
 #' @examples NULL
 contains_all_mz <- function(spec_mz, target_mz, dalton, ppm) {
+  spec_mz <- spec_mz[is.finite(spec_mz)]
+  target_mz <- target_mz[is.finite(target_mz)]
+
   if (length(spec_mz) == 0L || length(target_mz) == 0L) {
     return(FALSE)
   }
-  abs_tol <- dalton + (target_mz * ppm / 1e6)
-  # Vectorized outer subtraction
-  hits <- outer(spec_mz, target_mz, function(x, y) abs(x - y) <= abs_tol)
-  all(colSums(hits) > 0)
+
+  tol <- dalton + target_mz * ppm / 1e6
+
+  all(vapply(
+    X = seq_along(target_mz),
+    FUN = function(i) {
+      any(abs(spec_mz - target_mz[i]) <= tol[i])
+    },
+    FUN.VALUE = logical(1)
+  ))
 }
 
 #' @title Perform query
@@ -30,159 +39,57 @@ contains_all_mz <- function(spec_mz, target_mz, dalton, ppm) {
 #'
 #' @examples NULL
 perform_query <- function(spectra, frags, nls, dalton, ppm) {
-  # Early return if no spectra to search
   if (length(spectra) == 0L) {
     return(spectra)
   }
 
+  all_mz <- Spectra::mz(spectra)
+  keep <- rep(TRUE, length(spectra))
+
   # --- Filter by fragments ---
   if (length(frags) > 0L) {
-    # Remove any NA or infinite values from frags
     frags <- frags[is.finite(frags)]
-
     if (length(frags) > 0L) {
-      # Extract all m/z values at once
-      idx <- tryCatch(
-        {
-          all_mz <- Spectra::mz(spectra)
-
-          # Ensure we got the right number of m/z lists
-          if (length(all_mz) != length(spectra)) {
-            warning("m/z list length mismatch")
-            return(rep(FALSE, length(spectra)))
-          }
-
-          # Vectorized check across all spectra
-          vapply(
-            all_mz,
-            function(spec_mz) {
-              contains_all_mz(spec_mz, frags, dalton, ppm)
-            },
-            logical(1),
-            USE.NAMES = FALSE
-          )
-        },
-        error = function(e) {
-          warning("Error in fragment filtering: ", e$message)
-          return(rep(FALSE, length(spectra)))
-        }
-      )
-
-      # Ensure logical vector and correct length
-      if (length(idx) != length(spectra)) {
-        warning("Index length mismatch after fragment filtering")
-        return(spectra[FALSE])
-      }
-
-      idx[is.na(idx)] <- FALSE
-
-      # Subset safely
-      if (any(idx)) {
-        spectra <- spectra[idx]
-      } else {
-        return(spectra[FALSE])
-      }
-
-      # Early return if empty
-      if (length(spectra) == 0L) {
-        return(spectra)
-      }
+      keep <- keep &
+        vapply(
+          X = all_mz,
+          FUN = contains_all_mz,
+          FUN.VALUE = logical(1),
+          target_mz = frags,
+          dalton = dalton,
+          ppm = ppm
+        )
     }
   }
 
-  # --- Filter by neutral losses ---
+  # --- Filter by neutral losses (per spectrum) ---
   if (length(nls) > 0L) {
-    # Remove any NA or infinite values from nls
-    nls <- nls[is.finite(nls)]
+    precursor_mz <- Spectra::precursorMz(spectra)
+    valid <- is.finite(precursor_mz)
 
-    if (length(nls) > 0L) {
-      precursor_mz <- tryCatch(
-        {
-          Spectra::precursorMz(spectra)
-        },
-        error = function(e) {
-          warning("Error getting precursor m/z: ", e$message)
-          return(rep(NA_real_, length(spectra)))
-        }
-      )
-
-      # Ensure correct length
-      if (length(precursor_mz) != length(spectra)) {
-        warning("Precursor m/z length mismatch")
-        return(spectra[FALSE])
-      }
-
-      # Handle NA precursor m/z
-      valid_idx <- !is.na(precursor_mz) & is.finite(precursor_mz)
-
-      if (!any(valid_idx)) {
-        return(spectra[FALSE])
-      }
-
-      # Extract all m/z values at once
-      idx <- tryCatch(
-        {
-          all_mz <- Spectra::mz(spectra)
-
-          # Ensure we got the right number of m/z lists
-          if (length(all_mz) != length(spectra)) {
-            warning("m/z list length mismatch in neutral loss filtering")
-            return(rep(FALSE, length(spectra)))
+    keep <- keep &
+      vapply(
+        X = seq_along(spectra),
+        FUN = function(i) {
+          if (!valid[i]) {
+            return(FALSE)
           }
-
-          # Vectorized check across all spectra
-          result <- vapply(
-            seq_along(spectra),
-            function(i) {
-              if (!valid_idx[i]) {
-                return(FALSE)
-              }
-
-              spec_mz <- all_mz[[i]]
-              if (length(spec_mz) == 0L) {
-                return(FALSE)
-              }
-
-              # Calculate target m/z values for this spectrum
-              target_mz <- precursor_mz[i] - nls
-              target_mz <- target_mz[is.finite(target_mz) & target_mz > 0]
-
-              if (length(target_mz) == 0L) {
-                return(FALSE)
-              }
-
-              contains_all_mz(spec_mz, target_mz, dalton, ppm)
-            },
-            logical(1),
-            USE.NAMES = FALSE
-          )
-
-          result
+          spec <- all_mz[[i]]
+          if (length(spec) == 0L || all(is.na(spec))) {
+            return(FALSE)
+          }
+          target_mz <- precursor_mz[i] - nls
+          target_mz <- target_mz[is.finite(target_mz) & target_mz > 0]
+          if (length(target_mz) == 0L) {
+            return(FALSE)
+          }
+          contains_all_mz(spec, target_mz, dalton, ppm)
         },
-        error = function(e) {
-          warning("Error in neutral loss filtering: ", e$message)
-          return(rep(FALSE, length(spectra)))
-        }
+        FUN.VALUE = logical(1)
       )
-
-      # Ensure logical vector and correct length
-      if (length(idx) != length(spectra)) {
-        warning("Index length mismatch after neutral loss filtering")
-        return(spectra[FALSE])
-      }
-
-      idx[is.na(idx)] <- FALSE
-
-      # Subset safely
-      if (any(idx)) {
-        spectra <- spectra[idx]
-      } else {
-        return(spectra[FALSE])
-      }
-    }
   }
 
-  spectra
+  spectra[keep]
 }
 
 #' @title Perform list of queries
@@ -197,15 +104,12 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
 #'
 #' @examples NULL
 perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
-  # Get and validate target name
   target <- names(ions_list)[index]
   if (is.null(target) || is.na(target) || target == "") {
     target <- paste0("query_", index)
   }
 
   ions <- ions_list[[index]]
-
-  # Validate ions
   if (length(ions) == 0L || all(is.na(ions))) {
     return(tidytable::tidytable(target = target, value = character(0)))
   }
@@ -250,7 +154,6 @@ perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
     }
   )
 
-  # Early return if no results
   if (length(result_spectra) == 0L) {
     return(tidytable::tidytable(target = target, value = character(0)))
   }
@@ -259,7 +162,6 @@ perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
   value <- tryCatch(
     {
       spectra_data <- Spectra::spectraData(result_spectra)
-
       if (nrow(spectra_data) > 0L && "SKELETON" %in% names(spectra_data)) {
         skeleton <- spectra_data$SKELETON
         if (length(skeleton) > 0L && !all(is.na(skeleton))) {
@@ -291,27 +193,26 @@ perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
 #'
 #' @examples NULL
 perform_list_of_queries_progress <- function(ions_list, spectra, dalton, ppm) {
-  # Force garbage collection before starting
   invisible(gc(verbose = FALSE, full = TRUE))
+  n <- length(ions_list)
+  results <- vector("list", n)
 
-  results <- vector("list", length(ions_list))
-
-  if (requireNamespace("progress", quietly = TRUE)) {
-    pb <- progress::progress_bar$new(
-      total = length(ions_list),
+  pb <- if (requireNamespace("progress", quietly = TRUE)) {
+    progress::progress_bar$new(
+      total = n,
       format = "[:bar] :current/:total (:percent) eta: :eta"
     )
   } else {
-    pb <- NULL
+    NULL
   }
 
-  for (i in seq_along(ions_list)) {
+  for (i in seq_len(n)) {
     results[[i]] <- tryCatch(
       {
         perform_list_of_queries(i, ions_list, spectra, dalton, ppm)
       },
       error = function(e) {
-        warning("Critical error in query ", i, ": ", e$message)
+        warning("Error in query ", i, ": ", e$message)
         tidytable::tidytable(
           target = if (!is.null(names(ions_list)[i])) {
             names(ions_list)[i]
@@ -322,9 +223,7 @@ perform_list_of_queries_progress <- function(ions_list, spectra, dalton, ppm) {
         )
       }
     )
-
     if (!is.null(pb)) pb$tick()
   }
-
   results
 }
