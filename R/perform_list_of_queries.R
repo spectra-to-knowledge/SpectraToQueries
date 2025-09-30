@@ -153,29 +153,11 @@ perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
 #'
 #' @examples NULL
 perform_list_of_queries_progress <- function(ions_list, spectra, dalton, ppm) {
-  n_queries <- length(ions_list)
-  message("Processing ", n_queries, " queries...")
-
-  # Pre-allocate with correct length
-  results <- vector("list", length = n_queries)
-
-  # Calculate progress interval once
-  progress_interval <- max(100L, floor(n_queries / 10L))
-
-  for (i in seq_len(n_queries)) {
-    # Progress reporting
-    if (i == 1L || i %% progress_interval == 0L || i == n_queries) {
-      message(sprintf(
-        "Progress: %d/%d (%.1f%%)",
-        i,
-        n_queries,
-        100 * i / n_queries
-      ))
+  purrr::map(
+    .progress = interactive(),
+    .x = seq_along(ions_list),
+    .f = function(index) {
+      perform_list_of_queries(index, ions_list, spectra, dalton, ppm)
     }
-
-    results[[i]] <- perform_list_of_queries(i, ions_list, spectra, dalton, ppm)
-  }
-
-  message("Processing complete!")
-  results
+  )
 }

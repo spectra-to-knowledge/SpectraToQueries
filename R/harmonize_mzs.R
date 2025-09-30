@@ -12,8 +12,15 @@ harmonize_mzs <- function(spectra, dalton, ppm) {
 
   # Averaged m/z values from combined spectra
   averaged_intensities <- spectra_new |>
-    Spectra::peaksData() |>
-    Spectra::combinePeaksData(tolerance = dalton, ppm = ppm, peaks = "union") |>
+    Spectra::peaksData(
+      BPPARAM = BiocParallel::SerialParam()
+    ) |>
+    Spectra::combinePeaksData(
+      tolerance = dalton,
+      ppm = ppm,
+      peaks = "union",
+      BPPARAM = BiocParallel::SerialParam()
+    ) |>
     data.frame() |>
     tidytable::pull("mz")
   for (i in seq_along(seq_along(spectra_new))) {

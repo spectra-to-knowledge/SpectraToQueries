@@ -61,8 +61,11 @@ spectra_to_queries <- function(
     message("Loading spectra.")
     mia_spectra <- spectra |>
       MsBackendMgf::readMgf() |>
-      Spectra::Spectra() |>
-      Spectra::setBackend(Spectra::MsBackendMemory())
+      Spectra::Spectra(BPPARAM = BiocParallel::SerialParam()) |>
+      Spectra::setBackend(
+        backend = Spectra::MsBackendMemory(),
+        BPPARAM = BiocParallel::SerialParam()
+      )
   }
   mia_spectra@backend@spectraData$precursorMz <-
     mia_spectra@backend@spectraData$PRECURSOR_MZ |>
@@ -76,7 +79,10 @@ spectra_to_queries <- function(
   mia_spectra_1 <- mia_spectra |>
     Spectra::filterMsLevel(2L) |>
     Spectra::reduceSpectra(tolerance = dalton, ppm = ppm) |>
-    Spectra::combineSpectra(f = mia_spectra$TITLE) |>
+    Spectra::combineSpectra(
+      f = mia_spectra$TITLE,
+      BPPARAM = BiocParallel::SerialParam()
+    ) |>
     Spectra::deisotopeSpectra(tolerance = dalton, ppm = ppm) |>
     Spectra::filterPrecursorPeaks(
       tolerance = dalton,
@@ -84,7 +90,10 @@ spectra_to_queries <- function(
       mz = ">="
     ) |>
     Spectra::filterEmptySpectra() |>
-    Spectra::addProcessing(normalize_peaks()) |>
+    Spectra::addProcessing(
+      normalize_peaks(),
+      BPPARAM = BiocParallel::SerialParam()
+    ) |>
     Spectra::filterIntensity(intensity = c(intensity_min, Inf)) |>
     Spectra::applyProcessing()
 
@@ -116,7 +125,10 @@ spectra_to_queries <- function(
       )
     ) |>
     Spectra::reduceSpectra(tolerance = dalton, ppm = ppm) |>
-    Spectra::combineSpectra(f = mia_spectra$TITLE) |>
+    Spectra::combineSpectra(
+      f = mia_spectra$TITLE,
+      BPPARAM = BiocParallel::SerialParam()
+    ) |>
     Spectra::deisotopeSpectra(tolerance = dalton, ppm = ppm) |>
     Spectra::filterPrecursorPeaks(
       tolerance = dalton,
@@ -124,7 +136,10 @@ spectra_to_queries <- function(
       mz = ">="
     ) |>
     Spectra::filterEmptySpectra() |>
-    Spectra::addProcessing(normalize_peaks()) |>
+    Spectra::addProcessing(
+      normalize_peaks(),
+      BPPARAM = BiocParallel::SerialParam()
+    ) |>
     Spectra::filterIntensity(intensity = c(intensity_min, Inf)) |>
     Spectra::applyProcessing()
   mia_spectra_w_nl <- mia_spectra_nl |>
@@ -133,7 +148,10 @@ spectra_to_queries <- function(
   message("Bin spectra to get a matrix.")
   message("The window is ", dalton, " Dalton")
   mia_spectra_binned <- mia_spectra_w |>
-    Spectra::bin(binSize = dalton, zero.rm = FALSE) |>
+    Spectra::bin(
+      binSize = dalton,
+      zero.rm = FALSE
+    ) |>
     Spectra::applyProcessing()
 
   message("Create fragments and neutral losses matrices.")
@@ -157,7 +175,10 @@ spectra_to_queries <- function(
 
   mia_spectra_binned_nl <- mia_spectra_w_nl |>
     Spectra::reset() |>
-    Spectra::bin(binSize = dalton, zero.rm = FALSE) |>
+    Spectra::bin(
+      binSize = dalton,
+      zero.rm = FALSE
+    ) |>
     Spectra::applyProcessing()
   spectra_nl_mat <- mia_spectra_binned_nl |>
     create_matrix(name = mia_spectra_binned_nl$SKELETON) |>
