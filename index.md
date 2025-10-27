@@ -113,7 +113,7 @@ knowledge: a proof of concept with monoterpene indole alkaloids:
 | base | 4.5.1 | R Core Team (2025) |
 | BiocGenerics | 0.54.0 | Huber et al. (2015) |
 | BiocManager | 1.30.26 | Morgan and Ramos (2025) |
-| BiocParallel | 1.42.1 | Morgan et al. (2025) |
+| BiocParallel | 1.42.2 | Morgan et al. (2025) |
 | BiocVersion | 3.21.1 | Morgan (2024) |
 | knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
 | MsBackendMgf | 1.16.0 | Gatto, Rainer, and Gibb (2025) |
