@@ -8,6 +8,7 @@ utils::globalVariables(
     "group_count",
     "id",
     "ion",
+    "ions",
     "name",
     "precision",
     "recall",

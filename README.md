@@ -110,17 +110,16 @@ knowledge: a proof of concept with monoterpene indole alkaloids:
 
 | Package | Version | Citation |
 |:---|:---|:---|
-| base | 4.5.1 | R Core Team (2025) |
-| BiocGenerics | 0.55.1 | Huber et al. (2015) |
+| base | 4.5.2 | R Core Team (2025) |
 | BiocManager | 1.30.26 | Morgan and Ramos (2025) |
-| BiocParallel | 1.43.4 | Wang et al. (2025) |
+| BiocParallel | 1.44.0 | Wang et al. (2025) |
 | BiocVersion | 3.22.0 | Morgan (2025) |
 | knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
-| MsBackendMgf | 1.17.0 | Gatto, Rainer, and Gibb (2025) |
+| MsBackendMgf | 1.18.0 | Gatto, Rainer, and Gibb (2025) |
 | pkgload | 1.4.1 | Wickham et al. (2025) |
 | progress | 1.2.3 | Csárdi and FitzJohn (2023) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
-| Spectra | 1.19.4 | Rainer et al. (2022) |
+| Spectra | 1.20.0 | Rainer et al. (2022) |
 | testthat | 3.2.3 | Wickham (2011) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
@@ -158,15 +157,6 @@ Interface to “<span class="nocase">data.table</span>”*.
 Gatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2025.
 *MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format
 (Mgf) Files*. <https://doi.org/10.18129/B9.bioc.MsBackendMgf>.
-
-</div>
-
-<div id="ref-BiocGenerics" class="csl-entry">
-
-Huber, W., Carey, V. J., Gentleman, R., Anders, et al. 2015.
-“Orchestrating High-Throughput Genomic Analysis with Bioconductor.”
-*Nature Methods* 12 (2): 115–21.
-<http://www.nature.com/nmeth/journal/v12/n2/full/nmeth.3252.html>.
 
 </div>
 
