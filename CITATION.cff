@@ -132,32 +132,18 @@ references:
   year: '2025'
   version: '>= 4.4.0'
 - type: software
-  title: BiocGenerics
-  abstract: 'BiocGenerics: S4 generic functions used in Bioconductor'
-  notes: Imports
-  url: https://bioconductor.org/packages/BiocGenerics
-  repository: https://bioconductor.org/
-  authors:
-  - name: The Bioconductor Dev Team
-  - family-names: Pagès
-    given-names: Hervé
-    email: hpages.on.github@gmail.com
-    orcid: https://orcid.org/0009-0002-8272-4522
-  year: '2025'
-  doi: 10.18129/B9.bioc.BiocGenerics
-  version: '>= 0.52.0'
-- type: software
   title: BiocParallel
   abstract: 'BiocParallel: Bioconductor facilities for parallel evaluation'
   notes: Imports
   url: https://github.com/Bioconductor/BiocParallel
   repository: https://bioconductor.org/
   authors:
+  - family-names: Wang
+    given-names: Jiefei
+    email: jiefei0804@gmail.com
   - family-names: Morgan
     given-names: Martin
     email: mtmorgan.bioc@gmail.com
-  - family-names: Wang
-    given-names: Jiefei
   - family-names: Obenchain
     given-names: Valerie
   - family-names: Lang
