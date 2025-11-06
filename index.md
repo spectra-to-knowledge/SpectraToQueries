@@ -110,17 +110,17 @@ knowledge: a proof of concept with monoterpene indole alkaloids:
 
 | Package | Version | Citation |
 |:---|:---|:---|
-| base | 4.5.1 | R Core Team (2025) |
-| BiocGenerics | 0.54.0 | Huber et al. (2015) |
+| base | 4.5.2 | R Core Team (2025) |
+| BiocGenerics | 0.56.0 | Huber et al. (2015) |
 | BiocManager | 1.30.26 | Morgan and Ramos (2025) |
-| BiocParallel | 1.42.2 | Morgan et al. (2025) |
-| BiocVersion | 3.21.1 | Morgan (2024) |
+| BiocParallel | 1.44.0 | Wang et al. (2025) |
+| BiocVersion | 3.22.0 | Morgan (2025) |
 | knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
-| MsBackendMgf | 1.16.0 | Gatto, Rainer, and Gibb (2025) |
+| MsBackendMgf | 1.18.0 | Gatto, Rainer, and Gibb (2025) |
 | pkgload | 1.4.1 | Wickham et al. (2025) |
 | progress | 1.2.3 | Csárdi and FitzJohn (2023) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
-| Spectra | 1.18.2 | Rainer et al. (2022) |
+| Spectra | 1.19.11 | Rainer et al. (2022) |
 | testthat | 3.2.3 | Wickham (2011) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
@@ -172,7 +172,7 @@ Huber, W., Carey, V. J., Gentleman, R., Anders, et al. 2015.
 
 <div id="ref-BiocVersion" class="csl-entry">
 
-Morgan, Martin. 2024. *BiocVersion: Set the Appropriate Version of
+Morgan, Martin. 2025. *BiocVersion: Set the Appropriate Version of
 Bioconductor Packages*. <https://doi.org/10.18129/B9.bioc.BiocVersion>.
 
 </div>
@@ -182,15 +182,6 @@ Bioconductor Packages*. <https://doi.org/10.18129/B9.bioc.BiocVersion>.
 Morgan, Martin, and Marcel Ramos. 2025. *BiocManager: Access the
 Bioconductor Project Package Repository*.
 <https://bioconductor.github.io/BiocManager/>.
-
-</div>
-
-<div id="ref-BiocParallel" class="csl-entry">
-
-Morgan, Martin, Jiefei Wang, Valerie Obenchain, Michel Lang, Ryan
-Thompson, and Nitesh Turaga. 2025. *BiocParallel: Bioconductor
-Facilities for Parallel Evaluation*.
-<https://doi.org/10.18129/B9.bioc.BiocParallel>.
 
 </div>
 
@@ -208,6 +199,15 @@ Rainer, Johannes, Andrea Vicini, Liesa Salzer, Jan Stanstrup, Josep M.
 Badia, Steffen Neumann, Michael A. Stravs, et al. 2022. “A Modular and
 Expandable Ecosystem for Metabolomics Data Annotation in r.”
 *Metabolites* 12: 173. <https://doi.org/10.3390/metabo12020173>.
+
+</div>
+
+<div id="ref-BiocParallel" class="csl-entry">
+
+Wang, Jiefei, Martin Morgan, Valerie Obenchain, Michel Lang, Ryan
+Thompson, and Nitesh Turaga. 2025. *BiocParallel: Bioconductor
+Facilities for Parallel Evaluation*.
+<https://doi.org/10.18129/B9.bioc.BiocParallel>.
 
 </div>
 
