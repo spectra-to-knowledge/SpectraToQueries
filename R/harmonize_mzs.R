@@ -23,19 +23,29 @@ harmonize_mzs <- function(spectra, dalton, ppm) {
     ) |>
     data.frame() |>
     tidytable::pull("mz")
-  for (i in seq_along(seq_along(spectra_new))) {
-    mzs <- spectra_new@backend@peaksData[[i]] |>
-      data.frame() |>
-      tidytable::pull("mz")
 
-    for (j in seq_along(mzs)) {
-      matching_index <- which.min(abs(mzs[j] - averaged_intensities))
-      if (abs(mzs[[j]] - averaged_intensities[matching_index]) <= dalton) {
-        mzs[j] <- averaged_intensities[matching_index]
+  # Process all spectra more efficiently
+  for (i in seq_along(spectra_new)) {
+    # Direct access to mz values without intermediate data frame
+    mzs <- spectra_new@backend@peaksData[[i]][, 1]
+
+    # Vectorized matching for all m/z values at once
+    if (length(mzs) > 0) {
+      # For each mz, find the closest averaged value
+      for (j in seq_along(mzs)) {
+        # Calculate distances to all averaged values
+        diffs <- abs(mzs[j] - averaged_intensities)
+        min_idx <- which.min(diffs)
+
+        # Only update if within tolerance
+        if (diffs[min_idx] <= dalton) {
+          mzs[j] <- averaged_intensities[min_idx]
+        }
       }
-    }
 
-    spectra_new@backend@peaksData[[i]][, 1] <- mzs
+      # Update the m/z values in place
+      spectra_new@backend@peaksData[[i]][, 1] <- mzs
+    }
   }
 
   return(spectra_new)

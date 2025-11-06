@@ -206,24 +206,39 @@ perform_list_of_queries_progress <- function(ions_list, spectra, dalton, ppm) {
     NULL
   }
 
-  for (i in seq_len(n)) {
-    results[[i]] <- tryCatch(
-      {
-        perform_list_of_queries(i, ions_list, spectra, dalton, ppm)
-      },
-      error = function(e) {
-        warning("Error in query ", i, ": ", e$message)
-        tidytable::tidytable(
-          target = if (!is.null(names(ions_list)[i])) {
-            names(ions_list)[i]
-          } else {
-            paste0("query_", i)
-          },
-          value = character(0)
-        )
-      }
-    )
-    if (!is.null(pb)) pb$tick()
+  # Process in batches to allow periodic garbage collection
+  batch_size <- 100L
+  n_batches <- ceiling(n / batch_size)
+
+  for (batch in seq_len(n_batches)) {
+    start_idx <- (batch - 1L) * batch_size + 1L
+    end_idx <- min(batch * batch_size, n)
+
+    for (i in start_idx:end_idx) {
+      results[[i]] <- tryCatch(
+        {
+          perform_list_of_queries(i, ions_list, spectra, dalton, ppm)
+        },
+        error = function(e) {
+          warning("Error in query ", i, ": ", e$message)
+          tidytable::tidytable(
+            target = if (!is.null(names(ions_list)[i])) {
+              names(ions_list)[i]
+            } else {
+              paste0("query_", i)
+            },
+            value = character(0)
+          )
+        }
+      )
+      if (!is.null(pb)) pb$tick()
+    }
+
+    # Garbage collect after each batch
+    if (batch < n_batches) {
+      invisible(gc(verbose = FALSE))
+    }
   }
+
   results
 }
