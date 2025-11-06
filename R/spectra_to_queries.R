@@ -171,6 +171,7 @@ spectra_to_queries <- function(
       ppm = ppm
     )
   rm(mia_spectra_binned)
+  gc(verbose = FALSE)
 
   mia_spectra_binned_nl <- mia_spectra_w_nl |>
     Spectra::reset() |>
@@ -191,6 +192,7 @@ spectra_to_queries <- function(
       ppm = ppm
     )
   rm(mia_spectra_binned_nl)
+  gc(verbose = FALSE)
 
   message("Create a matrix containing fragments and neutral losses.")
   message("Round the values to ", decimals, ".")
@@ -234,6 +236,8 @@ spectra_to_queries <- function(
     ) |>
     tidytable::group_by(group) |>
     tidytable::add_count(name = "group_count") |>
+    tidytable::ungroup() |>
+    tidytable::filter(group_count >= n_skel_min) |>
     tidytable::pivot_longer(
       cols = !tidytable::starts_with("group"),
       names_to = "ion"
@@ -242,20 +246,19 @@ spectra_to_queries <- function(
 
   # Clean up large matrices to free memory
   rm(merged_mat, spectra_mat, spectra_nl_mat)
-  gc() # Force garbage collection
+  gc(verbose = FALSE)
 
   message("Extract the best ions to perform a query.")
   ions_table_filtered_1 <- ions_table |>
     tidytable::group_by(ion) |>
     tidytable::add_count(name = "count_per_ion") |>
+    tidytable::filter(count_per_ion >= n_spec_min) |>
     tidytable::ungroup() |>
     tidytable::group_by(group, ion) |>
     tidytable::add_count(name = "count_per_ion_per_group") |>
     tidytable::ungroup() |>
     tidytable::select(-value) |>
     tidytable::distinct() |>
-    tidytable::filter(count_per_ion >= n_spec_min) |>
-    tidytable::filter(group_count >= n_skel_min) |>
     tidytable::mutate(
       precision = count_per_ion_per_group / count_per_ion,
       recall = count_per_ion_per_group / group_count
@@ -270,6 +273,10 @@ spectra_to_queries <- function(
     tidytable::arrange(tidytable::desc(fscore)) |>
     tidytable::filter(fscore >= fscore_min | recall == 1) |>
     tidytable::mutate(value = 1)
+
+  # Clean up ions_table to free memory
+  rm(ions_table)
+  gc(verbose = FALSE)
 
   ions_table_diagnostic <- ions_table_filtered_1 |>
     tidytable::filter(recall == 1) |>
@@ -318,33 +325,35 @@ spectra_to_queries <- function(
 
   # Combination merging
   message("Merging diagnostic ions with combinations.")
-  new_combinations <- vector("list", length(combinations))
-  names(new_combinations) <- names(ions_list)
 
-  for (name in names(combinations)) {
-    x <- combinations[[name]]
-    diagnostic_ions <- ions_list_diagnostic[[name]]
+  # Pre-process diagnostic ions
+  has_diagnostic <- names(ions_list) %in% names(ions_list_diagnostic)
 
-    if (length(diagnostic_ions) > 0) {
-      # Pre-combine diagnostic ions to avoid repeated operations
-      new_combinations[[name]] <- lapply(x, function(sublist) {
-        unique(c(unlist(sublist), diagnostic_ions))
-      })
-    } else {
-      new_combinations[[name]] <- x
+  if (any(has_diagnostic)) {
+    # Only process items that have diagnostic ions
+    for (name in names(combinations)[has_diagnostic]) {
+      x <- combinations[[name]]
+      diagnostic_ions <- ions_list_diagnostic[[name]]
+
+      if (length(diagnostic_ions) > 0) {
+        # In-place update more efficient than creating new list
+        combinations[[name]] <- lapply(x, function(sublist) {
+          unique(c(unlist(sublist), diagnostic_ions))
+        })
+      }
     }
   }
 
   # Free memory from intermediate objects
-  rm(combinations, ions_list, ions_list_diagnostic)
-  gc()
+  rm(ions_list, ions_list_diagnostic)
+  gc(verbose = FALSE)
 
-  all_combinations <- unlist(new_combinations, recursive = FALSE)
+  all_combinations <- unlist(combinations, recursive = FALSE)
   names(all_combinations) <- gsub("\\d+$", "", names(all_combinations))
 
   # Clean up
-  rm(new_combinations)
-  gc()
+  rm(combinations)
+  gc(verbose = FALSE)
 
   message("Test the queries. (This is the longest step)")
   queries_results <- all_combinations |>

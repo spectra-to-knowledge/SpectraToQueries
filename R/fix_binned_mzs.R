@@ -29,6 +29,7 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
   # Pre-allocate result vector
   new_colnames <- numeric(length(old_colnames))
 
+  # Vectorized approach: for each old column, find all matching mzs and average
   for (i in seq_along(old_colnames)) {
     # Find matching m/z values within tolerance
     within_tolerance <- abs(all_mzs - old_colnames[i]) <= dalton
@@ -39,42 +40,34 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
     }
   }
 
-  # Update column names
-  new_m <- binned_m
-  colnames(new_m) <- new_colnames
+  # Round new column names
+  new_colnames_rounded <- round(new_colnames, decimals)
 
-  result_matrix <- new_m |>
-    data.frame() |>
-    tibble::rownames_to_column() |>
-    tidytable::pivot_longer(
-      cols = -rowname,
-      names_to = "name",
-      values_to = "value",
-      names_repair = "minimal"
-    ) |>
-    tidytable::mutate(
-      name = name |>
-        gsub(pattern = "\\.[0-9]{1,2}$", replacement = "")
-    ) |>
-    # tidytable::filter(!name |>
-    #   grepl(pattern = "V", fixed = TRUE)) |>
-    tidytable::mutate(
-      name = name |>
-        gsub(
-          pattern = "X",
-          replacement = "",
-          fixed = TRUE
-        ) |>
-        as.numeric() |>
-        round(digits = decimals) |>
-        as.character()
-    ) |>
-    tidytable::group_by(rowname, name) |>
-    tidytable::summarize(value = sum(value)) |>
-    tidytable::filter(!is.na(name)) |>
-    tidytable::pivot_wider(names_from = name, values_from = value) |>
-    tibble::column_to_rownames() |>
-    as.matrix()
+  # Group columns with same rounded m/z more efficiently
+  # Use aggregate instead of multiple pivot operations
+  unique_cols <- unique(new_colnames_rounded)
+
+  if (length(unique_cols) < ncol(binned_m)) {
+    # Need to merge some columns
+    result_matrix <- matrix(0, nrow = nrow(binned_m), ncol = length(unique_cols))
+    rownames(result_matrix) <- rownames(binned_m)
+
+    # Sum values for columns with same rounded m/z
+    for (i in seq_along(unique_cols)) {
+      matching_cols <- which(new_colnames_rounded == unique_cols[i])
+      if (length(matching_cols) == 1) {
+        result_matrix[, i] <- binned_m[, matching_cols]
+      } else {
+        result_matrix[, i] <- rowSums(binned_m[, matching_cols, drop = FALSE])
+      }
+    }
+
+    colnames(result_matrix) <- as.character(unique_cols)
+  } else {
+    # No merging needed, just update column names
+    result_matrix <- binned_m
+    colnames(result_matrix) <- as.character(new_colnames_rounded)
+  }
 
   return(result_matrix)
 }
