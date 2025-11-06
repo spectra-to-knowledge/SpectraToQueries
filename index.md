@@ -111,7 +111,6 @@ knowledge: a proof of concept with monoterpene indole alkaloids:
 | Package | Version | Citation |
 |:---|:---|:---|
 | base | 4.5.2 | R Core Team (2025) |
-| BiocGenerics | 0.56.0 | Huber et al. (2015) |
 | BiocManager | 1.30.26 | Morgan and Ramos (2025) |
 | BiocParallel | 1.44.0 | Wang et al. (2025) |
 | BiocVersion | 3.22.0 | Morgan (2025) |
@@ -158,15 +157,6 @@ Interface to “<span class="nocase">data.table</span>”*.
 Gatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2025.
 *MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format
 (Mgf) Files*. <https://doi.org/10.18129/B9.bioc.MsBackendMgf>.
-
-</div>
-
-<div id="ref-BiocGenerics" class="csl-entry">
-
-Huber, W., Carey, V. J., Gentleman, R., Anders, et al. 2015.
-“Orchestrating High-Throughput Genomic Analysis with Bioconductor.”
-*Nature Methods* 12 (2): 115–21.
-<http://www.nature.com/nmeth/journal/v12/n2/full/nmeth.3252.html>.
 
 </div>
 
