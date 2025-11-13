@@ -25,17 +25,17 @@ Imports:
     BiocParallel (>= 1.40.2),
     MsBackendMgf (>= 1.14.0),
     progress (>= 1.2.3),
-    purrr (>= 1.1.0),
+    purrr (>= 1.2.0),
     Spectra (>= 1.16.1),
     tidytable (>= 0.11.2),
     tibble (>= 3.3.0)
 Suggests: 
-    altdoc (>= 0.5.0),
+    altdoc (>= 0.7.0),
     BiocManager (>= 1.30.25),
     BiocVersion (>= 3.20.0),
-    grateful (>= 0.2.12),
+    grateful (>= 0.3.0),
     R.utils (>= 2.13.0),
-    spelling (>= 2.3.1),
+    spelling (>= 2.3.2),
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Encoding: UTF-8
