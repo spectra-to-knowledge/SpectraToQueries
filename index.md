@@ -120,7 +120,7 @@ knowledge: a proof of concept with monoterpene indole alkaloids:
 | progress | 1.2.3 | Csárdi and FitzJohn (2023) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
 | Spectra | 1.19.11 | Rainer et al. (2022) |
-| testthat | 3.2.3 | Wickham (2011) |
+| testthat | 3.3.0 | Wickham (2011) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
 
@@ -205,7 +205,7 @@ Facilities for Parallel Evaluation*.
 
 Wickham, Hadley. 2011. “<span class="nocase">testthat</span>: Get
 Started with Testing.” *The R Journal* 3: 5–10.
-<https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf>.
+<https://journal.r-project.org/articles/RJ-2011-002/>.
 
 </div>
 
