@@ -49,7 +49,11 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
 
   if (length(unique_cols) < ncol(binned_m)) {
     # Need to merge some columns
-    result_matrix <- matrix(0, nrow = nrow(binned_m), ncol = length(unique_cols))
+    result_matrix <- matrix(
+      0,
+      nrow = nrow(binned_m),
+      ncol = length(unique_cols)
+    )
     rownames(result_matrix) <- rownames(binned_m)
 
     # Sum values for columns with same rounded m/z

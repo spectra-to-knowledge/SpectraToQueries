@@ -14,8 +14,16 @@ combine_ions_minimal <- function(ion_lists) {
   sort_ions <- function(ions) {
     frags <- grep("_frag$", ions, value = TRUE)
     nls <- grep("_nl$", ions, value = TRUE)
-    frags_sorted <- if (length(frags)) paste0(sort(as.numeric(sub("_frag$", "", frags))), "_frag") else character(0)
-    nls_sorted <- if (length(nls)) paste0(sort(as.numeric(sub("_nl$", "", nls))), "_nl") else character(0)
+    frags_sorted <- if (length(frags)) {
+      paste0(sort(as.numeric(sub("_frag$", "", frags))), "_frag")
+    } else {
+      character(0)
+    }
+    nls_sorted <- if (length(nls)) {
+      paste0(sort(as.numeric(sub("_nl$", "", nls))), "_nl")
+    } else {
+      character(0)
+    }
     c(frags_sorted, nls_sorted)
   }
 

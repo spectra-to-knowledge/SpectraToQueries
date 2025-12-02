@@ -19,3 +19,5 @@ _\.new\.png$
 CITATION.cff
 ^altdoc$
 ^_quarto$
+^[.]?air[.]toml$
+^\.vscode$
