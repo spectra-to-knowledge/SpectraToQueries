@@ -120,7 +120,7 @@ knowledge: a proof of concept with monoterpene indole alkaloids:
 | progress | 1.2.3 | Csárdi and FitzJohn (2023) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
 | Spectra | 1.19.11 | Rainer et al. (2022) |
-| testthat | 3.3.0 | Wickham (2011) |
+| testthat | 3.3.1 | Wickham (2011) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
 
