@@ -114,12 +114,12 @@ knowledge: a proof of concept with monoterpene indole alkaloids:
 | BiocManager | 1.30.27 | Morgan and Ramos (2025) |
 | BiocParallel | 1.44.0 | Wang et al. (2025) |
 | BiocVersion | 3.22.0 | Morgan (2025) |
-| knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
+| knitr | 1.51 | Xie (2014); Xie (2015); Xie (2025) |
 | MsBackendMgf | 1.18.0 | Gatto, Rainer, and Gibb (2025) |
 | pkgload | 1.4.1 | Wickham et al. (2025) |
 | progress | 1.2.3 | Csárdi and FitzJohn (2023) |
 | rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
-| Spectra | 1.19.11 | Rainer et al. (2022) |
+| Spectra | 1.20.1 | Rainer et al. (2022) |
 | testthat | 3.3.1 | Wickham (2011) |
 | tidytable | 0.11.2 | Fairbanks (2024) |
 | tidyverse | 2.0.0 | Wickham et al. (2019) |
