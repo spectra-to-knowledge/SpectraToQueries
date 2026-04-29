@@ -4,8 +4,6 @@
 #'
 #' @param spectra Spectra path
 #' @param export Export path
-#' @param beta_1 Beta parameter of the single ion F-score calculation. Default to 1.0
-#' @param beta_2 Beta parameter of the total F-score calculation. Default to 0.5
 #' @param dalton Tolerance in Dalton. Default to 0.01
 #' @param decimals Number of decimals for rounding. Default to 4L
 #' @param intensity_min Minimal intensity. Default to 0.0
@@ -13,9 +11,9 @@
 #' @param n_skel_min Minimal number of individuals per skeleton. Default to 5L
 #' @param n_spec_min Minimal number of individuals where a signal has to be found. Default to 3L
 #' @param ppm Tolerance in parts per million Default to 30.0
-#' @param fscore_min Minimal single ion F-score. Default to 0.0
-#' @param precision_min Minimal single ion precision. Default to 0.0
-#' @param recall_min Minimal single ion recall. Default to 0.0
+#' @param mcc_min Minimal single-ion Matthews Correlation Coefficient. Default to 0.0
+#' @param precision_min Minimal single ion precision (pre-filter before MCC). Default to 0.0
+#' @param recall_min Minimal single ion recall (pre-filter before MCC). Default to 0.0
 #' @param zero_val Zero value for intensity. Default to 0.0
 #'
 #' @return A file with diagnostic query ions
@@ -26,8 +24,6 @@
 spectra_to_queries <- function(
   spectra = NULL,
   export = "data/interim/queries.tsv",
-  beta_1 = 1.0,
-  beta_2 = 0.5,
   dalton = 0.01,
   decimals = 4L,
   intensity_min = 0.0,
@@ -35,7 +31,7 @@ spectra_to_queries <- function(
   n_skel_min = 5L,
   n_spec_min = 3L,
   ppm = 30.0,
-  fscore_min = 0.0,
+  mcc_min = 0.0,
   precision_min = 0.0,
   recall_min = 0.0,
   zero_val = 0.0
@@ -70,6 +66,10 @@ spectra_to_queries <- function(
   mia_spectra@backend@spectraData$precursorMz <-
     mia_spectra@backend@spectraData$PRECURSOR_MZ |>
     as.numeric()
+
+  # Total number of spectra — required as the denominator for TN in MCC:
+  #   TN = total_spectra - TP - FP - FN
+  total_spectra <- length(mia_spectra)
 
   message(
     "Cut the fragments lower than ",
@@ -260,19 +260,42 @@ spectra_to_queries <- function(
     tidytable::ungroup() |>
     tidytable::select(-value) |>
     tidytable::distinct() |>
+    # Optional pre-filters on precision and recall before MCC computation.
+    # These reduce the candidate set cheaply and remain meaningful on their own.
     tidytable::mutate(
       precision = count_per_ion_per_group / count_per_ion,
       recall = count_per_ion_per_group / group_count
     ) |>
     tidytable::filter(precision >= precision_min) |>
     tidytable::filter(recall >= recall_min) |>
+    # -----------------------------------------------------------------------
+    # Matthews Correlation Coefficient (MCC) for a single ion / group pair.
+    #
+    #   TP = spectra in this group that contain the ion
+    #   FP = spectra in other groups that contain the ion
+    #   FN = spectra in this group that do NOT contain the ion
+    #   TN = all remaining spectra (neither in this group nor containing the ion)
+    #
+    #   MCC = (TP*TN - FP*FN) / sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
+    #
+    # When the denominator is zero (degenerate partition), MCC is set to 0.
+    # -----------------------------------------------------------------------
     tidytable::mutate(
-      fscore = (1 + beta_1^2) *
-        (precision * recall) /
-        ((precision * beta_1^2) + recall)
+      tp = count_per_ion_per_group,
+      fp = count_per_ion - count_per_ion_per_group,
+      fn_ = group_count - count_per_ion_per_group, # fn_ avoids clash with base fn()
+      tn = total_spectra - tp - fp - fn_,
+      mcc = tidytable::if_else(
+        condition = (tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_) > 0,
+        true = (tp * tn - fp * fn_) /
+          sqrt((tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_)),
+        false = 0.0 # degenerate case: ion present in every or no spectrum
+      )
     ) |>
-    tidytable::arrange(tidytable::desc(fscore)) |>
-    tidytable::filter(fscore >= fscore_min | recall == 1) |>
+    tidytable::select(-tp, -fp, -fn_, -tn) |> # drop intermediate columns
+    tidytable::arrange(tidytable::desc(mcc)) |>
+    # Keep ions that pass the MCC threshold OR are perfectly diagnostic (recall == 1)
+    tidytable::filter(mcc >= mcc_min | recall == 1) |>
     tidytable::mutate(value = 1)
 
   # Clean up ions_table to free memory
@@ -292,8 +315,10 @@ spectra_to_queries <- function(
   # Pivot back again.
   ions_table_final <- ions_table_filtered_1 |>
     tidytable::group_by(group) |>
-    tidytable::filter(fscore >= fscore_min & recall != 1) |>
-    tidytable::arrange(tidytable::desc(fscore)) |>
+    # Retain only non-perfectly-diagnostic ions that clear the MCC threshold,
+    # keeping the top `ions_max` per skeleton ranked by MCC.
+    tidytable::filter(mcc >= mcc_min & recall != 1) |>
+    tidytable::arrange(tidytable::desc(mcc)) |>
     tidytable::slice_head(n = ions_max) |>
     tidytable::ungroup() |>
     tidytable::distinct(group, ion, value) |>
@@ -365,11 +390,18 @@ spectra_to_queries <- function(
     )
   names(queries_results) <- names(all_combinations)
 
-  message("Evaluate the performance of the query based on F-score.")
+  message("Evaluate the performance of each query using MCC.")
   results_stats <- queries_results |>
     seq_along() |>
     purrr::map(
-      .f = function(result, beta_2) {
+      .f = function(result) {
+        # -----------------------------------------------------------------------
+        # Per-query confusion matrix entries:
+        #   TP = query hits that belong to the target skeleton
+        #   FP = query hits that belong to a different skeleton
+        #   FN = members of the target skeleton missed by the query
+        #   TN = all other spectra (not the target skeleton, not hit by query)
+        # -----------------------------------------------------------------------
         tp <- nrow(
           queries_results[[result]] |>
             tidytable::filter(target == value)
@@ -378,7 +410,7 @@ spectra_to_queries <- function(
           queries_results[[result]] |>
             tidytable::filter(target != value)
         )
-        fn <-
+        fn_ <-
           length(mia_spectra$SKELETON[
             mia_spectra$SKELETON |>
               gsub(
@@ -389,31 +421,31 @@ spectra_to_queries <- function(
               names(queries_results)[result]
           ]) -
           tp
-        recall <- tp / (tp + fn)
-        precision <- tp / (tp + fp)
-        f_beta <-
-          (1 + beta_2^2) *
-          (precision * recall) /
-          ((precision * beta_2^2) + recall)
-        return(round(f_beta, decimals))
-      },
-      beta_2 = beta_2
+        tn <- total_spectra - tp - fp - fn_
+
+        # MCC — returns 0 for degenerate partitions (zero denominator)
+        denom <- sqrt((tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_))
+        mcc <- if (denom > 0) (tp * tn - fp * fn_) / denom else 0.0
+
+        return(round(mcc, decimals))
+      }
     )
 
   best_queries <- data.frame(
     skeleton = names(all_combinations),
-    fscore = c(results_stats |> as.character()),
+    mcc = as.numeric(unlist(results_stats)),
     ions = I(all_combinations)
   ) |>
-    tidytable::filter(fscore != NaN) |>
-    tidytable::arrange(tidytable::desc(fscore)) |>
+    tidytable::filter(!is.nan(mcc)) |>
+    tidytable::arrange(tidytable::desc(mcc)) |>
     tidytable::group_by(skeleton) |>
-    tidytable::mutate(id = match(fscore, unique(fscore))) |>
+    # For each skeleton keep only the query with the highest MCC
+    tidytable::mutate(id = match(mcc, unique(mcc))) |>
     tidytable::filter(id == 1) |>
     tidytable::select(-id)
 
   final_queries <- best_queries |>
-    tidytable::group_by(skeleton, fscore) |>
+    tidytable::group_by(skeleton, mcc) |>
     tidytable::summarize(
       combined_ions = combine_ions_minimal(ions),
       .groups = "drop"
@@ -422,6 +454,6 @@ spectra_to_queries <- function(
   message("Export the best queries for further use.")
   create_dir(export)
   final_queries |>
-    tidytable::arrange(tidytable::desc(fscore)) |>
+    tidytable::arrange(tidytable::desc(mcc)) |>
     tidytable::fwrite(file = export, sep = "\t")
 }

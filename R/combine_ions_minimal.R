@@ -38,12 +38,21 @@ combine_ions_minimal <- function(ion_lists) {
     return(paste(common_sorted, collapse = " & "))
   }
 
+  # If one query is exactly the common set, the OR branch contains TRUE,
+  # so the minimal expression is just the common ions.
+  if (any(lengths(remaining) == 0)) {
+    return(paste(common_sorted, collapse = " & "))
+  }
+
   # Generate unique remaining sets
   unique_sets <- unique(remaining)
 
   # Build AND expression
   build_and <- function(vec) {
     sorted <- sort_ions(vec)
+    if (length(sorted) == 0) {
+      return(NA_character_)
+    }
     if (length(sorted) == 1) {
       return(sorted)
     }
@@ -52,10 +61,14 @@ combine_ions_minimal <- function(ion_lists) {
 
   # Combine unique sets with OR
   or_parts <- sapply(unique_sets, build_and)
+  or_parts <- or_parts[!is.na(or_parts) & nzchar(or_parts)]
 
   # Combine with common ions
   if (length(common_sorted) > 0) {
     common_expr <- paste(common_sorted, collapse = " & ")
+    if (length(or_parts) == 0) {
+      return(common_expr)
+    }
     paste(common_expr, paste(or_parts, collapse = " | "), sep = " & ")
   } else {
     paste(or_parts, collapse = " | ")
