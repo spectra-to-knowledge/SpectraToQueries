@@ -194,8 +194,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code class="language-R">spectra_to_queries(
   spectra = NULL,
   export = "data/interim/queries.tsv",
-  beta_1 = 1,
-  beta_2 = 0.5,
   dalton = 0.01,
   decimals = 4L,
   intensity_min = 0,
@@ -203,7 +201,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   n_skel_min = 5L,
   n_spec_min = 3L,
   ppm = 30,
-  fscore_min = 0,
+  mcc_min = 0,
   precision_min = 0,
   recall_min = 0,
   zero_val = 0
@@ -227,22 +225,6 @@ Spectra path
 </td>
 <td>
 Export path
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="beta_1">beta_1</code>
-</td>
-<td>
-Beta parameter of the single ion F-score calculation. Default to 1.0
-</td>
-</tr>
-<tr>
-<td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="beta_2">beta_2</code>
-</td>
-<td>
-Beta parameter of the total F-score calculation. Default to 0.5
 </td>
 </tr>
 <tr>
@@ -303,10 +285,10 @@ Tolerance in parts per million Default to 30.0
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="fscore_min">fscore_min</code>
+<code id="mcc_min">mcc_min</code>
 </td>
 <td>
-Minimal single ion F-score. Default to 0.0
+Minimal single-ion Matthews Correlation Coefficient. Default to 0.0
 </td>
 </tr>
 <tr>
@@ -314,7 +296,7 @@ Minimal single ion F-score. Default to 0.0
 <code id="precision_min">precision_min</code>
 </td>
 <td>
-Minimal single ion precision. Default to 0.0
+Minimal single ion precision (pre-filter before MCC). Default to 0.0
 </td>
 </tr>
 <tr>
@@ -322,7 +304,7 @@ Minimal single ion precision. Default to 0.0
 <code id="recall_min">recall_min</code>
 </td>
 <td>
-Minimal single ion recall. Default to 0.0
+Minimal single ion recall (pre-filter before MCC). Default to 0.0
 </td>
 </tr>
 <tr>
