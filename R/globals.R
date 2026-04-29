@@ -4,7 +4,7 @@ utils::globalVariables(
     "count_per_ion",
     "count_per_ion_per_group",
     "fn_",
-    "fp"
+    "fp",
     "fscore",
     "group",
     "group_count",
