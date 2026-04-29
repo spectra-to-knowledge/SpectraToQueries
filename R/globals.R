@@ -3,17 +3,22 @@ utils::globalVariables(
     "SKELETON",
     "count_per_ion",
     "count_per_ion_per_group",
+    "fn_",
+    "fp"
     "fscore",
     "group",
     "group_count",
     "id",
     "ion",
     "ions",
+    "mcc",
     "name",
     "precision",
     "recall",
     "rowname",
     "skeleton",
+    "tn",
+    "tp",
     "target",
     "value"
   )
