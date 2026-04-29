@@ -8,7 +8,7 @@ message: 'To cite package "SpectraToQueries" in publications use:'
 type: software
 license: AGPL-3.0-or-later
 title: 'SpectraToQueries: Spectra to queries'
-version: 0.0.0.9001
+version: 0.0.0.9002
 abstract: SpectraToQueries provides the infrastructure to translate spectra to queries.
 authors:
 - family-names: Rutz
@@ -127,10 +127,11 @@ references:
   authors:
   - name: R Core Team
   institution:
-    name: R Foundation for Statistical Computing
+    name: 'R Foundation for Statistical Computing (ROR: <https://ror.org/05qewa988>)'
     address: Vienna, Austria
-  year: '2025'
-  version: '>= 4.4.0'
+  year: '2026'
+  doi: 10.32614/R.manuals
+  version: '>= 4.5.0'
 - type: software
   title: BiocParallel
   abstract: 'BiocParallel: Bioconductor facilities for parallel evaluation'
@@ -154,9 +155,9 @@ references:
     email: rct@thompsonclan.org
   - family-names: Turaga
     given-names: Nitesh
-  year: '2025'
+  year: '2026'
   doi: 10.18129/B9.bioc.BiocParallel
-  version: '>= 1.40.2'
+  version: '>= 1.44.0'
 - type: software
   title: MsBackendMgf
   abstract: 'MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format
@@ -177,9 +178,9 @@ references:
     given-names: Sebastian
     email: mail@sebastiangibb.de
     orcid: https://orcid.org/0000-0001-7406-4443
-  year: '2025'
+  year: '2026'
   doi: 10.18129/B9.bioc.MsBackendMgf
-  version: '>= 1.14.0'
+  version: '>= 1.18.0'
 - type: software
   title: progress
   abstract: 'progress: Terminal Progress Bars'
@@ -192,7 +193,7 @@ references:
     email: csardi.gabor@gmail.com
   - family-names: FitzJohn
     given-names: Rich
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.progress
   version: '>= 1.2.3'
 - type: software
@@ -209,9 +210,9 @@ references:
   - family-names: Henry
     given-names: Lionel
     email: lionel@posit.co
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.purrr
-  version: '>= 1.2.0'
+  version: '>= 1.2.2'
 - type: software
   title: Spectra
   abstract: 'Spectra: Spectra Infrastructure for Mass Spectrometry Data'
@@ -235,9 +236,9 @@ references:
     given-names: Philippine
     email: philippine.louail@eurac.edu
     orcid: https://orcid.org/0009-0007-5429-6846
-  year: '2025'
+  year: '2026'
   doi: 10.18129/B9.bioc.Spectra
-  version: '>= 1.16.1'
+  version: '>= 1.20.1'
 - type: software
   title: tidytable
   abstract: 'tidytable: Tidy Interface to ''data.table'''
@@ -248,7 +249,7 @@ references:
   - family-names: Fairbanks
     given-names: Mark
     email: mark.t.fairbanks@gmail.com
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.tidytable
   version: '>= 0.11.2'
 - type: software
@@ -265,7 +266,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@rstudio.com
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.tibble
   version: '>= 3.3.0'
 - type: software
@@ -283,9 +284,9 @@ references:
     given-names: Vincent
     email: vincent.arel-bundock@umontreal.ca
     orcid: https://orcid.org/0000-0003-2042-7063
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.altdoc
-  version: '>= 0.7.0'
+  version: '>= 0.7.2'
 - type: software
   title: BiocManager
   abstract: 'BiocManager: Access the Bioconductor Project Package Repository'
@@ -301,21 +302,20 @@ references:
     given-names: Marcel
     email: marcel.ramos@sph.cuny.edu
     orcid: https://orcid.org/0000-0002-3242-0582
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.BiocManager
-  version: '>= 1.30.26'
+  version: '>= 1.30.27'
 - type: software
   title: BiocVersion
   abstract: 'BiocVersion: Set the appropriate version of Bioconductor packages'
   notes: Suggests
-  repository: https://bioconductor.org/
+  repository: https://bioc.r-universe.dev
   authors:
   - family-names: Morgan
     given-names: Martin
     email: martin.morgan@roswellpark.org
-  year: '2025'
-  doi: 10.18129/B9.bioc.BiocVersion
-  version: '>= 3.20.0'
+  year: '2026'
+  version: '>= 3.22.0'
 - type: software
   title: grateful
   abstract: 'grateful: Facilitate Citation of R Packages'
@@ -331,7 +331,7 @@ references:
     given-names: Connor P.
     email: connor@cpjackson.net
     orcid: https://orcid.org/0000-0002-4220-5210
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.grateful
   version: '>= 0.3.0'
 - type: software
@@ -344,7 +344,7 @@ references:
   - family-names: Bengtsson
     given-names: Henrik
     email: henrikb@braju.com
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.R.utils
   version: '>= 2.13.0'
 - type: software
@@ -361,7 +361,7 @@ references:
   - family-names: Hester
     given-names: Jim
     email: james.hester@rstudio.com
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.spelling
   version: '>= 2.3.2'
 - type: software
@@ -374,7 +374,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@posit.co
-  year: '2025'
+  year: '2026'
   doi: 10.32614/CRAN.package.testthat
-  version: '>= 3.0.0'
+  version: '>= 3.3.2'
 
