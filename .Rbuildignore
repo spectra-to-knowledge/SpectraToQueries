@@ -18,6 +18,7 @@ _\.new\.png$
 ^vignettes/articles$
 CITATION.cff
 ^altdoc$
+^grateful-refs\.bib$
 ^_quarto$
 ^[.]?air[.]toml$
 ^\.vscode$
