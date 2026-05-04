@@ -8,13 +8,13 @@
   "codeRepository": "https://github.com/spectra-to-knowledge/spectra-to-queries",
   "issueTracker": "https://github.com/spectra-to-knowledge/spectra-to-queries/issues",
   "license": "https://spdx.org/licenses/AGPL-3.0",
-  "version": "0.0.0.9001",
+  "version": "0.0.0.9002",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.5.1 (2025-06-13)",
+  "runtimePlatform": "R version 4.6.0 (2026-04-24)",
   "author": [
     {
       "@type": "Person",
@@ -47,7 +47,7 @@
       "@type": "SoftwareApplication",
       "identifier": "altdoc",
       "name": "altdoc",
-      "version": ">= 0.5.0",
+      "version": ">= 0.7.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -60,7 +60,7 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocManager",
       "name": "BiocManager",
-      "version": ">= 1.30.25",
+      "version": ">= 1.30.27",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -73,7 +73,7 @@
       "@type": "SoftwareApplication",
       "identifier": "BiocVersion",
       "name": "BiocVersion",
-      "version": ">= 3.20.0",
+      "version": ">= 3.22.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -86,7 +86,7 @@
       "@type": "SoftwareApplication",
       "identifier": "grateful",
       "name": "grateful",
-      "version": ">= 0.2.12",
+      "version": ">= 0.3.0",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -112,7 +112,7 @@
       "@type": "SoftwareApplication",
       "identifier": "spelling",
       "name": "spelling",
-      "version": ">= 2.3.1",
+      "version": ">= 2.3.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -125,7 +125,7 @@
       "@type": "SoftwareApplication",
       "identifier": "testthat",
       "name": "testthat",
-      "version": ">= 3.0.0",
+      "version": ">= 3.3.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -140,26 +140,13 @@
       "@type": "SoftwareApplication",
       "identifier": "R",
       "name": "R",
-      "version": ">= 4.4.0"
+      "version": ">= 4.5.0"
     },
     "2": {
       "@type": "SoftwareApplication",
-      "identifier": "BiocGenerics",
-      "name": "BiocGenerics",
-      "version": ">= 0.52.0",
-      "provider": {
-        "@id": "https://www.bioconductor.org",
-        "@type": "Organization",
-        "name": "Bioconductor",
-        "url": "https://www.bioconductor.org"
-      },
-      "sameAs": "https://bioconductor.org/packages/release/bioc/html/BiocGenerics.html"
-    },
-    "3": {
-      "@type": "SoftwareApplication",
       "identifier": "BiocParallel",
       "name": "BiocParallel",
-      "version": ">= 1.40.2",
+      "version": ">= 1.44.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -168,11 +155,11 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/BiocParallel.html"
     },
-    "4": {
+    "3": {
       "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
-      "version": ">= 1.14.0",
+      "version": ">= 1.18.0",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -181,7 +168,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
     },
-    "5": {
+    "4": {
       "@type": "SoftwareApplication",
       "identifier": "progress",
       "name": "progress",
@@ -194,11 +181,11 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=progress"
     },
-    "6": {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "purrr",
       "name": "purrr",
-      "version": ">= 1.1.0",
+      "version": ">= 1.2.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -207,11 +194,11 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=purrr"
     },
-    "7": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
-      "version": ">= 1.16.1",
+      "version": ">= 1.20.1",
       "provider": {
         "@id": "https://www.bioconductor.org",
         "@type": "Organization",
@@ -220,7 +207,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "8": {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -233,7 +220,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=tidytable"
     },
-    "9": {
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "tibble",
       "name": "tibble",
@@ -249,7 +236,7 @@
     "SystemRequirements": null
   },
   "keywords": ["knowledgeExtraction", "spectralInformation", "queryingSystem", "knowledge-extraction", "spectral-library", "tandem-ms", "monoterpene-indole-alkaloids", "querying-system", "spectral-information"],
-  "fileSize": "2306.048KB",
+  "fileSize": "1392.687KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

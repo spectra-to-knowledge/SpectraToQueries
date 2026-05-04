@@ -6,6 +6,8 @@
 \alias{SpectraToQueries-package}
 \title{SpectraToQueries: Spectra to queries}
 \description{
+\if{html}{\figure{logo.svg}{options: style='float: right' alt='logo' width='120'}}
+
 SpectraToQueries provides the infrastructure to translate spectra to queries.
 }
 \seealso{
@@ -19,6 +21,11 @@ Useful links:
 }
 \author{
 \strong{Maintainer}: Adriano Rutz \email{adafede@gmail.com} (\href{https://orcid.org/0000-0003-0443-9902}{ORCID})
+
+Authors:
+\itemize{
+  \item Adriano Rutz \email{adafede@gmail.com} (\href{https://orcid.org/0000-0003-0443-9902}{ORCID})
+}
 
 Other contributors:
 \itemize{
