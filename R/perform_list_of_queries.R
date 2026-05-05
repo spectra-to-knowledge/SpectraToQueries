@@ -222,11 +222,7 @@ perform_list_of_queries_progress <- function(ions_list, spectra, dalton, ppm) {
         error = function(e) {
           warning("Error in query ", i, ": ", e$message)
           tidytable::tidytable(
-            target = if (!is.null(names(ions_list)[i])) {
-              names(ions_list)[i]
-            } else {
-              paste0("query_", i)
-            },
+            target = names(ions_list)[i] %||% paste0("query_", i),
             value = character(0)
           )
         }

@@ -12,8 +12,8 @@ combine_ions_minimal <- function(ion_lists) {
 
   # Helper to split and sort fragments/nls, return only non-empty
   sort_ions <- function(ions) {
-    frags <- grep("_frag$", ions, value = TRUE)
-    nls <- grep("_nl$", ions, value = TRUE)
+    frags <- grepv("_frag$", ions)
+    nls <- grepv("_nl$", ions)
     frags_sorted <- if (length(frags)) {
       paste0(sort(as.numeric(sub("_frag$", "", frags))), "_frag")
     } else {

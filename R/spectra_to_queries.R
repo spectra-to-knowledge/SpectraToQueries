@@ -213,7 +213,7 @@ spectra_to_queries <- function(
 
   # Filter zero columns
   zeros <- colSums(merged_mat) <= zero_val
-  if (any(!zeros)) {
+  if (!all(zeros)) {
     merged_mat <- merged_mat[, !zeros, drop = FALSE]
     # Update column names for non-zero columns
     all_names <- c(frag_names, nl_names)
