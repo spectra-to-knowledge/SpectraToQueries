@@ -1,108 +1,45 @@
 [
   {
-    "objectID": "NEWS.html",
-    "href": "NEWS.html",
-    "title": "SpectraToQueries",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "SpectraToQueries ",
     "section": "",
-    "text": "SpectraToQueries\n\n\nSpectraToQueries 0.0.9001\n\nUpdated minimal R version to 4.4.0 (and related Bioconductor dependencies)\n\n\n\nSpectraToQueries 0.0.9000\n\nInitial version."
+    "text": "Repository to translate spectra to queries.\n\n\nHere is what you minimally need:\n\nA file containing MS/MS spectra with associated skeleton information (or any other relevant chemical classification) provided as metadata. This structure information, stored in the metadata field “skeleton”, allows the generation of queries specific to a given skeleton by extracting repetitive skeleton-specific fragmentation patterns. The MIADB file is provided as an example.\n\n\n\n\nAs the package is not (yet) available on CRAN, you will need to install with:\ninstall.packages(\n  \"SpectraToQueries\",\n  repos = c(\n    \"https://spectra-to-knowledge.r-universe.dev\",\n    \"https://bioconductor.org/packages/release/bioc\",\n    \"https://cloud.r-project.org\"\n  )\n)\n\n\n\nTo reproduce the example that uses the Monoterpene Indole Alkaloids Database (.mgf) file by default, which includes the annotation of spectral skeletons:\nSpectraToQueries::spectra_to_queries()\nTo reproduce the “grouped” example that uses the MIADB file, which includes an expert-based annotation of spectral “super skeletons” (combination of skeletons exhibiting a high structural similarity):\nSpectraToQueries::spectra_to_queries(\n  spectra = system.file(\n    \"extdata\",\n    \"spectra_grouped.rds\",\n    package = \"SpectraToQueries\"\n  ),\n  export = \"data/interim/queries-grouped.tsv\"\n)\nTo generate diagnostic ions queries from your spectra:\nSpectraToQueries::spectra_to_queries(\n  spectra = \"yourAwesomeSpectra.mgf\",\n  export = \"path/yourEvenBetterResults.tsv\"\n)\nShowing all parameters:\nSpectraToQueries::spectra_to_queries(\n  spectra = NULL,\n  export = \"data/interim/queries.tsv\",\n  beta_1 = 1.0,\n  beta_2 = 0.5,\n  dalton = 0.01,\n  decimals = 4L,\n  intensity_min = 0.0,\n  ions_max = 10L,\n  n_skel_min = 5L,\n  n_spec_min = 3L,\n  ppm = 30.0,\n  fscore_min = 0.0,\n  precision_min = 0.0,\n  recall_min = 0.0,\n  zero_val = 0.0\n)\n\n\n\nTranslating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids: https://doi.org/10.1186/s13321-025-01009-0\n\n\n\n\n\n\n\n\n\n\n\nPackage\nVersion\nCitation\n\n\n\n\nbase\n4.5.2\nR Core Team (2025)\n\n\nBiocManager\n1.30.26\nMorgan and Ramos (2025)\n\n\nBiocParallel\n1.44.0\nWang et al. (2025)\n\n\nBiocVersion\n3.22.0\nMorgan (2025)\n\n\nknitr\n1.50\nXie (2014); Xie (2015); Xie (2025)\n\n\nMsBackendMgf\n1.18.0\nGatto, Rainer, and Gibb (2025)\n\n\npkgload\n1.4.1\nWickham et al. (2025)\n\n\nprogress\n1.2.3\nCsárdi and FitzJohn (2023)\n\n\nrmarkdown\n2.30\nXie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025)\n\n\nSpectra\n1.20.0\nRainer et al. (2022)\n\n\ntestthat\n3.2.3\nWickham (2011)\n\n\ntidytable\n0.11.2\nFairbanks (2024)\n\n\ntidyverse\n2.0.0\nWickham et al. (2019)\n\n\n\n\n\nAllaire, JJ, Yihui Xie, Christophe Dervieux, Jonathan McPherson, Javier Luraschi, Kevin Ushey, Aron Atkins, et al. 2025. rmarkdown: Dynamic Documents for r. https://github.com/rstudio/rmarkdown.\n\n\nCsárdi, Gábor, and Rich FitzJohn. 2023. progress: Terminal Progress Bars. https://doi.org/10.32614/CRAN.package.progress.\n\n\nFairbanks, Mark. 2024. tidytable: Tidy Interface to “data.table”. https://doi.org/10.32614/CRAN.package.tidytable.\n\n\nGatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2025. MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format (Mgf) Files. https://doi.org/10.18129/B9.bioc.MsBackendMgf.\n\n\nMorgan, Martin. 2025. BiocVersion: Set the Appropriate Version of Bioconductor Packages. https://doi.org/10.18129/B9.bioc.BiocVersion.\n\n\nMorgan, Martin, and Marcel Ramos. 2025. BiocManager: Access the Bioconductor Project Package Repository. https://doi.org/10.32614/CRAN.package.BiocManager.\n\n\nR Core Team. 2025. R: A Language and Environment for Statistical Computing. Vienna, Austria: R Foundation for Statistical Computing. https://www.R-project.org/.\n\n\nRainer, Johannes, Andrea Vicini, Liesa Salzer, Jan Stanstrup, Josep M. Badia, Steffen Neumann, Michael A. Stravs, et al. 2022. “A Modular and Expandable Ecosystem for Metabolomics Data Annotation in r.” Metabolites 12: 173. https://doi.org/10.3390/metabo12020173.\n\n\nWang, Jiefei, Martin Morgan, Valerie Obenchain, Michel Lang, Ryan Thompson, and Nitesh Turaga. 2025. BiocParallel: Bioconductor Facilities for Parallel Evaluation. https://doi.org/10.18129/B9.bioc.BiocParallel.\n\n\nWickham, Hadley. 2011. “testthat: Get Started with Testing.” The R Journal 3: 5–10. https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf.\n\n\nWickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. “Welcome to the tidyverse.” Journal of Open Source Software 4 (43): 1686. https://doi.org/10.21105/joss.01686.\n\n\nWickham, Hadley, Winston Chang, Jim Hester, and Lionel Henry. 2025. pkgload: Simulate Package Installation and Attach. https://doi.org/10.32614/CRAN.package.pkgload.\n\n\nXie, Yihui. 2014. “knitr: A Comprehensive Tool for Reproducible Research in R.” In Implementing Reproducible Computational Research, edited by Victoria Stodden, Friedrich Leisch, and Roger D. Peng. Chapman; Hall/CRC.\n\n\n———. 2015. Dynamic Documents with R and Knitr. 2nd ed. Boca Raton, Florida: Chapman; Hall/CRC. https://yihui.org/knitr/.\n\n\n———. 2025. knitr: A General-Purpose Package for Dynamic Report Generation in R. https://yihui.org/knitr/.\n\n\nXie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. R Markdown: The Definitive Guide. Boca Raton, Florida: Chapman; Hall/CRC. https://bookdown.org/yihui/rmarkdown.\n\n\nXie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. R Markdown Cookbook. Boca Raton, Florida: Chapman; Hall/CRC. https://bookdown.org/yihui/rmarkdown-cookbook."
   },
   {
-    "objectID": "man/fix_binned_mzs.html",
-    "href": "man/fix_binned_mzs.html",
-    "title": "SpectraToQueries",
+    "objectID": "index.html#requirements",
+    "href": "index.html#requirements",
+    "title": "SpectraToQueries ",
     "section": "",
-    "text": "Fix binned mzs\n\n\n\nfix_binned_mzs(binned_m, original_mzs, dalton, ppm, decimals)\n\n\n\n\n\n\n\nbinned_m\n\n\nBinned matrix\n\n\n\n\noriginal_mzs\n\n\nOriginal m/z values from spectra\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\ndecimals\n\n\nNumber of decimal places for rounding\n\n\n\n\n\n\nMatrix with corrected m/z column names\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Here is what you minimally need:\n\nA file containing MS/MS spectra with associated skeleton information (or any other relevant chemical classification) provided as metadata. This structure information, stored in the metadata field “skeleton”, allows the generation of queries specific to a given skeleton by extracting repetitive skeleton-specific fragmentation patterns. The MIADB file is provided as an example."
   },
   {
-    "objectID": "man/fix_binned_mzs.html#fix-binned-mzs",
-    "href": "man/fix_binned_mzs.html#fix-binned-mzs",
-    "title": "SpectraToQueries",
+    "objectID": "index.html#installation",
+    "href": "index.html#installation",
+    "title": "SpectraToQueries ",
     "section": "",
-    "text": "Fix binned mzs\n\n\n\nfix_binned_mzs(binned_m, original_mzs, dalton, ppm, decimals)\n\n\n\n\n\n\n\nbinned_m\n\n\nBinned matrix\n\n\n\n\noriginal_mzs\n\n\nOriginal m/z values from spectra\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\ndecimals\n\n\nNumber of decimal places for rounding\n\n\n\n\n\n\nMatrix with corrected m/z column names\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "As the package is not (yet) available on CRAN, you will need to install with:\ninstall.packages(\n  \"SpectraToQueries\",\n  repos = c(\n    \"https://spectra-to-knowledge.r-universe.dev\",\n    \"https://bioconductor.org/packages/release/bioc\",\n    \"https://cloud.r-project.org\"\n  )\n)"
   },
   {
-    "objectID": "man/generate_combinations_progress.html",
-    "href": "man/generate_combinations_progress.html",
-    "title": "SpectraToQueries",
+    "objectID": "index.html#use",
+    "href": "index.html#use",
+    "title": "SpectraToQueries ",
     "section": "",
-    "text": "Generate combinations with progress\n\n\n\ngenerate_combinations_progress(indices, ions_list, max_ions)\n\n\n\n\n\n\n\nindices\n\n\nVector of indices to process\n\n\n\n\nions_list\n\n\nList of ions for each index\n\n\n\n\nmax_ions\n\n\nMaximum number of ions in combinations\n\n\n\n\n\n\nList of all combinations for each index\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "To reproduce the example that uses the Monoterpene Indole Alkaloids Database (.mgf) file by default, which includes the annotation of spectral skeletons:\nSpectraToQueries::spectra_to_queries()\nTo reproduce the “grouped” example that uses the MIADB file, which includes an expert-based annotation of spectral “super skeletons” (combination of skeletons exhibiting a high structural similarity):\nSpectraToQueries::spectra_to_queries(\n  spectra = system.file(\n    \"extdata\",\n    \"spectra_grouped.rds\",\n    package = \"SpectraToQueries\"\n  ),\n  export = \"data/interim/queries-grouped.tsv\"\n)\nTo generate diagnostic ions queries from your spectra:\nSpectraToQueries::spectra_to_queries(\n  spectra = \"yourAwesomeSpectra.mgf\",\n  export = \"path/yourEvenBetterResults.tsv\"\n)\nShowing all parameters:\nSpectraToQueries::spectra_to_queries(\n  spectra = NULL,\n  export = \"data/interim/queries.tsv\",\n  beta_1 = 1.0,\n  beta_2 = 0.5,\n  dalton = 0.01,\n  decimals = 4L,\n  intensity_min = 0.0,\n  ions_max = 10L,\n  n_skel_min = 5L,\n  n_spec_min = 3L,\n  ppm = 30.0,\n  fscore_min = 0.0,\n  precision_min = 0.0,\n  recall_min = 0.0,\n  zero_val = 0.0\n)"
   },
   {
-    "objectID": "man/generate_combinations_progress.html#generate-combinations-with-progress",
-    "href": "man/generate_combinations_progress.html#generate-combinations-with-progress",
-    "title": "SpectraToQueries",
+    "objectID": "index.html#main-citations",
+    "href": "index.html#main-citations",
+    "title": "SpectraToQueries ",
     "section": "",
-    "text": "Generate combinations with progress\n\n\n\ngenerate_combinations_progress(indices, ions_list, max_ions)\n\n\n\n\n\n\n\nindices\n\n\nVector of indices to process\n\n\n\n\nions_list\n\n\nList of ions for each index\n\n\n\n\nmax_ions\n\n\nMaximum number of ions in combinations\n\n\n\n\n\n\nList of all combinations for each index\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids: https://doi.org/10.1186/s13321-025-01009-0"
   },
   {
-    "objectID": "man/perform_list_of_queries.html",
-    "href": "man/perform_list_of_queries.html",
-    "title": "SpectraToQueries",
+    "objectID": "index.html#additional-software-credits",
+    "href": "index.html#additional-software-credits",
+    "title": "SpectraToQueries ",
     "section": "",
-    "text": "Perform list of queries\n\n\n\nperform_list_of_queries(index, ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nindex\n\n\nIndex of the ion list to process\n\n\n\n\nions_list\n\n\nList of ions for queries\n\n\n\n\nspectra\n\n\nSpectra object to search\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nData frame with target and value columns\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
-  },
-  {
-    "objectID": "man/perform_list_of_queries.html#perform-list-of-queries",
-    "href": "man/perform_list_of_queries.html#perform-list-of-queries",
-    "title": "SpectraToQueries",
-    "section": "",
-    "text": "Perform list of queries\n\n\n\nperform_list_of_queries(index, ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nindex\n\n\nIndex of the ion list to process\n\n\n\n\nions_list\n\n\nList of ions for queries\n\n\n\n\nspectra\n\n\nSpectra object to search\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nData frame with target and value columns\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
-  },
-  {
-    "objectID": "man/harmonize_mzs.html",
-    "href": "man/harmonize_mzs.html",
-    "title": "SpectraToQueries",
-    "section": "",
-    "text": "Harmonize mzs\n\n\n\nharmonize_mzs(spectra, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra object\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nSpectra with harmonized m/z values\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
-  },
-  {
-    "objectID": "man/harmonize_mzs.html#harmonize-mzs",
-    "href": "man/harmonize_mzs.html#harmonize-mzs",
-    "title": "SpectraToQueries",
-    "section": "",
-    "text": "Harmonize mzs\n\n\n\nharmonize_mzs(spectra, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra object\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nSpectra with harmonized m/z values\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
-  },
-  {
-    "objectID": "man/perform_query.html",
-    "href": "man/perform_query.html",
-    "title": "SpectraToQueries",
-    "section": "",
-    "text": "Perform query\n\n\n\nperform_query(spectra, frags, nls, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra object\n\n\n\n\nfrags\n\n\nFragment masses to search for\n\n\n\n\nnls\n\n\nNeutral losses to search for\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nFiltered spectra object\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
-  },
-  {
-    "objectID": "man/perform_query.html#perform-query",
-    "href": "man/perform_query.html#perform-query",
-    "title": "SpectraToQueries",
-    "section": "",
-    "text": "Perform query\n\n\n\nperform_query(spectra, frags, nls, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra object\n\n\n\n\nfrags\n\n\nFragment masses to search for\n\n\n\n\nnls\n\n\nNeutral losses to search for\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nFiltered spectra object\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
-  },
-  {
-    "objectID": "man/contains_all_mz.html",
-    "href": "man/contains_all_mz.html",
-    "title": "SpectraToQueries",
-    "section": "",
-    "text": "Check if spectrum contains all target m/z values\n\n\n\ncontains_all_mz(spec_mz, target_mz, dalton, ppm)\n\n\n\n\n\n\n\nspec_mz\n\n\nNumeric vector of spectrum m/z values\n\n\n\n\ntarget_mz\n\n\nNumeric vector of target m/z values to find\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nLogical indicating if all targets are found\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
-  },
-  {
-    "objectID": "man/contains_all_mz.html#check-if-spectrum-contains-all-target-mz-values",
-    "href": "man/contains_all_mz.html#check-if-spectrum-contains-all-target-mz-values",
-    "title": "SpectraToQueries",
-    "section": "",
-    "text": "Check if spectrum contains all target m/z values\n\n\n\ncontains_all_mz(spec_mz, target_mz, dalton, ppm)\n\n\n\n\n\n\n\nspec_mz\n\n\nNumeric vector of spectrum m/z values\n\n\n\n\ntarget_mz\n\n\nNumeric vector of target m/z values to find\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nLogical indicating if all targets are found\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
-  },
-  {
-    "objectID": "man/combine_ions_minimal.html",
-    "href": "man/combine_ions_minimal.html",
-    "title": "SpectraToQueries",
-    "section": "",
-    "text": "Combine ions into minimal AND/OR expression with sorting\n\n\n\ncombine_ions_minimal(ion_lists)\n\n\n\n\n\n\n\nion_lists\n\n\nList of character vectors representing ion combinations\n\n\n\n\n\n\nSingle character string representing nested AND/OR expression"
-  },
-  {
-    "objectID": "man/combine_ions_minimal.html#combine-ions-into-minimal-andor-expression-with-sorting",
-    "href": "man/combine_ions_minimal.html#combine-ions-into-minimal-andor-expression-with-sorting",
-    "title": "SpectraToQueries",
-    "section": "",
-    "text": "Combine ions into minimal AND/OR expression with sorting\n\n\n\ncombine_ions_minimal(ion_lists)\n\n\n\n\n\n\n\nion_lists\n\n\nList of character vectors representing ion combinations\n\n\n\n\n\n\nSingle character string representing nested AND/OR expression"
+    "text": "Package\nVersion\nCitation\n\n\n\n\nbase\n4.5.2\nR Core Team (2025)\n\n\nBiocManager\n1.30.26\nMorgan and Ramos (2025)\n\n\nBiocParallel\n1.44.0\nWang et al. (2025)\n\n\nBiocVersion\n3.22.0\nMorgan (2025)\n\n\nknitr\n1.50\nXie (2014); Xie (2015); Xie (2025)\n\n\nMsBackendMgf\n1.18.0\nGatto, Rainer, and Gibb (2025)\n\n\npkgload\n1.4.1\nWickham et al. (2025)\n\n\nprogress\n1.2.3\nCsárdi and FitzJohn (2023)\n\n\nrmarkdown\n2.30\nXie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025)\n\n\nSpectra\n1.20.0\nRainer et al. (2022)\n\n\ntestthat\n3.2.3\nWickham (2011)\n\n\ntidytable\n0.11.2\nFairbanks (2024)\n\n\ntidyverse\n2.0.0\nWickham et al. (2019)\n\n\n\n\n\nAllaire, JJ, Yihui Xie, Christophe Dervieux, Jonathan McPherson, Javier Luraschi, Kevin Ushey, Aron Atkins, et al. 2025. rmarkdown: Dynamic Documents for r. https://github.com/rstudio/rmarkdown.\n\n\nCsárdi, Gábor, and Rich FitzJohn. 2023. progress: Terminal Progress Bars. https://doi.org/10.32614/CRAN.package.progress.\n\n\nFairbanks, Mark. 2024. tidytable: Tidy Interface to “data.table”. https://doi.org/10.32614/CRAN.package.tidytable.\n\n\nGatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2025. MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format (Mgf) Files. https://doi.org/10.18129/B9.bioc.MsBackendMgf.\n\n\nMorgan, Martin. 2025. BiocVersion: Set the Appropriate Version of Bioconductor Packages. https://doi.org/10.18129/B9.bioc.BiocVersion.\n\n\nMorgan, Martin, and Marcel Ramos. 2025. BiocManager: Access the Bioconductor Project Package Repository. https://doi.org/10.32614/CRAN.package.BiocManager.\n\n\nR Core Team. 2025. R: A Language and Environment for Statistical Computing. Vienna, Austria: R Foundation for Statistical Computing. https://www.R-project.org/.\n\n\nRainer, Johannes, Andrea Vicini, Liesa Salzer, Jan Stanstrup, Josep M. Badia, Steffen Neumann, Michael A. Stravs, et al. 2022. “A Modular and Expandable Ecosystem for Metabolomics Data Annotation in r.” Metabolites 12: 173. https://doi.org/10.3390/metabo12020173.\n\n\nWang, Jiefei, Martin Morgan, Valerie Obenchain, Michel Lang, Ryan Thompson, and Nitesh Turaga. 2025. BiocParallel: Bioconductor Facilities for Parallel Evaluation. https://doi.org/10.18129/B9.bioc.BiocParallel.\n\n\nWickham, Hadley. 2011. “testthat: Get Started with Testing.” The R Journal 3: 5–10. https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf.\n\n\nWickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. “Welcome to the tidyverse.” Journal of Open Source Software 4 (43): 1686. https://doi.org/10.21105/joss.01686.\n\n\nWickham, Hadley, Winston Chang, Jim Hester, and Lionel Henry. 2025. pkgload: Simulate Package Installation and Attach. https://doi.org/10.32614/CRAN.package.pkgload.\n\n\nXie, Yihui. 2014. “knitr: A Comprehensive Tool for Reproducible Research in R.” In Implementing Reproducible Computational Research, edited by Victoria Stodden, Friedrich Leisch, and Roger D. Peng. Chapman; Hall/CRC.\n\n\n———. 2015. Dynamic Documents with R and Knitr. 2nd ed. Boca Raton, Florida: Chapman; Hall/CRC. https://yihui.org/knitr/.\n\n\n———. 2025. knitr: A General-Purpose Package for Dynamic Report Generation in R. https://yihui.org/knitr/.\n\n\nXie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. R Markdown: The Definitive Guide. Boca Raton, Florida: Chapman; Hall/CRC. https://bookdown.org/yihui/rmarkdown.\n\n\nXie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. R Markdown Cookbook. Boca Raton, Florida: Chapman; Hall/CRC. https://bookdown.org/yihui/rmarkdown-cookbook."
   },
   {
     "objectID": "LICENSE.html",
@@ -133,95 +70,74 @@
     "text": "If you develop a new program, and you want it to be of the greatest possible use to the public, the best way to achieve this is to make it free software which everyone can redistribute and change under these terms.\nTo do so, attach the following notices to the program. It is safest to attach them to the start of each source file to most effectively state the exclusion of warranty; and each file should have at least the “copyright” line and a pointer to where the full notice is found.\n    &lt;one line to give the program's name and a brief idea of what it does.&gt;\n    Copyright (C) &lt;year&gt;  &lt;name of author&gt;\n\n    This program is free software: you can redistribute it and/or modify\n    it under the terms of the GNU Affero General Public License as\n    published by the Free Software Foundation, either version 3 of the\n    License, or (at your option) any later version.\n\n    This program is distributed in the hope that it will be useful,\n    but WITHOUT ANY WARRANTY; without even the implied warranty of\n    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n    GNU Affero General Public License for more details.\n\n    You should have received a copy of the GNU Affero General Public License\n    along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.\nAlso add information on how to contact you by electronic and paper mail.\nIf your software can interact with users remotely through a computer network, you should also make sure that it provides a way for users to get its source. For example, if your program is a web application, its interface could display a “Source” link that leads users to an archive of the code. There are many ways you could offer source, and different solutions will be better for different programs; see section 13 for the specific requirements.\nYou should also get your employer (if you work as a programmer) or school, if any, to sign a “copyright disclaimer” for the program, if necessary. For more information on this, and how to apply and follow the GNU AGPL, see https://www.gnu.org/licenses/."
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "SpectraToQueries ",
-    "section": "",
-    "text": "Repository to translate spectra to queries.\n\n\nHere is what you minimally need:\n\nA file containing MS/MS spectra with associated skeleton information (or any other relevant chemical classification) provided as metadata. This structure information, stored in the metadata field “skeleton”, allows the generation of queries specific to a given skeleton by extracting repetitive skeleton-specific fragmentation patterns. The MIADB file is provided as an example.\n\n\n\n\nAs the package is not (yet) available on CRAN, you will need to install with:\ninstall.packages(\n  \"SpectraToQueries\",\n  repos = c(\n    \"https://spectra-to-knowledge.r-universe.dev\",\n    \"https://bioc.r-universe.dev\",\n    \"https://cloud.r-project.org\"\n  )\n)\n\n\n\nTo reproduce the example that uses the Monoterpene Indole Alkaloids Database (.mgf) file by default, which includes the annotation of spectral skeletons:\nSpectraToQueries::spectra_to_queries()\nTo reproduce the “grouped” example that uses the MIADB file, which includes an expert-based annotation of spectral “super skeletons” (combination of skeletons exhibiting a high structural similarity):\nSpectraToQueries::spectra_to_queries(\n  spectra = system.file(\n    \"extdata\",\n    \"spectra_grouped.rds\",\n    package = \"SpectraToQueries\"\n  ),\n  export = \"data/interim/queries-grouped.tsv\"\n)\nTo generate diagnostic ions queries from your spectra:\nSpectraToQueries::spectra_to_queries(\n  spectra = \"yourAwesomeSpectra.mgf\",\n  export = \"path/yourEvenBetterResults.tsv\"\n)\nShowing all parameters:\nSpectraToQueries::spectra_to_queries(\n  spectra = NULL,\n  export = \"data/interim/queries.tsv\",\n  beta_1 = 1.0,\n  beta_2 = 0.5,\n  dalton = 0.01,\n  decimals = 4L,\n  intensity_min = 0.0,\n  ions_max = 10L,\n  n_skel_min = 5L,\n  n_spec_min = 3L,\n  ppm = 30.0,\n  fscore_min = 0.0,\n  precision_min = 0.0,\n  recall_min = 0.0,\n  zero_val = 0.0\n)\n\n\n\nTranslating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids: https://doi.org/10.1186/s13321-025-01009-0\n\n\n\n\n\n\n\n\n\n\n\nPackage\nVersion\nCitation\n\n\n\n\nbase\n4.5.2\nR Core Team (2025)\n\n\nBiocManager\n1.30.26\nMorgan and Ramos (2025)\n\n\nBiocParallel\n1.44.0\nWang et al. (2025)\n\n\nBiocVersion\n3.22.0\nMorgan (2025)\n\n\nknitr\n1.50\nXie (2014); Xie (2015); Xie (2025)\n\n\nMsBackendMgf\n1.18.0\nGatto, Rainer, and Gibb (2025)\n\n\npkgload\n1.4.1\nWickham et al. (2025)\n\n\nprogress\n1.2.3\nCsárdi and FitzJohn (2023)\n\n\nrmarkdown\n2.30\nXie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025)\n\n\nSpectra\n1.20.0\nRainer et al. (2022)\n\n\ntestthat\n3.2.3\nWickham (2011)\n\n\ntidytable\n0.11.2\nFairbanks (2024)\n\n\ntidyverse\n2.0.0\nWickham et al. (2019)\n\n\n\n\n\nAllaire, JJ, Yihui Xie, Christophe Dervieux, Jonathan McPherson, Javier Luraschi, Kevin Ushey, Aron Atkins, et al. 2025. rmarkdown: Dynamic Documents for r. https://github.com/rstudio/rmarkdown.\n\n\nCsárdi, Gábor, and Rich FitzJohn. 2023. progress: Terminal Progress Bars. https://doi.org/10.32614/CRAN.package.progress.\n\n\nFairbanks, Mark. 2024. tidytable: Tidy Interface to “data.table”. https://doi.org/10.32614/CRAN.package.tidytable.\n\n\nGatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2025. MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format (Mgf) Files. https://doi.org/10.18129/B9.bioc.MsBackendMgf.\n\n\nMorgan, Martin. 2025. BiocVersion: Set the Appropriate Version of Bioconductor Packages. https://doi.org/10.18129/B9.bioc.BiocVersion.\n\n\nMorgan, Martin, and Marcel Ramos. 2025. BiocManager: Access the Bioconductor Project Package Repository. https://doi.org/10.32614/CRAN.package.BiocManager.\n\n\nR Core Team. 2025. R: A Language and Environment for Statistical Computing. Vienna, Austria: R Foundation for Statistical Computing. https://www.R-project.org/.\n\n\nRainer, Johannes, Andrea Vicini, Liesa Salzer, Jan Stanstrup, Josep M. Badia, Steffen Neumann, Michael A. Stravs, et al. 2022. “A Modular and Expandable Ecosystem for Metabolomics Data Annotation in r.” Metabolites 12: 173. https://doi.org/10.3390/metabo12020173.\n\n\nWang, Jiefei, Martin Morgan, Valerie Obenchain, Michel Lang, Ryan Thompson, and Nitesh Turaga. 2025. BiocParallel: Bioconductor Facilities for Parallel Evaluation. https://doi.org/10.18129/B9.bioc.BiocParallel.\n\n\nWickham, Hadley. 2011. “testthat: Get Started with Testing.” The R Journal 3: 5–10. https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf.\n\n\nWickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. “Welcome to the tidyverse.” Journal of Open Source Software 4 (43): 1686. https://doi.org/10.21105/joss.01686.\n\n\nWickham, Hadley, Winston Chang, Jim Hester, and Lionel Henry. 2025. pkgload: Simulate Package Installation and Attach. https://doi.org/10.32614/CRAN.package.pkgload.\n\n\nXie, Yihui. 2014. “knitr: A Comprehensive Tool for Reproducible Research in R.” In Implementing Reproducible Computational Research, edited by Victoria Stodden, Friedrich Leisch, and Roger D. Peng. Chapman; Hall/CRC.\n\n\n———. 2015. Dynamic Documents with R and Knitr. 2nd ed. Boca Raton, Florida: Chapman; Hall/CRC. https://yihui.org/knitr/.\n\n\n———. 2025. knitr: A General-Purpose Package for Dynamic Report Generation in R. https://yihui.org/knitr/.\n\n\nXie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. R Markdown: The Definitive Guide. Boca Raton, Florida: Chapman; Hall/CRC. https://bookdown.org/yihui/rmarkdown.\n\n\nXie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. R Markdown Cookbook. Boca Raton, Florida: Chapman; Hall/CRC. https://bookdown.org/yihui/rmarkdown-cookbook."
-  },
-  {
-    "objectID": "index.html#requirements",
-    "href": "index.html#requirements",
-    "title": "SpectraToQueries ",
-    "section": "",
-    "text": "Here is what you minimally need:\n\nA file containing MS/MS spectra with associated skeleton information (or any other relevant chemical classification) provided as metadata. This structure information, stored in the metadata field “skeleton”, allows the generation of queries specific to a given skeleton by extracting repetitive skeleton-specific fragmentation patterns. The MIADB file is provided as an example."
-  },
-  {
-    "objectID": "index.html#installation",
-    "href": "index.html#installation",
-    "title": "SpectraToQueries ",
-    "section": "",
-    "text": "As the package is not (yet) available on CRAN, you will need to install with:\ninstall.packages(\n  \"SpectraToQueries\",\n  repos = c(\n    \"https://spectra-to-knowledge.r-universe.dev\",\n    \"https://bioc.r-universe.dev\",\n    \"https://cloud.r-project.org\"\n  )\n)"
-  },
-  {
-    "objectID": "index.html#use",
-    "href": "index.html#use",
-    "title": "SpectraToQueries ",
-    "section": "",
-    "text": "To reproduce the example that uses the Monoterpene Indole Alkaloids Database (.mgf) file by default, which includes the annotation of spectral skeletons:\nSpectraToQueries::spectra_to_queries()\nTo reproduce the “grouped” example that uses the MIADB file, which includes an expert-based annotation of spectral “super skeletons” (combination of skeletons exhibiting a high structural similarity):\nSpectraToQueries::spectra_to_queries(\n  spectra = system.file(\n    \"extdata\",\n    \"spectra_grouped.rds\",\n    package = \"SpectraToQueries\"\n  ),\n  export = \"data/interim/queries-grouped.tsv\"\n)\nTo generate diagnostic ions queries from your spectra:\nSpectraToQueries::spectra_to_queries(\n  spectra = \"yourAwesomeSpectra.mgf\",\n  export = \"path/yourEvenBetterResults.tsv\"\n)\nShowing all parameters:\nSpectraToQueries::spectra_to_queries(\n  spectra = NULL,\n  export = \"data/interim/queries.tsv\",\n  beta_1 = 1.0,\n  beta_2 = 0.5,\n  dalton = 0.01,\n  decimals = 4L,\n  intensity_min = 0.0,\n  ions_max = 10L,\n  n_skel_min = 5L,\n  n_spec_min = 3L,\n  ppm = 30.0,\n  fscore_min = 0.0,\n  precision_min = 0.0,\n  recall_min = 0.0,\n  zero_val = 0.0\n)"
-  },
-  {
-    "objectID": "index.html#main-citations",
-    "href": "index.html#main-citations",
-    "title": "SpectraToQueries ",
-    "section": "",
-    "text": "Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids: https://doi.org/10.1186/s13321-025-01009-0"
-  },
-  {
-    "objectID": "index.html#additional-software-credits",
-    "href": "index.html#additional-software-credits",
-    "title": "SpectraToQueries ",
-    "section": "",
-    "text": "Package\nVersion\nCitation\n\n\n\n\nbase\n4.5.2\nR Core Team (2025)\n\n\nBiocManager\n1.30.26\nMorgan and Ramos (2025)\n\n\nBiocParallel\n1.44.0\nWang et al. (2025)\n\n\nBiocVersion\n3.22.0\nMorgan (2025)\n\n\nknitr\n1.50\nXie (2014); Xie (2015); Xie (2025)\n\n\nMsBackendMgf\n1.18.0\nGatto, Rainer, and Gibb (2025)\n\n\npkgload\n1.4.1\nWickham et al. (2025)\n\n\nprogress\n1.2.3\nCsárdi and FitzJohn (2023)\n\n\nrmarkdown\n2.30\nXie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025)\n\n\nSpectra\n1.20.0\nRainer et al. (2022)\n\n\ntestthat\n3.2.3\nWickham (2011)\n\n\ntidytable\n0.11.2\nFairbanks (2024)\n\n\ntidyverse\n2.0.0\nWickham et al. (2019)\n\n\n\n\n\nAllaire, JJ, Yihui Xie, Christophe Dervieux, Jonathan McPherson, Javier Luraschi, Kevin Ushey, Aron Atkins, et al. 2025. rmarkdown: Dynamic Documents for r. https://github.com/rstudio/rmarkdown.\n\n\nCsárdi, Gábor, and Rich FitzJohn. 2023. progress: Terminal Progress Bars. https://doi.org/10.32614/CRAN.package.progress.\n\n\nFairbanks, Mark. 2024. tidytable: Tidy Interface to “data.table”. https://doi.org/10.32614/CRAN.package.tidytable.\n\n\nGatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2025. MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format (Mgf) Files. https://doi.org/10.18129/B9.bioc.MsBackendMgf.\n\n\nMorgan, Martin. 2025. BiocVersion: Set the Appropriate Version of Bioconductor Packages. https://doi.org/10.18129/B9.bioc.BiocVersion.\n\n\nMorgan, Martin, and Marcel Ramos. 2025. BiocManager: Access the Bioconductor Project Package Repository. https://doi.org/10.32614/CRAN.package.BiocManager.\n\n\nR Core Team. 2025. R: A Language and Environment for Statistical Computing. Vienna, Austria: R Foundation for Statistical Computing. https://www.R-project.org/.\n\n\nRainer, Johannes, Andrea Vicini, Liesa Salzer, Jan Stanstrup, Josep M. Badia, Steffen Neumann, Michael A. Stravs, et al. 2022. “A Modular and Expandable Ecosystem for Metabolomics Data Annotation in r.” Metabolites 12: 173. https://doi.org/10.3390/metabo12020173.\n\n\nWang, Jiefei, Martin Morgan, Valerie Obenchain, Michel Lang, Ryan Thompson, and Nitesh Turaga. 2025. BiocParallel: Bioconductor Facilities for Parallel Evaluation. https://doi.org/10.18129/B9.bioc.BiocParallel.\n\n\nWickham, Hadley. 2011. “testthat: Get Started with Testing.” The R Journal 3: 5–10. https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf.\n\n\nWickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. “Welcome to the tidyverse.” Journal of Open Source Software 4 (43): 1686. https://doi.org/10.21105/joss.01686.\n\n\nWickham, Hadley, Winston Chang, Jim Hester, and Lionel Henry. 2025. pkgload: Simulate Package Installation and Attach. https://doi.org/10.32614/CRAN.package.pkgload.\n\n\nXie, Yihui. 2014. “knitr: A Comprehensive Tool for Reproducible Research in R.” In Implementing Reproducible Computational Research, edited by Victoria Stodden, Friedrich Leisch, and Roger D. Peng. Chapman; Hall/CRC.\n\n\n———. 2015. Dynamic Documents with R and Knitr. 2nd ed. Boca Raton, Florida: Chapman; Hall/CRC. https://yihui.org/knitr/.\n\n\n———. 2025. knitr: A General-Purpose Package for Dynamic Report Generation in R. https://yihui.org/knitr/.\n\n\nXie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. R Markdown: The Definitive Guide. Boca Raton, Florida: Chapman; Hall/CRC. https://bookdown.org/yihui/rmarkdown.\n\n\nXie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. R Markdown Cookbook. Boca Raton, Florida: Chapman; Hall/CRC. https://bookdown.org/yihui/rmarkdown-cookbook."
-  },
-  {
-    "objectID": "CITATION.html",
-    "href": "CITATION.html",
-    "title": "Citation",
-    "section": "",
-    "text": "Citation\nTo cite SpectraToQueries in publications use:\n\nRutz A, Szwarc S (2025). SpectraToQueries: SpectraToQueries provides the infrastructure to translate spectra to queries. R package, version 0.0.9001.\n\n\nSzwarc S, Rutz A, Lee K, Mejri Y, Bonnet O, Hazni H, Jagora A, Mbeng Obame R, Jin Kyoung N, Otogo N’Nang E, Alaribe S, Awang K, Bernadat G, Choi Y, Courdavault V, Frederich M, Gaslonde T, Huber F, Kam T, Low Y, Poupon E, van der Hooft J, Kang K, Le Pogam P, Beniddir M (2025). “Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids.” J. Cheminform., 17. ISSN 1758-2946. doi:10.1186/s13321-025-01009-0. https://doi.org/10.1186/s13321-025-01009-0."
-  },
-  {
-    "objectID": "man/generate_combinations.html",
-    "href": "man/generate_combinations.html",
+    "objectID": "man/perform_list_of_queries_progress.html",
+    "href": "man/perform_list_of_queries_progress.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Generate combinations\n\n\n\ngenerate_combinations(x, max_ions)\n\n\n\n\n\n\n\nx\n\n\nVector of elements to combine\n\n\n\n\nmax_ions\n\n\nMaximum number of ions in combinations\n\n\n\n\n\n\nList of all combinations\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Perform list of queries (progress)\n\n\n\nperform_list_of_queries_progress(ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nions_list\n\n\nList of ion combinations for queries\n\n\n\n\nspectra\n\n\nSpectra object to search\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nList of query results\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
-    "objectID": "man/generate_combinations.html#generate-combinations",
-    "href": "man/generate_combinations.html#generate-combinations",
+    "objectID": "man/perform_list_of_queries_progress.html#perform-list-of-queries-progress",
+    "href": "man/perform_list_of_queries_progress.html#perform-list-of-queries-progress",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Generate combinations\n\n\n\ngenerate_combinations(x, max_ions)\n\n\n\n\n\n\n\nx\n\n\nVector of elements to combine\n\n\n\n\nmax_ions\n\n\nMaximum number of ions in combinations\n\n\n\n\n\n\nList of all combinations\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Perform list of queries (progress)\n\n\n\nperform_list_of_queries_progress(ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nions_list\n\n\nList of ion combinations for queries\n\n\n\n\nspectra\n\n\nSpectra object to search\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nList of query results\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
-    "objectID": "man/create_dir.html",
-    "href": "man/create_dir.html",
+    "objectID": "man/perform_query.html",
+    "href": "man/perform_query.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "This function creates a directory at the specified path if it does not already exist.\n\n\n\ncreate_dir(export)\n\n\n\n\n\n\n\nexport\n\n\nPath to the directory to be created\n\n\n\n\n\n\nMessage indicating the status of directory creation\n\n\n\nhttps://github.com/taxonomicallyinformedannotation/tima/blob/main/R/create_dir.R"
+    "text": "Perform query\n\n\n\nperform_query(spectra, frags, nls, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra object\n\n\n\n\nfrags\n\n\nFragment masses to search for\n\n\n\n\nnls\n\n\nNeutral losses to search for\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nFiltered spectra object\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
-    "objectID": "man/create_dir.html#create-directory",
-    "href": "man/create_dir.html#create-directory",
+    "objectID": "man/perform_query.html#perform-query",
+    "href": "man/perform_query.html#perform-query",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "This function creates a directory at the specified path if it does not already exist.\n\n\n\ncreate_dir(export)\n\n\n\n\n\n\n\nexport\n\n\nPath to the directory to be created\n\n\n\n\n\n\nMessage indicating the status of directory creation\n\n\n\nhttps://github.com/taxonomicallyinformedannotation/tima/blob/main/R/create_dir.R"
+    "text": "Perform query\n\n\n\nperform_query(spectra, frags, nls, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra object\n\n\n\n\nfrags\n\n\nFragment masses to search for\n\n\n\n\nnls\n\n\nNeutral losses to search for\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nFiltered spectra object\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
-    "objectID": "man/create_matrix.html",
-    "href": "man/create_matrix.html",
+    "objectID": "man/combine_ions_minimal.html",
+    "href": "man/combine_ions_minimal.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Create matrix\n\n\n\ncreate_matrix(spectra, zero_val = 0, name)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\nzero_val\n\n\nZero value\n\n\n\n\nname\n\n\nName\n\n\n\n\n\n\nA matrix with spectra intensity data\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Combine ions into minimal AND/OR expression with sorting\n\n\n\ncombine_ions_minimal(ion_lists)\n\n\n\n\n\n\n\nion_lists\n\n\nList of character vectors representing ion combinations\n\n\n\n\n\n\nSingle character string representing nested AND/OR expression"
   },
   {
-    "objectID": "man/create_matrix.html#create-matrix",
-    "href": "man/create_matrix.html#create-matrix",
+    "objectID": "man/combine_ions_minimal.html#combine-ions-into-minimal-andor-expression-with-sorting",
+    "href": "man/combine_ions_minimal.html#combine-ions-into-minimal-andor-expression-with-sorting",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Create matrix\n\n\n\ncreate_matrix(spectra, zero_val = 0, name)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\nzero_val\n\n\nZero value\n\n\n\n\nname\n\n\nName\n\n\n\n\n\n\nA matrix with spectra intensity data\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Combine ions into minimal AND/OR expression with sorting\n\n\n\ncombine_ions_minimal(ion_lists)\n\n\n\n\n\n\n\nion_lists\n\n\nList of character vectors representing ion combinations\n\n\n\n\n\n\nSingle character string representing nested AND/OR expression"
+  },
+  {
+    "objectID": "man/spectra_to_queries.html",
+    "href": "man/spectra_to_queries.html",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "This function converts spectra to queries.\n\n\n\nspectra_to_queries(\n  spectra = NULL,\n  export = \"data/interim/queries.tsv\",\n  dalton = 0.01,\n  decimals = 4L,\n  intensity_min = 0,\n  ions_max = 10L,\n  n_skel_min = 5L,\n  n_spec_min = 3L,\n  ppm = 30,\n  mcc_min = 0,\n  precision_min = 0,\n  recall_min = 0,\n  zero_val = 0\n)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra path\n\n\n\n\nexport\n\n\nExport path\n\n\n\n\ndalton\n\n\nTolerance in Dalton. Default to 0.01\n\n\n\n\ndecimals\n\n\nNumber of decimals for rounding. Default to 4L\n\n\n\n\nintensity_min\n\n\nMinimal intensity. Default to 0.0\n\n\n\n\nions_max\n\n\nMaximal number of ions in the query. Default to 10L\n\n\n\n\nn_skel_min\n\n\nMinimal number of individuals per skeleton. Default to 5L\n\n\n\n\nn_spec_min\n\n\nMinimal number of individuals where a signal has to be found. Default to 3L\n\n\n\n\nppm\n\n\nTolerance in parts per million Default to 30.0\n\n\n\n\nmcc_min\n\n\nMinimal single-ion Matthews Correlation Coefficient. Default to 0.0\n\n\n\n\nprecision_min\n\n\nMinimal single ion precision (pre-filter before MCC). Default to 0.0\n\n\n\n\nrecall_min\n\n\nMinimal single ion recall (pre-filter before MCC). Default to 0.0\n\n\n\n\nzero_val\n\n\nZero value for intensity. Default to 0.0\n\n\n\n\n\n\nA file with diagnostic query ions\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+  },
+  {
+    "objectID": "man/spectra_to_queries.html#spectra-to-queries",
+    "href": "man/spectra_to_queries.html#spectra-to-queries",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "This function converts spectra to queries.\n\n\n\nspectra_to_queries(\n  spectra = NULL,\n  export = \"data/interim/queries.tsv\",\n  dalton = 0.01,\n  decimals = 4L,\n  intensity_min = 0,\n  ions_max = 10L,\n  n_skel_min = 5L,\n  n_spec_min = 3L,\n  ppm = 30,\n  mcc_min = 0,\n  precision_min = 0,\n  recall_min = 0,\n  zero_val = 0\n)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra path\n\n\n\n\nexport\n\n\nExport path\n\n\n\n\ndalton\n\n\nTolerance in Dalton. Default to 0.01\n\n\n\n\ndecimals\n\n\nNumber of decimals for rounding. Default to 4L\n\n\n\n\nintensity_min\n\n\nMinimal intensity. Default to 0.0\n\n\n\n\nions_max\n\n\nMaximal number of ions in the query. Default to 10L\n\n\n\n\nn_skel_min\n\n\nMinimal number of individuals per skeleton. Default to 5L\n\n\n\n\nn_spec_min\n\n\nMinimal number of individuals where a signal has to be found. Default to 3L\n\n\n\n\nppm\n\n\nTolerance in parts per million Default to 30.0\n\n\n\n\nmcc_min\n\n\nMinimal single-ion Matthews Correlation Coefficient. Default to 0.0\n\n\n\n\nprecision_min\n\n\nMinimal single ion precision (pre-filter before MCC). Default to 0.0\n\n\n\n\nrecall_min\n\n\nMinimal single ion recall (pre-filter before MCC). Default to 0.0\n\n\n\n\nzero_val\n\n\nZero value for intensity. Default to 0.0\n\n\n\n\n\n\nA file with diagnostic query ions\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+  },
+  {
+    "objectID": "man/fix_binned_mzs.html",
+    "href": "man/fix_binned_mzs.html",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "Fix binned mzs\n\n\n\nfix_binned_mzs(binned_m, original_mzs, dalton, ppm, decimals)\n\n\n\n\n\n\n\nbinned_m\n\n\nBinned matrix\n\n\n\n\noriginal_mzs\n\n\nOriginal m/z values from spectra\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\ndecimals\n\n\nNumber of decimal places for rounding\n\n\n\n\n\n\nMatrix with corrected m/z column names\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+  },
+  {
+    "objectID": "man/fix_binned_mzs.html#fix-binned-mzs",
+    "href": "man/fix_binned_mzs.html#fix-binned-mzs",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "Fix binned mzs\n\n\n\nfix_binned_mzs(binned_m, original_mzs, dalton, ppm, decimals)\n\n\n\n\n\n\n\nbinned_m\n\n\nBinned matrix\n\n\n\n\noriginal_mzs\n\n\nOriginal m/z values from spectra\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\ndecimals\n\n\nNumber of decimal places for rounding\n\n\n\n\n\n\nMatrix with corrected m/z column names\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/normalize_peaks.html",
@@ -252,31 +168,115 @@
     "text": "Filter matrix\n\n\n\nfilter_matrix(matrix, n)\n\n\n\n\n\n\n\nmatrix\n\n\nMatrix to filter\n\n\n\n\nn\n\n\nMinimum number of non-zero values per column\n\n\n\n\n\n\nFiltered matrix with columns having at least n non-zero values\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
-    "objectID": "man/spectra_to_queries.html",
-    "href": "man/spectra_to_queries.html",
+    "objectID": "NEWS.html",
+    "href": "NEWS.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "This function converts spectra to queries.\n\n\n\nspectra_to_queries(\n  spectra = NULL,\n  export = \"data/interim/queries.tsv\",\n  dalton = 0.01,\n  decimals = 4L,\n  intensity_min = 0,\n  ions_max = 10L,\n  n_skel_min = 5L,\n  n_spec_min = 3L,\n  ppm = 30,\n  mcc_min = 0,\n  precision_min = 0,\n  recall_min = 0,\n  zero_val = 0\n)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra path\n\n\n\n\nexport\n\n\nExport path\n\n\n\n\ndalton\n\n\nTolerance in Dalton. Default to 0.01\n\n\n\n\ndecimals\n\n\nNumber of decimals for rounding. Default to 4L\n\n\n\n\nintensity_min\n\n\nMinimal intensity. Default to 0.0\n\n\n\n\nions_max\n\n\nMaximal number of ions in the query. Default to 10L\n\n\n\n\nn_skel_min\n\n\nMinimal number of individuals per skeleton. Default to 5L\n\n\n\n\nn_spec_min\n\n\nMinimal number of individuals where a signal has to be found. Default to 3L\n\n\n\n\nppm\n\n\nTolerance in parts per million Default to 30.0\n\n\n\n\nmcc_min\n\n\nMinimal single-ion Matthews Correlation Coefficient. Default to 0.0\n\n\n\n\nprecision_min\n\n\nMinimal single ion precision (pre-filter before MCC). Default to 0.0\n\n\n\n\nrecall_min\n\n\nMinimal single ion recall (pre-filter before MCC). Default to 0.0\n\n\n\n\nzero_val\n\n\nZero value for intensity. Default to 0.0\n\n\n\n\n\n\nA file with diagnostic query ions\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "SpectraToQueries\n\n\nSpectraToQueries 0.0.9001\n\nUpdated minimal R version to 4.4.0 (and related Bioconductor dependencies)\n\n\n\nSpectraToQueries 0.0.9000\n\nInitial version."
   },
   {
-    "objectID": "man/spectra_to_queries.html#spectra-to-queries",
-    "href": "man/spectra_to_queries.html#spectra-to-queries",
+    "objectID": "man/harmonize_mzs.html",
+    "href": "man/harmonize_mzs.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "This function converts spectra to queries.\n\n\n\nspectra_to_queries(\n  spectra = NULL,\n  export = \"data/interim/queries.tsv\",\n  dalton = 0.01,\n  decimals = 4L,\n  intensity_min = 0,\n  ions_max = 10L,\n  n_skel_min = 5L,\n  n_spec_min = 3L,\n  ppm = 30,\n  mcc_min = 0,\n  precision_min = 0,\n  recall_min = 0,\n  zero_val = 0\n)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra path\n\n\n\n\nexport\n\n\nExport path\n\n\n\n\ndalton\n\n\nTolerance in Dalton. Default to 0.01\n\n\n\n\ndecimals\n\n\nNumber of decimals for rounding. Default to 4L\n\n\n\n\nintensity_min\n\n\nMinimal intensity. Default to 0.0\n\n\n\n\nions_max\n\n\nMaximal number of ions in the query. Default to 10L\n\n\n\n\nn_skel_min\n\n\nMinimal number of individuals per skeleton. Default to 5L\n\n\n\n\nn_spec_min\n\n\nMinimal number of individuals where a signal has to be found. Default to 3L\n\n\n\n\nppm\n\n\nTolerance in parts per million Default to 30.0\n\n\n\n\nmcc_min\n\n\nMinimal single-ion Matthews Correlation Coefficient. Default to 0.0\n\n\n\n\nprecision_min\n\n\nMinimal single ion precision (pre-filter before MCC). Default to 0.0\n\n\n\n\nrecall_min\n\n\nMinimal single ion recall (pre-filter before MCC). Default to 0.0\n\n\n\n\nzero_val\n\n\nZero value for intensity. Default to 0.0\n\n\n\n\n\n\nA file with diagnostic query ions\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Harmonize mzs\n\n\n\nharmonize_mzs(spectra, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra object\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nSpectra with harmonized m/z values\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
-    "objectID": "man/perform_list_of_queries_progress.html",
-    "href": "man/perform_list_of_queries_progress.html",
+    "objectID": "man/harmonize_mzs.html#harmonize-mzs",
+    "href": "man/harmonize_mzs.html#harmonize-mzs",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Perform list of queries (progress)\n\n\n\nperform_list_of_queries_progress(ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nions_list\n\n\nList of ion combinations for queries\n\n\n\n\nspectra\n\n\nSpectra object to search\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nList of query results\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Harmonize mzs\n\n\n\nharmonize_mzs(spectra, dalton, ppm)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra object\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nSpectra with harmonized m/z values\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
-    "objectID": "man/perform_list_of_queries_progress.html#perform-list-of-queries-progress",
-    "href": "man/perform_list_of_queries_progress.html#perform-list-of-queries-progress",
+    "objectID": "man/create_matrix.html",
+    "href": "man/create_matrix.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Perform list of queries (progress)\n\n\n\nperform_list_of_queries_progress(ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nions_list\n\n\nList of ion combinations for queries\n\n\n\n\nspectra\n\n\nSpectra object to search\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nList of query results\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Create matrix\n\n\n\ncreate_matrix(spectra, zero_val = 0, name)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\nzero_val\n\n\nZero value\n\n\n\n\nname\n\n\nName\n\n\n\n\n\n\nA matrix with spectra intensity data\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+  },
+  {
+    "objectID": "man/create_matrix.html#create-matrix",
+    "href": "man/create_matrix.html#create-matrix",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "Create matrix\n\n\n\ncreate_matrix(spectra, zero_val = 0, name)\n\n\n\n\n\n\n\nspectra\n\n\nSpectra\n\n\n\n\nzero_val\n\n\nZero value\n\n\n\n\nname\n\n\nName\n\n\n\n\n\n\nA matrix with spectra intensity data\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+  },
+  {
+    "objectID": "man/contains_all_mz.html",
+    "href": "man/contains_all_mz.html",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "Check if spectrum contains all target m/z values\n\n\n\ncontains_all_mz(spec_mz, target_mz, dalton, ppm)\n\n\n\n\n\n\n\nspec_mz\n\n\nNumeric vector of spectrum m/z values\n\n\n\n\ntarget_mz\n\n\nNumeric vector of target m/z values to find\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nLogical indicating if all targets are found\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+  },
+  {
+    "objectID": "man/contains_all_mz.html#check-if-spectrum-contains-all-target-mz-values",
+    "href": "man/contains_all_mz.html#check-if-spectrum-contains-all-target-mz-values",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "Check if spectrum contains all target m/z values\n\n\n\ncontains_all_mz(spec_mz, target_mz, dalton, ppm)\n\n\n\n\n\n\n\nspec_mz\n\n\nNumeric vector of spectrum m/z values\n\n\n\n\ntarget_mz\n\n\nNumeric vector of target m/z values to find\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nLogical indicating if all targets are found\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+  },
+  {
+    "objectID": "man/generate_combinations_progress.html",
+    "href": "man/generate_combinations_progress.html",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "Generate combinations with progress\n\n\n\ngenerate_combinations_progress(indices, ions_list, max_ions)\n\n\n\n\n\n\n\nindices\n\n\nVector of indices to process\n\n\n\n\nions_list\n\n\nList of ions for each index\n\n\n\n\nmax_ions\n\n\nMaximum number of ions in combinations\n\n\n\n\n\n\nList of all combinations for each index\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+  },
+  {
+    "objectID": "man/generate_combinations_progress.html#generate-combinations-with-progress",
+    "href": "man/generate_combinations_progress.html#generate-combinations-with-progress",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "Generate combinations with progress\n\n\n\ngenerate_combinations_progress(indices, ions_list, max_ions)\n\n\n\n\n\n\n\nindices\n\n\nVector of indices to process\n\n\n\n\nions_list\n\n\nList of ions for each index\n\n\n\n\nmax_ions\n\n\nMaximum number of ions in combinations\n\n\n\n\n\n\nList of all combinations for each index\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+  },
+  {
+    "objectID": "man/generate_combinations.html",
+    "href": "man/generate_combinations.html",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "Generate combinations\n\n\n\ngenerate_combinations(x, max_ions)\n\n\n\n\n\n\n\nx\n\n\nVector of elements to combine\n\n\n\n\nmax_ions\n\n\nMaximum number of ions in combinations\n\n\n\n\n\n\nList of all combinations\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+  },
+  {
+    "objectID": "man/generate_combinations.html#generate-combinations",
+    "href": "man/generate_combinations.html#generate-combinations",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "Generate combinations\n\n\n\ngenerate_combinations(x, max_ions)\n\n\n\n\n\n\n\nx\n\n\nVector of elements to combine\n\n\n\n\nmax_ions\n\n\nMaximum number of ions in combinations\n\n\n\n\n\n\nList of all combinations\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+  },
+  {
+    "objectID": "man/create_dir.html",
+    "href": "man/create_dir.html",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "This function creates a directory at the specified path if it does not already exist.\n\n\n\ncreate_dir(export)\n\n\n\n\n\n\n\nexport\n\n\nPath to the directory to be created\n\n\n\n\n\n\nMessage indicating the status of directory creation\n\n\n\nhttps://github.com/taxonomicallyinformedannotation/tima/blob/main/R/create_dir.R"
+  },
+  {
+    "objectID": "man/create_dir.html#create-directory",
+    "href": "man/create_dir.html#create-directory",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "This function creates a directory at the specified path if it does not already exist.\n\n\n\ncreate_dir(export)\n\n\n\n\n\n\n\nexport\n\n\nPath to the directory to be created\n\n\n\n\n\n\nMessage indicating the status of directory creation\n\n\n\nhttps://github.com/taxonomicallyinformedannotation/tima/blob/main/R/create_dir.R"
+  },
+  {
+    "objectID": "man/perform_list_of_queries.html",
+    "href": "man/perform_list_of_queries.html",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "Perform list of queries\n\n\n\nperform_list_of_queries(index, ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nindex\n\n\nIndex of the ion list to process\n\n\n\n\nions_list\n\n\nList of ions for queries\n\n\n\n\nspectra\n\n\nSpectra object to search\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nData frame with target and value columns\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+  },
+  {
+    "objectID": "man/perform_list_of_queries.html#perform-list-of-queries",
+    "href": "man/perform_list_of_queries.html#perform-list-of-queries",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "Perform list of queries\n\n\n\nperform_list_of_queries(index, ions_list, spectra, dalton, ppm)\n\n\n\n\n\n\n\nindex\n\n\nIndex of the ion list to process\n\n\n\n\nions_list\n\n\nList of ions for queries\n\n\n\n\nspectra\n\n\nSpectra object to search\n\n\n\n\ndalton\n\n\nTolerance in Dalton\n\n\n\n\nppm\n\n\nTolerance in parts per million\n\n\n\n\n\n\nData frame with target and value columns\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+  },
+  {
+    "objectID": "CITATION.html",
+    "href": "CITATION.html",
+    "title": "Citation",
+    "section": "",
+    "text": "Citation\nTo cite SpectraToQueries in publications use:\n\nRutz A, Szwarc S (2025). SpectraToQueries: SpectraToQueries provides the infrastructure to translate spectra to queries. R package, version 0.0.9001.\n\n\nSzwarc S, Rutz A, Lee K, Mejri Y, Bonnet O, Hazni H, Jagora A, Mbeng Obame R, Jin Kyoung N, Otogo N’Nang E, Alaribe S, Awang K, Bernadat G, Choi Y, Courdavault V, Frederich M, Gaslonde T, Huber F, Kam T, Low Y, Poupon E, van der Hooft J, Kang K, Le Pogam P, Beniddir M (2025). “Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids.” J. Cheminform., 17. ISSN 1758-2946. doi:10.1186/s13321-025-01009-0. https://doi.org/10.1186/s13321-025-01009-0."
   }
 ]
