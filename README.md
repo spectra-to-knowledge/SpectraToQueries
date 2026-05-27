@@ -38,7 +38,7 @@ install.packages(
   "SpectraToQueries",
   repos = c(
     "https://spectra-to-knowledge.r-universe.dev",
-    "https://bioc.r-universe.dev",
+    "https://bioconductor.org/packages/release/bioc",
     "https://cloud.r-project.org"
   )
 )
