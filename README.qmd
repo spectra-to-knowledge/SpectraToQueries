@@ -1,5 +1,5 @@
 ---
-format: 
+format:
   gfm: default
   html: default
 bibliography: grateful-refs.bib
@@ -111,7 +111,6 @@ grateful::cite_packages(
   output = "table",
   out.dir = getwd(),
   path = desc_path
-) |> 
+) |>
   knitr::kable()
 ```
-
