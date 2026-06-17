@@ -1,5 +1,3 @@
-
-
 <!-- README.md is generated from README.qmd. Please edit that file -->
 
 # SpectraToQueries <img src='https://raw.githubusercontent.com/spectra-to-knowledge/SpectraToQueries/main/man/figures/logo.svg' align="right" height="139" />
@@ -21,19 +19,18 @@ Repository to translate spectra to queries.
 
 Here is what you *minimally* need:
 
-- **A file containing MS/MS spectra with associated skeleton
-  information** (or any other relevant chemical classification)
-  **provided as metadata**. This structure information, stored in the
-  metadata field “skeleton”, allows the generation of queries specific
-  to a given skeleton by extracting repetitive skeleton-specific
-  fragmentation patterns. The MIADB file is provided as an example.
+- **A file containing MS/MS spectra with associated skeleton information** (or
+  any other relevant chemical classification) **provided as metadata**. This
+  structure information, stored in the metadata field "skeleton", allows the
+  generation of queries specific to a given skeleton by extracting repetitive
+  skeleton-specific fragmentation patterns. The MIADB file is provided as an
+  example.
 
 ## Installation
 
-As the package is not (yet) available on CRAN, you will need to install
-with:
+As the package is not (yet) available on CRAN, you will need to install with:
 
-``` r
+```r
 install.packages(
   "SpectraToQueries",
   repos = c(
@@ -46,19 +43,18 @@ install.packages(
 
 ## Use
 
-To reproduce the example that uses the Monoterpene Indole Alkaloids
-Database (.mgf) file by default, which includes the annotation of
-spectral skeletons:
+To reproduce the example that uses the Monoterpene Indole Alkaloids Database
+(.mgf) file by default, which includes the annotation of spectral skeletons:
 
-``` r
+```r
 SpectraToQueries::spectra_to_queries()
 ```
 
-To reproduce the “grouped” example that uses the MIADB file, which
-includes an expert-based annotation of spectral “super skeletons”
-(combination of skeletons exhibiting a high structural similarity):
+To reproduce the "grouped" example that uses the MIADB file, which includes an
+expert-based annotation of spectral "super skeletons" (combination of skeletons
+exhibiting a high structural similarity):
 
-``` r
+```r
 SpectraToQueries::spectra_to_queries(
   spectra = system.file(
     "extdata",
@@ -71,7 +67,7 @@ SpectraToQueries::spectra_to_queries(
 
 To generate diagnostic ions queries from your spectra:
 
-``` r
+```r
 SpectraToQueries::spectra_to_queries(
   spectra = "yourAwesomeSpectra.mgf",
   export = "path/yourEvenBetterResults.tsv"
@@ -80,7 +76,7 @@ SpectraToQueries::spectra_to_queries(
 
 Showing all parameters:
 
-``` r
+```r
 SpectraToQueries::spectra_to_queries(
   spectra = NULL,
   export = "data/interim/queries.tsv",
@@ -102,27 +98,27 @@ SpectraToQueries::spectra_to_queries(
 
 ## Main Citations
 
-Translating community-wide spectral library into actionable chemical
-knowledge: a proof of concept with monoterpene indole alkaloids:
+Translating community-wide spectral library into actionable chemical knowledge:
+a proof of concept with monoterpene indole alkaloids:
 <https://doi.org/10.1186/s13321-025-01009-0>
 
 ## Additional software credits
 
-| Package | Version | Citation |
-|:---|:---|:---|
-| base | 4.5.2 | R Core Team (2025) |
-| BiocManager | 1.30.26 | Morgan and Ramos (2025) |
-| BiocParallel | 1.44.0 | Wang et al. (2025) |
-| BiocVersion | 3.22.0 | Morgan (2025) |
-| knitr | 1.50 | Xie (2014); Xie (2015); Xie (2025) |
-| MsBackendMgf | 1.18.0 | Gatto, Rainer, and Gibb (2025) |
-| pkgload | 1.4.1 | Wickham et al. (2025) |
-| progress | 1.2.3 | Csárdi and FitzJohn (2023) |
-| rmarkdown | 2.30 | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
-| Spectra | 1.20.0 | Rainer et al. (2022) |
-| testthat | 3.2.3 | Wickham (2011) |
-| tidytable | 0.11.2 | Fairbanks (2024) |
-| tidyverse | 2.0.0 | Wickham et al. (2019) |
+  | Package      | Version | Citation                                                                                      |
+  | :----------- | :------ | :-------------------------------------------------------------------------------------------- |
+  | base         | 4.5.2   | R Core Team (2025)                                                                            |
+  | BiocManager  | 1.30.26 | Morgan and Ramos (2025)                                                                       |
+  | BiocParallel | 1.44.0  | Wang et al. (2025)                                                                            |
+  | BiocVersion  | 3.22.0  | Morgan (2025)                                                                                 |
+  | knitr        | 1.50    | Xie (2014); Xie (2015); Xie (2025)                                                            |
+  | MsBackendMgf | 1.18.0  | Gatto, Rainer, and Gibb (2025)                                                                |
+  | pkgload      | 1.4.1   | Wickham et al. (2025)                                                                         |
+  | progress     | 1.2.3   | Csárdi and FitzJohn (2023)                                                                    |
+  | rmarkdown    | 2.30    | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
+  | Spectra      | 1.20.0  | Rainer et al. (2022)                                                                          |
+  | testthat     | 3.2.3   | Wickham (2011)                                                                                |
+  | tidytable    | 0.11.2  | Fairbanks (2024)                                                                              |
+  | tidyverse    | 2.0.0   | Wickham et al. (2019)                                                                         |
 
 <div id="refs" class="references csl-bib-body hanging-indent"
 entry-spacing="0">

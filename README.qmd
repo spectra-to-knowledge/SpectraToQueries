@@ -10,10 +10,13 @@ bibliography: grateful-refs.bib
 # SpectraToQueries <img src='https://raw.githubusercontent.com/spectra-to-knowledge/SpectraToQueries/main/man/figures/logo.svg' align="right" height="139" />
 
 <!-- badges: start -->
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![R-CMD-check](https://github.com/spectra-to-knowledge/SpectraToQueries/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/spectra-to-knowledge/SpectraToQueries/actions/workflows/R-CMD-check.yaml)
-[![r-universe badge](https://spectra-to-knowledge.r-universe.dev/SpectraToQueries/badges/version?&color=blue&style=classic)](https://spectra-to-knowledge.r-universe.dev/SpectraToQueries)
-[![Codecov test coverage](https://codecov.io/gh/spectra-to-knowledge/SpectraToQueries/graph/badge.svg)](https://app.codecov.io/gh/spectra-to-knowledge/SpectraToQueries)
+[![r-universe
+badge](https://spectra-to-knowledge.r-universe.dev/SpectraToQueries/badges/version?&color=blue&style=classic)](https://spectra-to-knowledge.r-universe.dev/SpectraToQueries)
+[![Codecov test
+coverage](https://codecov.io/gh/spectra-to-knowledge/SpectraToQueries/graph/badge.svg)](https://app.codecov.io/gh/spectra-to-knowledge/SpectraToQueries)
 <!-- badges: end -->
 
 Repository to translate spectra to queries.
@@ -22,15 +25,18 @@ Repository to translate spectra to queries.
 
 Here is what you *minimally* need:
 
-- **A file containing MS/MS spectra with associated skeleton information** (or any other relevant chemical classification) **provided as metadata**.
-This structure information, stored in the metadata field "skeleton", allows the generation of queries specific to a given skeleton by extracting repetitive skeleton-specific fragmentation patterns.
-The MIADB file is provided as an example.
+- **A file containing MS/MS spectra with associated skeleton information** (or
+  any other relevant chemical classification) **provided as metadata**. This
+  structure information, stored in the metadata field "skeleton", allows the
+  generation of queries specific to a given skeleton by extracting repetitive
+  skeleton-specific fragmentation patterns. The MIADB file is provided as an
+  example.
 
 ## Installation
 
 As the package is not (yet) available on CRAN, you will need to install with:
 
-``` r
+```r
 install.packages(
   "SpectraToQueries",
   repos = c(
@@ -43,15 +49,18 @@ install.packages(
 
 ## Use
 
-To reproduce the example that uses the Monoterpene Indole Alkaloids Database (.mgf) file by default, which includes the annotation of spectral skeletons:
+To reproduce the example that uses the Monoterpene Indole Alkaloids Database
+(.mgf) file by default, which includes the annotation of spectral skeletons:
 
-``` r
+```r
 SpectraToQueries::spectra_to_queries()
 ```
 
-To reproduce the "grouped" example that uses the MIADB file, which includes an expert-based annotation of spectral "super skeletons" (combination of skeletons exhibiting a high structural similarity):
+To reproduce the "grouped" example that uses the MIADB file, which includes an
+expert-based annotation of spectral "super skeletons" (combination of skeletons
+exhibiting a high structural similarity):
 
-``` r
+```r
 SpectraToQueries::spectra_to_queries(
   spectra = system.file(
     "extdata",
@@ -64,7 +73,7 @@ SpectraToQueries::spectra_to_queries(
 
 To generate diagnostic ions queries from your spectra:
 
-``` r
+```r
 SpectraToQueries::spectra_to_queries(
   spectra = "yourAwesomeSpectra.mgf",
   export = "path/yourEvenBetterResults.tsv"
@@ -95,11 +104,16 @@ SpectraToQueries::spectra_to_queries(
 
 ## Main Citations
 
-Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids: <https://doi.org/10.1186/s13321-025-01009-0>
+Translating community-wide spectral library into actionable chemical knowledge:
+a proof of concept with monoterpene indole alkaloids:
+<https://doi.org/10.1186/s13321-025-01009-0>
 
 ## Additional software credits
 
-```{r, echo = FALSE, message = FALSE}
+```{r}
+#| echo: false
+#| message: false
+
 # Check if DESCRIPTION is in current dir
 # Else `altdoc` will not find the dependencies
 desc_path <- if (file.exists("DESCRIPTION")) {
