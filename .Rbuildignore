@@ -17,6 +17,7 @@ CITATION.cff
 ^docs$
 ^grateful-refs\.bib$
 ^pkgdown$
+^prek[.]toml$
 ^renv$
 ^renv\.lock$
 ^tima\.Rproj$
