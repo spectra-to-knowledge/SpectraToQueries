@@ -37,7 +37,8 @@ install.packages(
     "https://spectra-to-knowledge.r-universe.dev",
     "https://bioconductor.org/packages/release/bioc",
     "https://cloud.r-project.org"
-  )
+  ),
+  type = "source"
 )
 ```
 
