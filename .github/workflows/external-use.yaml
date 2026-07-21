@@ -67,7 +67,8 @@ jobs:
           "https://spectra-to-knowledge.r-universe.dev",
           "https://bioconductor.org/packages/release/bioc",
           "https://cloud.r-project.org"
-          )
+          ),
+          type = "binary"
           )
         shell: Rscript {0}
       - name: Run pipeline
