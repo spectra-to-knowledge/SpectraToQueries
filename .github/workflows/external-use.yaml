@@ -57,7 +57,6 @@ jobs:
           brew install libomp
           LIBOMP_PREFIX="$(brew --prefix libomp)"
           mkdir -p ~/.R
-          # Detect architecture for correct optimization flags
           if [[ $(uname -m) == "arm64" ]]; then
             ARCH_FLAGS="-mcpu=native"
           else
