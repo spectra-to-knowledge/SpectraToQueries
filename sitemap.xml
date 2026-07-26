@@ -2,74 +2,74 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/index.html</loc>
-    <lastmod>2026-07-25T21:03:39.717Z</lastmod>
+    <lastmod>2026-07-26T12:59:38.745Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/filter_matrix.html</loc>
-    <lastmod>2026-07-25T21:03:43.749Z</lastmod>
+    <lastmod>2026-07-26T12:59:43.806Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/perform_list_of_queries.html</loc>
-    <lastmod>2026-07-25T21:03:48.449Z</lastmod>
+    <lastmod>2026-07-26T12:59:50.387Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/normalize_peaks.html</loc>
-    <lastmod>2026-07-25T21:03:47.385Z</lastmod>
+    <lastmod>2026-07-26T12:59:48.739Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/combine_ions_minimal.html</loc>
-    <lastmod>2026-07-25T21:03:39.864Z</lastmod>
+    <lastmod>2026-07-26T12:59:38.953Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/spectra_to_queries.html</loc>
-    <lastmod>2026-07-25T21:03:48.955Z</lastmod>
+    <lastmod>2026-07-26T12:59:51.394Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/harmonize_mzs.html</loc>
-    <lastmod>2026-07-25T21:03:46.420Z</lastmod>
+    <lastmod>2026-07-26T12:59:47.693Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/create_dir.html</loc>
-    <lastmod>2026-07-25T21:03:41.800Z</lastmod>
+    <lastmod>2026-07-26T12:59:41.485Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/CITATION.html</loc>
-    <lastmod>2026-07-25T21:03:39.765Z</lastmod>
+    <lastmod>2026-07-26T12:59:38.779Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/LICENSE.html</loc>
-    <lastmod>2026-07-25T21:03:39.701Z</lastmod>
+    <lastmod>2026-07-26T12:59:38.734Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/generate_combinations_progress.html</loc>
-    <lastmod>2026-07-25T21:03:45.492Z</lastmod>
+    <lastmod>2026-07-26T12:59:46.017Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/perform_list_of_queries_progress.html</loc>
-    <lastmod>2026-07-25T21:03:48.199Z</lastmod>
+    <lastmod>2026-07-26T12:59:49.874Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/fix_binned_mzs.html</loc>
-    <lastmod>2026-07-25T21:03:44.529Z</lastmod>
+    <lastmod>2026-07-26T12:59:44.847Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/perform_query.html</loc>
-    <lastmod>2026-07-25T21:03:48.698Z</lastmod>
+    <lastmod>2026-07-26T12:59:50.879Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/generate_combinations.html</loc>
-    <lastmod>2026-07-25T21:03:46.150Z</lastmod>
+    <lastmod>2026-07-26T12:59:47.174Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/contains_all_mz.html</loc>
-    <lastmod>2026-07-25T21:03:41.044Z</lastmod>
+    <lastmod>2026-07-26T12:59:40.313Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/create_matrix.html</loc>
-    <lastmod>2026-07-25T21:03:42.762Z</lastmod>
+    <lastmod>2026-07-26T12:59:42.628Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/NEWS.html</loc>
-    <lastmod>2026-07-25T21:03:39.691Z</lastmod>
+    <lastmod>2026-07-26T12:59:38.727Z</lastmod>
   </url>
 </urlset>
