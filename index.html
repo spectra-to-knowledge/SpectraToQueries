@@ -192,7 +192,11 @@ div.csl-indent {
   <ul class="collapse">
   <li><a href="#requirements" id="toc-requirements" class="nav-link" data-scroll-target="#requirements">Requirements</a></li>
   <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
-  <li><a href="#use" id="toc-use" class="nav-link" data-scroll-target="#use">Use</a></li>
+  <li><a href="#use" id="toc-use" class="nav-link" data-scroll-target="#use">Use</a>
+  <ul class="collapse">
+  <li><a href="#viewing-all-parameters" id="toc-viewing-all-parameters" class="nav-link" data-scroll-target="#viewing-all-parameters">Viewing all parameters</a></li>
+  <li><a href="#example-data" id="toc-example-data" class="nav-link" data-scroll-target="#example-data">Example data</a></li>
+  </ul></li>
   <li><a href="#main-citations" id="toc-main-citations" class="nav-link" data-scroll-target="#main-citations">Main Citations</a></li>
   <li><a href="#additional-software-credits" id="toc-additional-software-credits" class="nav-link" data-scroll-target="#additional-software-credits">Additional software credits</a></li>
   </ul></li>
@@ -221,55 +225,56 @@ div.csl-indent {
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
 <p>As the package is not (yet) available on CRAN, you will need to install with:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: "install"</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SpectraToQueries"</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">repos =</span> <span class="fu">c</span>(</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://spectra-to-knowledge.r-universe.dev"</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://cran.r-universe.dev"</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://bioc.r-universe.dev"</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SpectraToQueries"</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">repos =</span> <span class="fu">c</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://spectra-to-knowledge.r-universe.dev"</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://cran.r-universe.dev"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"https://bioc.r-universe.dev"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="use" class="level2">
 <h2 class="anchored" data-anchor-id="use">Use</h2>
-<p>To reproduce the example that uses the Monoterpene Indole Alkaloids Database (.mgf) file by default, which includes the annotation of spectral skeletons:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: "run"</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>SpectraToQueries<span class="sc">::</span><span class="fu">spectra_to_queries</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>To reproduce the “grouped” example that uses the MIADB file, which includes an expert-based annotation of spectral “super skeletons” (combination of skeletons exhibiting a high structural similarity):</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: "run_grouped"</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>SpectraToQueries<span class="sc">::</span><span class="fu">spectra_to_queries</span>(</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="fu">system.file</span>(</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"extdata"</span>,</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"spectra_grouped.rds"</span>,</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">package =</span> <span class="st">"SpectraToQueries"</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">export =</span> <span class="st">"data/interim/queries-grouped.tsv"</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>To generate diagnostic ions queries from your spectra:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: "run_own"</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>SpectraToQueries<span class="sc">::</span><span class="fu">spectra_to_queries</span>(</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="st">"yourAwesomeSpectra.mgf"</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">export =</span> <span class="st">"path/yourEvenBetterResults.tsv"</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Showing all parameters:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: "run_arguments"</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>SpectraToQueries<span class="sc">::</span><span class="fu">spectra_to_queries</span>(</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="cn">NULL</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">export =</span> <span class="st">"data/interim/queries.tsv"</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_1 =</span> <span class="fl">1.0</span>,</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_2 =</span> <span class="fl">0.5</span>,</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">dalton =</span> <span class="fl">0.01</span>,</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">decimals =</span> <span class="dv">4</span>L,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">intensity_min =</span> <span class="fl">0.0</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">ions_max =</span> <span class="dv">10</span>L,</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_skel_min =</span> <span class="dv">5</span>L,</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_spec_min =</span> <span class="dv">3</span>L,</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">fscore_min =</span> <span class="fl">0.0</span>,</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">precision_min =</span> <span class="fl">0.0</span>,</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">recall_min =</span> <span class="fl">0.0</span>,</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">zero_val =</span> <span class="fl">0.0</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>To run the default example with raw spectra from the Monoterpene Indole Alkaloids Database (MIADB):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SpectraToQueries<span class="sc">::</span><span class="fu">spectra_to_queries</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>To run with grouped spectra (pre-combined by skeleton classification):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>SpectraToQueries<span class="sc">::</span><span class="fu">spectra_to_queries</span>(<span class="at">spectra =</span> <span class="st">"grouped"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>To generate diagnostic ions queries from your own spectra:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>SpectraToQueries<span class="sc">::</span><span class="fu">spectra_to_queries</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="st">"yourAwesomeSpectra.mgf"</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">export =</span> <span class="st">"path/yourEvenBetterResults.tsv"</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="viewing-all-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="viewing-all-parameters">Viewing all parameters</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>SpectraToQueries<span class="sc">::</span><span class="fu">spectra_to_queries</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> <span class="cn">NULL</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">export =</span> <span class="st">"data/interim/queries.tsv"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">dalton =</span> <span class="fl">0.01</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">decimals =</span> <span class="dv">4</span>L,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">intensity_min =</span> <span class="fl">0.0</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">ions_max =</span> <span class="dv">10</span>L,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_skel_min =</span> <span class="dv">5</span>L,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_spec_min =</span> <span class="dv">3</span>L,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">ppm =</span> <span class="fl">30.0</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">mcc_min =</span> <span class="fl">0.0</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">precision_min =</span> <span class="fl">0.0</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">recall_min =</span> <span class="fl">0.0</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">zero_val =</span> <span class="fl">0.0</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="example-data" class="level3">
+<h3 class="anchored" data-anchor-id="example-data">Example data</h3>
+<p>The package includes two example datasets from MIADB:</p>
+<ul>
+<li><code>mia_spectra_df</code> — Raw spectra (321 spectra)</li>
+<li><code>mia_spectra_grouped_df</code> — Pre-grouped spectra (321 spectra)</li>
+</ul>
+<p>These are stored as portable data.frames (with <code>mz</code> and <code>intensity</code> as list columns) and automatically converted to Spectra objects when loaded.</p>
+<p>To access them directly:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">data</span>(mia_spectra_df, <span class="at">package =</span> <span class="st">"SpectraToQueries"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">data</span>(mia_spectra_grouped_df, <span class="at">package =</span> <span class="st">"SpectraToQueries"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
 </section>
 <section id="main-citations" class="level2">
 <h2 class="anchored" data-anchor-id="main-citations">Main Citations</h2>
@@ -317,14 +322,14 @@ div.csl-indent {
 <td style="text-align: left;">Christofides (2026)</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">data.table</td>
-<td style="text-align: left;">1.18.4</td>
-<td style="text-align: left;">Barrett et al.&nbsp;(2026)</td>
-</tr>
-<tr class="odd">
 <td style="text-align: left;">fastmatch</td>
 <td style="text-align: left;">1.1.8</td>
 <td style="text-align: left;">Urbanek (2026)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">here</td>
+<td style="text-align: left;">1.0.2</td>
+<td style="text-align: left;">Müller (2025)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">knitr</td>
@@ -337,29 +342,29 @@ div.csl-indent {
 <td style="text-align: left;">Gatto et al.&nbsp;(2026)</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">pkgload</td>
-<td style="text-align: left;">1.5.3</td>
-<td style="text-align: left;">Wickham et al.&nbsp;(2026)</td>
-</tr>
-<tr class="odd">
 <td style="text-align: left;">progress</td>
 <td style="text-align: left;">1.2.3</td>
 <td style="text-align: left;">Csárdi and FitzJohn (2023)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">rmarkdown</td>
 <td style="text-align: left;">2.31</td>
 <td style="text-align: left;">Xie et al.&nbsp;(2018); Xie et al.&nbsp;(2020); Allaire et al.&nbsp;(2026)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td style="text-align: left;">Spectra</td>
 <td style="text-align: left;">1.22.2</td>
 <td style="text-align: left;">Rainer et al.&nbsp;(2022)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td style="text-align: left;">SpectraToQueries</td>
-<td style="text-align: left;">0.0.0.9001</td>
+<td style="text-align: left;">0.0.0.9002</td>
 <td style="text-align: left;">Rutz and Szwarc (2025); <span class="nocase">Szwarc et al.</span> (2025)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">spelling</td>
+<td style="text-align: left;">2.3.2</td>
+<td style="text-align: left;">Ooms and Hester (2025)</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">stringi</td>
@@ -381,14 +386,16 @@ div.csl-indent {
 <td style="text-align: left;">2.0.0</td>
 <td style="text-align: left;">Wickham et al.&nbsp;(2019)</td>
 </tr>
+<tr class="odd">
+<td style="text-align: left;">usethis</td>
+<td style="text-align: left;">3.2.1</td>
+<td style="text-align: left;">Wickham et al.&nbsp;(2025)</td>
+</tr>
 </tbody>
 </table>
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-rmarkdown2026" class="csl-entry" role="listitem">
 Allaire, JJ, Yihui Xie, Christophe Dervieux, et al.&nbsp;2026. <em><span class="nocase">rmarkdown</span>: Dynamic Documents for r</em>. <a href="https://github.com/rstudio/rmarkdown" class="uri">https://github.com/rstudio/rmarkdown</a>.
-</div>
-<div id="ref-datatable" class="csl-entry" role="listitem">
-Barrett, Tyson, Matt Dowle, Arun Srinivasan, et al.&nbsp;2026. <em><span class="nocase">data.table</span>: Extension of “<span class="nocase">data.frame</span>”</em>. <a href="https://doi.org/10.32614/CRAN.package.data.table" class="uri">https://doi.org/10.32614/CRAN.package.data.table</a>.
 </div>
 <div id="ref-cheapr" class="csl-entry" role="listitem">
 Christofides, Nick. 2026. <em><span class="nocase">cheapr</span>: Simple Functions to Save Time and Memory</em>. <a href="https://doi.org/10.32614/CRAN.package.cheapr" class="uri">https://doi.org/10.32614/CRAN.package.cheapr</a>.
@@ -410,6 +417,12 @@ Morgan, Martin. 2025. <em>BiocVersion: Set the Appropriate Version of Bioconduct
 </div>
 <div id="ref-BiocManager" class="csl-entry" role="listitem">
 Morgan, Martin, and Marcel Ramos. 2025. <em>BiocManager: Access the Bioconductor Project Package Repository</em>. <a href="https://doi.org/10.32614/CRAN.package.BiocManager" class="uri">https://doi.org/10.32614/CRAN.package.BiocManager</a>.
+</div>
+<div id="ref-here" class="csl-entry" role="listitem">
+Müller, Kirill. 2025. <em><span class="nocase">here</span>: A Simpler Way to Find Your Files</em>. <a href="https://doi.org/10.32614/CRAN.package.here" class="uri">https://doi.org/10.32614/CRAN.package.here</a>.
+</div>
+<div id="ref-spelling" class="csl-entry" role="listitem">
+Ooms, Jeroen, and Jim Hester. 2025. <em><span class="nocase">spelling</span>: Tools for Spell Checking in r</em>. <a href="https://doi.org/10.32614/CRAN.package.spelling" class="uri">https://doi.org/10.32614/CRAN.package.spelling</a>.
 </div>
 <div id="ref-base" class="csl-entry" role="listitem">
 R Core Team. 2026. <em>R: A Language and Environment for Statistical Computing</em>. R Foundation for Statistical Computing. <a href="https://doi.org/10.32614/R.manuals" class="uri">https://doi.org/10.32614/R.manuals</a>.
@@ -435,8 +448,8 @@ Wickham, Hadley. 2011. “<span class="nocase">testthat</span>: Get Started with
 <div id="ref-tidyverse" class="csl-entry" role="listitem">
 Wickham, Hadley, Mara Averick, Jennifer Bryan, et al.&nbsp;2019. “Welcome to the <span class="nocase">tidyverse</span>.” <em>Journal of Open Source Software</em> 4 (43): 1686. <a href="https://doi.org/10.21105/joss.01686" class="uri">https://doi.org/10.21105/joss.01686</a>.
 </div>
-<div id="ref-pkgload" class="csl-entry" role="listitem">
-Wickham, Hadley, Winston Chang, Jim Hester, and Lionel Henry. 2026. <em><span class="nocase">pkgload</span>: Simulate Package Installation and Attach</em>. <a href="https://doi.org/10.32614/CRAN.package.pkgload" class="uri">https://doi.org/10.32614/CRAN.package.pkgload</a>.
+<div id="ref-usethis" class="csl-entry" role="listitem">
+Wickham, Hadley, Jennifer Bryan, Malcolm Barrett, and Andy Teucher. 2025. <em><span class="nocase">usethis</span>: Automate Package and Project Setup</em>. <a href="https://doi.org/10.32614/CRAN.package.usethis" class="uri">https://doi.org/10.32614/CRAN.package.usethis</a>.
 </div>
 <div id="ref-knitr2014" class="csl-entry" role="listitem">
 Xie, Yihui. 2014. “<span class="nocase">knitr</span>: A Comprehensive Tool for Reproducible Research in R.” In <em>Implementing Reproducible Computational Research</em>, edited by Victoria Stodden, Friedrich Leisch, and Roger D. Peng. Chapman; Hall/CRC.
