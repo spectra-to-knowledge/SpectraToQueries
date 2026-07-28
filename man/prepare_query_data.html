@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>news – SpectraToQueries</title>
+<title>prepare_query_data – SpectraToQueries</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -26,27 +26,62 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<link href="./man/figures/logo.svg" rel="icon" type="image/svg+xml">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-78cbf92561b3ffa009074af41bd9ed9b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../man/figures/logo.svg" rel="icon" type="image/svg+xml">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-78cbf92561b3ffa009074af41bd9ed9b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -85,11 +120,11 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./man/figures/logo.svg" alt="SpectraToQueries logo" class="navbar-logo light-content">
-    <img src="./man/figures/logo.svg" alt="SpectraToQueries logo" class="navbar-logo dark-content">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../man/figures/logo.svg" alt="SpectraToQueries logo" class="navbar-logo light-content">
+    <img src="../man/figures/logo.svg" alt="SpectraToQueries logo" class="navbar-logo dark-content">
     </a>
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">SpectraToQueries</span>
     </a>
   </div>
@@ -100,15 +135,15 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./NEWS.html" aria-current="page"> 
+    <a class="nav-link" href="../NEWS.html"> 
 <span class="menu-text">News</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./LICENSE.html"> 
+    <a class="nav-link" href="../LICENSE.html"> 
 <span class="menu-text">License</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./CITATION.html"> 
+    <a class="nav-link" href="../CITATION.html"> 
 <span class="menu-text">Citation</span></a>
   </li>  
 </ul>
@@ -134,14 +169,13 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#spectratoqueries" id="toc-spectratoqueries" class="nav-link active" data-scroll-target="#spectratoqueries">SpectraToQueries</a></li>
-  <li><a href="#spectratoqueries-0.0.9002" id="toc-spectratoqueries-0.0.9002" class="nav-link" data-scroll-target="#spectratoqueries-0.0.9002">SpectraToQueries 0.0.9002</a>
+  <li><a href="#prepare-spectra-data-for-querying" id="toc-prepare-spectra-data-for-querying" class="nav-link active" data-scroll-target="#prepare-spectra-data-for-querying">Prepare spectra data for querying</a>
   <ul class="collapse">
-  <li><a href="#data-documentation" id="toc-data-documentation" class="nav-link" data-scroll-target="#data-documentation">Data &amp; Documentation</a></li>
-  <li><a href="#dependencies" id="toc-dependencies" class="nav-link" data-scroll-target="#dependencies">Dependencies</a></li>
+  <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
+  <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
+  <li><a href="#arguments" id="toc-arguments" class="nav-link" data-scroll-target="#arguments">Arguments</a></li>
+  <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
-  <li><a href="#spectratoqueries-0.0.9001" id="toc-spectratoqueries-0.0.9001" class="nav-link" data-scroll-target="#spectratoqueries-0.0.9001">SpectraToQueries 0.0.9001</a></li>
-  <li><a href="#spectratoqueries-0.0.9000" id="toc-spectratoqueries-0.0.9000" class="nav-link" data-scroll-target="#spectratoqueries-0.0.9000">SpectraToQueries 0.0.9000</a></li>
   </ul>
 </nav>
     </div>
@@ -151,62 +185,43 @@ ul.task-list li input[type="checkbox"] {
 
 
 <script async="" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-<section id="spectratoqueries" class="level1">
-<h1>SpectraToQueries</h1>
+<section id="prepare-spectra-data-for-querying" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="prepare-spectra-data-for-querying">Prepare spectra data for querying</h2>
+<section id="description" class="level3">
+<h3 class="anchored" data-anchor-id="description">Description</h3>
+<p>Extracts mz, precursor m/z, and skeleton labels once, so perform_query() never has to touch the Spectra backend again.</p>
 </section>
-<section id="spectratoqueries-0.0.9002" class="level1">
-<h1>SpectraToQueries 0.0.9002</h1>
-<section id="data-documentation" class="level2">
-<h2 class="anchored" data-anchor-id="data-documentation">Data &amp; Documentation</h2>
-<ul>
-<li><strong>Added clean <code>data/</code> objects</strong> for standard spectra:
-<ul>
-<li><code>spectra_grouped</code> (352KB): Example dataset, 321 grouped Spectra from MIADB, 53 unique skeletons</li>
-<li><code>spectra</code> (354KB): Ungrouped variant for comparison</li>
-<li>Both fully documented with <code>@format</code>, <code>@source</code>, and usage examples</li>
-<li>Load via <code>data(spectra_grouped)</code> or <code>data(spectra)</code> instead of <code>readRDS()</code> + <code>system.file()</code></li>
-</ul></li>
-<li><strong><code>spectra_to_queries()</code> API improvements</strong>:
-<ul>
-<li><code>spectra = NULL</code> now loads <code>spectra_grouped</code> automatically (cleaner default)</li>
-<li><code>spectra = "grouped"</code> alias for explicit grouped-data loading</li>
-<li>Accepts file paths and Spectra objects as before</li>
-<li>Updated roxygen with concrete usage examples</li>
-</ul></li>
-<li><strong>Cleaned <code>R/data.R</code></strong>:
-<ul>
-<li>Removed all <code>inst/extdata/</code> system paths from examples</li>
-<li>Added concrete example showing <code>data(spectra_grouped)</code> usage</li>
-<li>Marked examples as <code>\dontrun</code> to avoid long test times in check</li>
-</ul></li>
-</ul>
+<section id="usage" class="level3">
+<h3 class="anchored" data-anchor-id="usage">Usage</h3>
+<pre><code class="language-R">prepare_query_data(spectra)
+</code></pre>
 </section>
-<section id="dependencies" class="level2">
-<h2 class="anchored" data-anchor-id="dependencies">Dependencies</h2>
-<ul>
-<li>All fastverse toolkit already declared:
-<ul>
-<li><code>fastmatch</code> (set membership) in <code>combine_ions_minimal.R</code></li>
-<li><code>stringi</code> (fixed-string operations) across multiple functions</li>
-<li><code>tidytable</code> (grouping/summarization) now used in <code>fix_binned_mzs.R</code></li>
-</ul></li>
-<li>Removed direct <code>BiocParallel</code>, <code>data.table</code>, <code>progress</code>, <code>purrr</code>, and <code>tibble</code> dependency (tidytable already in imports)</li>
-</ul>
+<section id="arguments" class="level3">
+<h3 class="anchored" data-anchor-id="arguments">Arguments</h3>
+<table role="presentation">
+<tbody><tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="spectra">spectra</code>
+</td>
+<td>
+Spectra object
+</td>
+</tr>
+</tbody></table>
 </section>
-</section>
-<section id="spectratoqueries-0.0.9001" class="level1">
-<h1>SpectraToQueries 0.0.9001</h1>
-<ul>
-<li>Updated minimal R version to <code>4.4.0</code> (and related Bioconductor dependencies)</li>
-</ul>
-</section>
-<section id="spectratoqueries-0.0.9000" class="level1">
-<h1>SpectraToQueries 0.0.9000</h1>
-<ul>
-<li>Initial version.</li>
-</ul>
+<section id="examples" class="level3">
+<h3 class="anchored" data-anchor-id="examples">Examples</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"SpectraToQueries"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cn">NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>NULL</code></pre>
+</div>
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

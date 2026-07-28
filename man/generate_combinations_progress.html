@@ -194,7 +194,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">generate_combinations_progress(indices, ions_list, max_ions)
+<pre><code class="language-R">generate_combinations_progress(
+  indices,
+  ions_list,
+  max_ions,
+  show_progress = TRUE
+)
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -222,6 +227,14 @@ List of ions for each index
 </td>
 <td>
 Maximum number of ions in combinations
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="show_progress">show_progress</code>
+</td>
+<td>
+Logical: show progress bar (default TRUE)
 </td>
 </tr>
 </tbody></table>

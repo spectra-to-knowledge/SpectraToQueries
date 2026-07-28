@@ -169,7 +169,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#perform-list-of-queries-progress" id="toc-perform-list-of-queries-progress" class="nav-link active" data-scroll-target="#perform-list-of-queries-progress">Perform list of queries (progress)</a>
+  <li><a href="#perform-list-of-queries" id="toc-perform-list-of-queries" class="nav-link active" data-scroll-target="#perform-list-of-queries">Perform list of queries</a>
   <ul class="collapse">
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
   <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
@@ -186,15 +186,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <script async="" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-<section id="perform-list-of-queries-progress" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="perform-list-of-queries-progress">Perform list of queries (progress)</h2>
+<section id="perform-list-of-queries" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="perform-list-of-queries">Perform list of queries</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>Perform list of queries (progress)</p>
+<p>Perform list of queries</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">perform_list_of_queries_progress(ions_list, spectra, dalton, ppm)
+<pre><code class="language-R">perform_list_of_queries_progress(
+  ions_list,
+  spectra,
+  dalton,
+  ppm,
+  show_progress = TRUE
+)
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -230,6 +236,14 @@ Tolerance in Dalton
 </td>
 <td>
 Tolerance in parts per million
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="show_progress">show_progress</code>
+</td>
+<td>
+Logical: show progress bar (default TRUE)
 </td>
 </tr>
 </tbody></table>

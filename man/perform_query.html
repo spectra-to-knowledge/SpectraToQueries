@@ -194,7 +194,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">perform_query(spectra, frags, nls, dalton, ppm)
+<pre><code class="language-R">perform_query(all_mz, precursor_mz, frags, nls, dalton, ppm)
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -202,10 +202,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table role="presentation">
 <tbody><tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="spectra">spectra</code>
+<code id="all_mz">all_mz</code>
 </td>
 <td>
-Spectra object
+List of numeric vectors of m/z values for each spectrum
+</td>
+</tr>
+<tr>
+<td style="white-space: collapse; font-family: monospace; vertical-align: top">
+<code id="precursor_mz">precursor_mz</code>
+</td>
+<td>
+Numeric vector of precursor m/z values for each spectrum
 </td>
 </tr>
 <tr>

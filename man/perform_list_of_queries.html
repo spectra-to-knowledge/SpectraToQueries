@@ -194,7 +194,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
-<pre><code class="language-R">perform_list_of_queries(index, ions_list, spectra, dalton, ppm)
+<pre><code class="language-R">perform_list_of_queries(index, ions_list, query_data, dalton, ppm)
 </code></pre>
 </section>
 <section id="arguments" class="level3">
@@ -218,10 +218,10 @@ List of ions for queries
 </tr>
 <tr>
 <td style="white-space: collapse; font-family: monospace; vertical-align: top">
-<code id="spectra">spectra</code>
+<code id="query_data">query_data</code>
 </td>
 <td>
-Spectra object to search
+Data frame with columns <code>mz</code>, <code>precursor_mz</code>, and <code>skeleton</code>
 </td>
 </tr>
 <tr>
