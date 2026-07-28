@@ -37,7 +37,6 @@ Here is what you *minimally* need:
 As the package is not (yet) available on CRAN, you will need to install with:
 
 ```r
-#| label: "install"
 install.packages(
   "SpectraToQueries",
   repos = c(
@@ -50,49 +49,34 @@ install.packages(
 
 ## Use
 
-To reproduce the example that uses the Monoterpene Indole Alkaloids Database
-(.mgf) file by default, which includes the annotation of spectral skeletons:
+To run the default example with raw spectra from the Monoterpene Indole
+Alkaloids Database (MIADB):
 
 ```r
-#| label: "run"
 SpectraToQueries::spectra_to_queries()
 ```
 
-To reproduce the "grouped" example that uses the MIADB file, which includes an
-expert-based annotation of spectral "super skeletons" (combination of skeletons
-exhibiting a high structural similarity):
+To run with grouped spectra (pre-combined by skeleton classification):
 
 ```r
-#| label: "run_grouped"
-SpectraToQueries::spectra_to_queries(
-  spectra = system.file(
-    "extdata",
-    "spectra_grouped.rds",
-    package = "SpectraToQueries"
-  ),
-  export = "data/interim/queries-grouped.tsv"
-)
+SpectraToQueries::spectra_to_queries(spectra = "grouped")
 ```
 
-To generate diagnostic ions queries from your spectra:
+To generate diagnostic ions queries from your own spectra:
 
 ```r
-#| label: "run_own"
 SpectraToQueries::spectra_to_queries(
   spectra = "yourAwesomeSpectra.mgf",
   export = "path/yourEvenBetterResults.tsv"
 )
 ```
 
-Showing all parameters:
+### Viewing all parameters
 
 ```r
-#| label: "run_arguments"
 SpectraToQueries::spectra_to_queries(
   spectra = NULL,
   export = "data/interim/queries.tsv",
-  beta_1 = 1.0,
-  beta_2 = 0.5,
   dalton = 0.01,
   decimals = 4L,
   intensity_min = 0.0,
@@ -100,11 +84,28 @@ SpectraToQueries::spectra_to_queries(
   n_skel_min = 5L,
   n_spec_min = 3L,
   ppm = 30.0,
-  fscore_min = 0.0,
+  mcc_min = 0.0,
   precision_min = 0.0,
   recall_min = 0.0,
   zero_val = 0.0
 )
+```
+
+### Example data
+
+The package includes two example datasets from MIADB:
+
+- `mia_spectra_df` --- Raw spectra (321 spectra)
+- `mia_spectra_grouped_df` --- Pre-grouped spectra (321 spectra)
+
+These are stored as portable data.frames (with `mz` and `intensity` as list
+columns) and automatically converted to Spectra objects when loaded.
+
+To access them directly:
+
+```r
+utils::data(mia_spectra_df, package = "SpectraToQueries")
+utils::data(mia_spectra_grouped_df, package = "SpectraToQueries")
 ```
 
 ## Main Citations

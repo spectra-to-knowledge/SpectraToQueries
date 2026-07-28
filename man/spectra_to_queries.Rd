@@ -21,7 +21,9 @@ spectra_to_queries(
 )
 }
 \arguments{
-\item{spectra}{Spectra path}
+\item{spectra}{Spectra object or path to MGF file. If \code{NULL}, loads the example
+\code{spectra} dataset. If the string \code{"grouped"}, loads the grouped example
+spectra. Otherwise, a path to an MGF file or a Spectra object.}
 
 \item{export}{Export path}
 
@@ -51,8 +53,15 @@ spectra_to_queries(
 A file with diagnostic query ions
 }
 \description{
-This function converts spectra to queries.
+This function converts spectra to diagnostic ion queries.
 }
 \examples{
-NULL
+\dontrun{
+  # Run with default spectra
+  spectra_to_queries()
+
+  # Or explicitly load and pass spectra_grouped
+  data(spectra_grouped)
+  spectra_to_queries(spectra = spectra_grouped)
+}
 }

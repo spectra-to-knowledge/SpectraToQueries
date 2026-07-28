@@ -31,7 +31,6 @@ Here is what you *minimally* need:
 As the package is not (yet) available on CRAN, you will need to install with:
 
 ```r
-#| label: "install"
 install.packages(
   "SpectraToQueries",
   repos = c(
@@ -44,60 +43,63 @@ install.packages(
 
 ## Use
 
-To reproduce the example that uses the Monoterpene Indole Alkaloids Database
-(.mgf) file by default, which includes the annotation of spectral skeletons:
+To run the default example with raw spectra from the Monoterpene Indole
+Alkaloids Database (MIADB):
 
 ```r
-#| label: "run"
 SpectraToQueries::spectra_to_queries()
 ```
 
-To reproduce the "grouped" example that uses the MIADB file, which includes an
-expert-based annotation of spectral "super skeletons" (combination of skeletons
-exhibiting a high structural similarity):
+To run with grouped spectra (pre-combined by skeleton classification):
 
 ```r
-#| label: "run_grouped"
-SpectraToQueries::spectra_to_queries(
-  spectra = system.file(
-    "extdata",
-    "spectra_grouped.rds",
-    package = "SpectraToQueries"
-  ),
-  export = "data/interim/queries-grouped.tsv"
-)
+SpectraToQueries::spectra_to_queries(spectra = "grouped")
 ```
 
-To generate diagnostic ions queries from your spectra:
+To generate diagnostic ions queries from your own spectra:
 
 ```r
-#| label: "run_own"
 SpectraToQueries::spectra_to_queries(
   spectra = "yourAwesomeSpectra.mgf",
   export = "path/yourEvenBetterResults.tsv"
 )
 ```
 
-Showing all parameters:
+### Viewing all parameters
 
 ```r
-#| label: "run_arguments"
 SpectraToQueries::spectra_to_queries(
   spectra = NULL,
   export = "data/interim/queries.tsv",
-  beta_1 = 1.0,
-  beta_2 = 0.5,
   dalton = 0.01,
   decimals = 4L,
   intensity_min = 0.0,
   ions_max = 10L,
   n_skel_min = 5L,
   n_spec_min = 3L,
-  fscore_min = 0.0,
+  ppm = 30.0,
+  mcc_min = 0.0,
   precision_min = 0.0,
   recall_min = 0.0,
   zero_val = 0.0
 )
+```
+
+### Example data
+
+The package includes two example datasets from MIADB:
+
+- `mia_spectra_df` --- Raw spectra (321 spectra)
+- `mia_spectra_grouped_df` --- Pre-grouped spectra (321 spectra)
+
+These are stored as portable data.frames (with `mz` and `intensity` as list
+columns) and automatically converted to Spectra objects when loaded.
+
+To access them directly:
+
+```r
+utils::data(mia_spectra_df, package = "SpectraToQueries")
+utils::data(mia_spectra_grouped_df, package = "SpectraToQueries")
 ```
 
 ## Main Citations
@@ -115,19 +117,20 @@ a proof of concept with monoterpene indole alkaloids:
   | BiocParallel     | 1.46.0     | Wang et al. (2026)                                                       |
   | BiocVersion      | 3.23.1     | Morgan (2025)                                                            |
   | cheapr           | 1.5.2      | Christofides (2026)                                                      |
-  | data.table       | 1.18.4     | Barrett et al. (2026)                                                    |
   | fastmatch        | 1.1.8      | Urbanek (2026)                                                           |
+  | here             | 1.0.2      | Müller (2025)                                                            |
   | knitr            | 1.51       | Xie (2014); Xie (2015); Xie (2025)                                       |
   | MsBackendMgf     | 1.20.0     | Gatto et al. (2026)                                                      |
-  | pkgload          | 1.5.3      | Wickham et al. (2026)                                                    |
   | progress         | 1.2.3      | Csárdi and FitzJohn (2023)                                               |
   | rmarkdown        | 2.31       | Xie et al. (2018); Xie et al. (2020); Allaire et al. (2026)              |
   | Spectra          | 1.22.2     | Rainer et al. (2022)                                                     |
-  | SpectraToQueries | 0.0.0.9001 | Rutz and Szwarc (2025); <span class="nocase">Szwarc et al.</span> (2025) |
+  | SpectraToQueries | 0.0.0.9002 | Rutz and Szwarc (2025); <span class="nocase">Szwarc et al.</span> (2025) |
+  | spelling         | 2.3.2      | Ooms and Hester (2025)                                                   |
   | stringi          | 1.8.7      | Gagolewski (2022)                                                        |
   | testthat         | 3.3.2      | Wickham (2011)                                                           |
   | tidytable        | 0.11.2     | Fairbanks (2024)                                                         |
   | tidyverse        | 2.0.0      | Wickham et al. (2019)                                                    |
+  | usethis          | 3.2.1      | Wickham et al. (2025)                                                    |
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 
@@ -136,15 +139,6 @@ a proof of concept with monoterpene indole alkaloids:
 Allaire, JJ, Yihui Xie, Christophe Dervieux, et al. 2026.
 *<span class="nocase">rmarkdown</span>: Dynamic Documents for r*.
 <https://github.com/rstudio/rmarkdown>.
-
-</div>
-
-<div id="ref-datatable" class="csl-entry">
-
-Barrett, Tyson, Matt Dowle, Arun Srinivasan, et al. 2026.
-*<span class="nocase">data.table</span>: Extension of
-“<span class="nocase">data.frame</span>”*.
-<https://doi.org/10.32614/CRAN.package.data.table>.
 
 </div>
 
@@ -200,6 +194,21 @@ Bioconductor Packages*.
 Morgan, Martin, and Marcel Ramos. 2025. *BiocManager: Access the
 Bioconductor Project Package Repository*.
 <https://doi.org/10.32614/CRAN.package.BiocManager>.
+
+</div>
+
+<div id="ref-here" class="csl-entry">
+
+Müller, Kirill. 2025. *<span class="nocase">here</span>: A Simpler Way
+to Find Your Files*. <https://doi.org/10.32614/CRAN.package.here>.
+
+</div>
+
+<div id="ref-spelling" class="csl-entry">
+
+Ooms, Jeroen, and Jim Hester. 2025.
+*<span class="nocase">spelling</span>: Tools for Spell Checking in r*.
+<https://doi.org/10.32614/CRAN.package.spelling>.
 
 </div>
 
@@ -270,11 +279,11 @@ Software* 4 (43): 1686. <https://doi.org/10.21105/joss.01686>.
 
 </div>
 
-<div id="ref-pkgload" class="csl-entry">
+<div id="ref-usethis" class="csl-entry">
 
-Wickham, Hadley, Winston Chang, Jim Hester, and Lionel Henry. 2026.
-*<span class="nocase">pkgload</span>: Simulate Package Installation and
-Attach*. <https://doi.org/10.32614/CRAN.package.pkgload>.
+Wickham, Hadley, Jennifer Bryan, Malcolm Barrett, and Andy Teucher.
+2025. *<span class="nocase">usethis</span>: Automate Package and Project
+Setup*. <https://doi.org/10.32614/CRAN.package.usethis>.
 
 </div>
 

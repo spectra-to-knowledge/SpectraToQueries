@@ -12,6 +12,8 @@ utils::globalVariables(
     "ion",
     "ions",
     "mcc",
+    "mia_spectra_df",
+    "mia_spectra_grouped_df",
     "name",
     "old_idx",
     "precision",

@@ -1,8 +1,10 @@
 #' @title Spectra to queries
 #'
-#' @description This function converts spectra to queries.
+#' @description This function converts spectra to diagnostic ion queries.
 #'
-#' @param spectra Spectra path
+#' @param spectra Spectra object or path to MGF file. If `NULL`, loads the example
+#'   `spectra` dataset. If the string `"grouped"`, loads the grouped example
+#'   spectra. Otherwise, a path to an MGF file or a Spectra object.
 #' @param export Export path
 #' @param dalton Tolerance in Dalton. Default to 0.01
 #' @param decimals Number of decimals for rounding. Default to 4L
@@ -20,7 +22,15 @@
 #'
 #' @export
 #'
-#' @examples NULL
+#' @examples
+#' \dontrun{
+#'   # Run with default spectra
+#'   spectra_to_queries()
+#'
+#'   # Or explicitly load and pass spectra_grouped
+#'   data(spectra_grouped)
+#'   spectra_to_queries(spectra = spectra_grouped)
+#' }
 spectra_to_queries <- function(
   spectra = NULL,
   export = "data/interim/queries.tsv",
@@ -38,23 +48,22 @@ spectra_to_queries <- function(
 ) {
   if (is.null(spectra)) {
     message("No spectra given, loading example spectra.")
-    mia_spectra <- readRDS(system.file(
-      "extdata",
-      "spectra.rds",
-      package = "SpectraToQueries"
-    ))
-  } else if (
-    spectra ==
-      system.file(
-        "extdata",
-        "spectra_grouped.rds",
-        package = "SpectraToQueries"
-      )
-  ) {
-    message("Loading grouped spectra.")
-    mia_spectra <- readRDS(spectra)
-  } else {
-    message("Loading spectra.")
+    utils::data(
+      mia_spectra_df,
+      package = "SpectraToQueries",
+      envir = environment()
+    )
+    mia_spectra <- df_to_spectra(mia_spectra_df)
+  } else if (is.character(spectra) && spectra == "grouped") {
+    message("Loading grouped example spectra.")
+    utils::data(
+      mia_spectra_grouped_df,
+      package = "SpectraToQueries",
+      envir = environment()
+    )
+    mia_spectra <- df_to_spectra(mia_spectra_grouped_df)
+  } else if (is.character(spectra)) {
+    message("Loading spectra from file.")
     mia_spectra <- spectra |>
       MsBackendMgf::readMgf() |>
       Spectra::Spectra(BPPARAM = BiocParallel::SerialParam()) |>
@@ -62,6 +71,9 @@ spectra_to_queries <- function(
         backend = Spectra::MsBackendMemory(),
         BPPARAM = BiocParallel::SerialParam()
       )
+  } else {
+    # Assume it's already a Spectra object
+    mia_spectra <- spectra
   }
   mia_spectra@backend@spectraData$precursorMz <-
     mia_spectra@backend@spectraData$PRECURSOR_MZ |>
