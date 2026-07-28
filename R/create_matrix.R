@@ -18,29 +18,28 @@ create_matrix <- function(spectra, zero_val = 0, name) {
   n_spectra <- length(intensity_list)
   n_peaks <- length(intensity_list[[1L]])
 
-  # First pass: identify non-zero columns to avoid storing unnecessary data
-  col_sums <- numeric(n_peaks)
+  # Use colSums approach: create matrix directly and filter
+  # Initialize matrix with all values
+  spectra_mat <- matrix(0, nrow = n_spectra, ncol = n_peaks)
+
+  # Fill matrix row by row (more cache-friendly than column-wise)
   for (i in seq_len(n_spectra)) {
-    col_sums <- col_sums + intensity_list[[i]]
+    spectra_mat[i, ] <- intensity_list[[i]]
   }
 
+  # Vectorized: identify non-zero columns using colSums
+  col_sums <- colSums(spectra_mat)
   keep_cols <- col_sums > zero_val
-  n_keep <- sum(keep_cols)
 
-  if (n_keep == 0L) {
+  if (!any(keep_cols)) {
     # Handle edge case where all columns are zeros
     spectra_mat <- matrix(0, nrow = n_spectra, ncol = 0)
     rownames(spectra_mat) <- name
     return(spectra_mat)
   }
 
-  # Create smaller matrix with only non-zero columns
-  spectra_mat <- matrix(0, nrow = n_spectra, ncol = n_keep)
-
-  # Fill matrix with only kept columns
-  for (i in seq_len(n_spectra)) {
-    spectra_mat[i, ] <- intensity_list[[i]][keep_cols]
-  }
+  # Subset matrix using logical indexing (vectorized)
+  spectra_mat <- spectra_mat[, keep_cols, drop = FALSE]
 
   # Get mz values only once and filter
   mz_vals <- Spectra::mz(

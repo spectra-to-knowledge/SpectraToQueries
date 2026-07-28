@@ -30,14 +30,14 @@ harmonize_mzs <- function(spectra, dalton, ppm) {
     mzs <- spectra_new@backend@peaksData[[i]][, 1]
 
     # Vectorized matching for all m/z values at once
-    if (length(mzs) > 0) {
+    if (length(mzs) > 0L) {
       # For each mz, find the closest averaged value
       for (j in seq_along(mzs)) {
         # Calculate distances to all averaged values
         diffs <- abs(mzs[j] - averaged_intensities)
         min_idx <- which.min(diffs)
 
-        # Only update if within tolerance
+        # Only update if within tolerance (dalton only, matching original semantics)
         if (diffs[min_idx] <= dalton) {
           mzs[j] <- averaged_intensities[min_idx]
         }

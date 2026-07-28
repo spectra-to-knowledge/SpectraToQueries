@@ -31,6 +31,7 @@ Here is what you *minimally* need:
 As the package is not (yet) available on CRAN, you will need to install with:
 
 ```r
+#| label: "install"
 install.packages(
   "SpectraToQueries",
   repos = c(
@@ -47,6 +48,7 @@ To reproduce the example that uses the Monoterpene Indole Alkaloids Database
 (.mgf) file by default, which includes the annotation of spectral skeletons:
 
 ```r
+#| label: "run"
 SpectraToQueries::spectra_to_queries()
 ```
 
@@ -55,6 +57,7 @@ expert-based annotation of spectral "super skeletons" (combination of skeletons
 exhibiting a high structural similarity):
 
 ```r
+#| label: "run_grouped"
 SpectraToQueries::spectra_to_queries(
   spectra = system.file(
     "extdata",
@@ -68,6 +71,7 @@ SpectraToQueries::spectra_to_queries(
 To generate diagnostic ions queries from your spectra:
 
 ```r
+#| label: "run_own"
 SpectraToQueries::spectra_to_queries(
   spectra = "yourAwesomeSpectra.mgf",
   export = "path/yourEvenBetterResults.tsv"
@@ -77,6 +81,7 @@ SpectraToQueries::spectra_to_queries(
 Showing all parameters:
 
 ```r
+#| label: "run_arguments"
 SpectraToQueries::spectra_to_queries(
   spectra = NULL,
   export = "data/interim/queries.tsv",
@@ -88,7 +93,6 @@ SpectraToQueries::spectra_to_queries(
   ions_max = 10L,
   n_skel_min = 5L,
   n_spec_min = 3L,
-  ppm = 30.0,
   fscore_min = 0.0,
   precision_min = 0.0,
   recall_min = 0.0,
@@ -104,31 +108,51 @@ a proof of concept with monoterpene indole alkaloids:
 
 ## Additional software credits
 
-  | Package      | Version | Citation                                                                                      |
-  | :----------- | :------ | :-------------------------------------------------------------------------------------------- |
-  | base         | 4.5.2   | R Core Team (2025)                                                                            |
-  | BiocManager  | 1.30.26 | Morgan and Ramos (2025)                                                                       |
-  | BiocParallel | 1.44.0  | Wang et al. (2025)                                                                            |
-  | BiocVersion  | 3.22.0  | Morgan (2025)                                                                                 |
-  | knitr        | 1.50    | Xie (2014); Xie (2015); Xie (2025)                                                            |
-  | MsBackendMgf | 1.18.0  | Gatto, Rainer, and Gibb (2025)                                                                |
-  | pkgload      | 1.4.1   | Wickham et al. (2025)                                                                         |
-  | progress     | 1.2.3   | Csárdi and FitzJohn (2023)                                                                    |
-  | rmarkdown    | 2.30    | Xie, Allaire, and Grolemund (2018); Xie, Dervieux, and Riederer (2020); Allaire et al. (2025) |
-  | Spectra      | 1.20.0  | Rainer et al. (2022)                                                                          |
-  | testthat     | 3.2.3   | Wickham (2011)                                                                                |
-  | tidytable    | 0.11.2  | Fairbanks (2024)                                                                              |
-  | tidyverse    | 2.0.0   | Wickham et al. (2019)                                                                         |
+  | Package          | Version    | Citation                                                                 |
+  | :--------------- | :--------- | :----------------------------------------------------------------------- |
+  | base             | 4.6.1      | R Core Team (2026)                                                       |
+  | BiocManager      | 1.30.27    | Morgan and Ramos (2025)                                                  |
+  | BiocParallel     | 1.46.0     | Wang et al. (2026)                                                       |
+  | BiocVersion      | 3.23.1     | Morgan (2025)                                                            |
+  | cheapr           | 1.5.2      | Christofides (2026)                                                      |
+  | data.table       | 1.18.4     | Barrett et al. (2026)                                                    |
+  | fastmatch        | 1.1.8      | Urbanek (2026)                                                           |
+  | knitr            | 1.51       | Xie (2014); Xie (2015); Xie (2025)                                       |
+  | MsBackendMgf     | 1.20.0     | Gatto et al. (2026)                                                      |
+  | pkgload          | 1.5.3      | Wickham et al. (2026)                                                    |
+  | progress         | 1.2.3      | Csárdi and FitzJohn (2023)                                               |
+  | rmarkdown        | 2.31       | Xie et al. (2018); Xie et al. (2020); Allaire et al. (2026)              |
+  | Spectra          | 1.22.2     | Rainer et al. (2022)                                                     |
+  | SpectraToQueries | 0.0.0.9001 | Rutz and Szwarc (2025); <span class="nocase">Szwarc et al.</span> (2025) |
+  | stringi          | 1.8.7      | Gagolewski (2022)                                                        |
+  | testthat         | 3.3.2      | Wickham (2011)                                                           |
+  | tidytable        | 0.11.2     | Fairbanks (2024)                                                         |
+  | tidyverse        | 2.0.0      | Wickham et al. (2019)                                                    |
 
-<div id="refs" class="references csl-bib-body hanging-indent"
-entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 
-<div id="ref-rmarkdown2025" class="csl-entry">
+<div id="ref-rmarkdown2026" class="csl-entry">
 
-Allaire, JJ, Yihui Xie, Christophe Dervieux, Jonathan McPherson, Javier
-Luraschi, Kevin Ushey, Aron Atkins, et al. 2025.
+Allaire, JJ, Yihui Xie, Christophe Dervieux, et al. 2026.
 *<span class="nocase">rmarkdown</span>: Dynamic Documents for r*.
 <https://github.com/rstudio/rmarkdown>.
+
+</div>
+
+<div id="ref-datatable" class="csl-entry">
+
+Barrett, Tyson, Matt Dowle, Arun Srinivasan, et al. 2026.
+*<span class="nocase">data.table</span>: Extension of
+“<span class="nocase">data.frame</span>”*.
+<https://doi.org/10.32614/CRAN.package.data.table>.
+
+</div>
+
+<div id="ref-cheapr" class="csl-entry">
+
+Christofides, Nick. 2026. *<span class="nocase">cheapr</span>: Simple
+Functions to Save Time and Memory*.
+<https://doi.org/10.32614/CRAN.package.cheapr>.
 
 </div>
 
@@ -148,9 +172,17 @@ Interface to “<span class="nocase">data.table</span>”*.
 
 </div>
 
+<div id="ref-stringi" class="csl-entry">
+
+Gagolewski, Marek. 2022. “<span class="nocase">stringi</span>: Fast and
+Portable Character String Processing in R.” *Journal of Statistical
+Software* 103 (2): 1–59. <https://doi.org/10.18637/jss.v103.i02>.
+
+</div>
+
 <div id="ref-MsBackendMgf" class="csl-entry">
 
-Gatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2025.
+Gatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2026.
 *MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format
 (Mgf) Files*. <https://doi.org/10.18129/B9.bioc.MsBackendMgf>.
 
@@ -159,7 +191,7 @@ Gatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2025.
 <div id="ref-BiocVersion" class="csl-entry">
 
 Morgan, Martin. 2025. *BiocVersion: Set the Appropriate Version of
-Bioconductor Packages*. <https://doi.org/10.18129/B9.bioc.BiocVersion>.
+Bioconductor Packages*.
 
 </div>
 
@@ -173,25 +205,50 @@ Bioconductor Project Package Repository*.
 
 <div id="ref-base" class="csl-entry">
 
-R Core Team. 2025. *R: A Language and Environment for Statistical
-Computing*. Vienna, Austria: R Foundation for Statistical Computing.
-<https://www.R-project.org/>.
+R Core Team. 2026. *R: A Language and Environment for Statistical
+Computing*. R Foundation for Statistical Computing.
+<https://doi.org/10.32614/R.manuals>.
 
 </div>
 
 <div id="ref-Spectra" class="csl-entry">
 
-Rainer, Johannes, Andrea Vicini, Liesa Salzer, Jan Stanstrup, Josep M.
-Badia, Steffen Neumann, Michael A. Stravs, et al. 2022. “A Modular and
-Expandable Ecosystem for Metabolomics Data Annotation in r.”
+Rainer, Johannes, Andrea Vicini, Liesa Salzer, et al. 2022. “A Modular
+and Expandable Ecosystem for Metabolomics Data Annotation in r.”
 *Metabolites* 12: 173. <https://doi.org/10.3390/metabo12020173>.
+
+</div>
+
+<div id="ref-SpectraToQueries2025a" class="csl-entry">
+
+Rutz, Adriano, and Sarah Szwarc. 2025. *SpectraToQueries:
+SpectraToQueries Provides the Infrastructure to Translate Spectra to
+Queries*.
+
+</div>
+
+<div id="ref-SpectraToQueries2025b" class="csl-entry">
+
+<span class="nocase">Szwarc, Sarah, Adriano Rutz, Kyungha Lee, et
+al.</span> 2025. “Translating Community-Wide Spectral Library into
+Actionable Chemical Knowledge: A Proof of Concept with Monoterpene
+Indole Alkaloids.” *J. Cheminform.* 17.
+<https://doi.org/10.1186/s13321-025-01009-0>.
+
+</div>
+
+<div id="ref-fastmatch" class="csl-entry">
+
+Urbanek, Simon. 2026. *<span class="nocase">fastmatch</span>: Fast
+“<span class="nocase">match()</span>” Function*.
+<https://doi.org/10.32614/CRAN.package.fastmatch>.
 
 </div>
 
 <div id="ref-BiocParallel" class="csl-entry">
 
 Wang, Jiefei, Martin Morgan, Valerie Obenchain, Michel Lang, Ryan
-Thompson, and Nitesh Turaga. 2025. *BiocParallel: Bioconductor
+Thompson, and Nitesh Turaga. 2026. *BiocParallel: Bioconductor
 Facilities for Parallel Evaluation*.
 <https://doi.org/10.18129/B9.bioc.BiocParallel>.
 
@@ -201,22 +258,21 @@ Facilities for Parallel Evaluation*.
 
 Wickham, Hadley. 2011. “<span class="nocase">testthat</span>: Get
 Started with Testing.” *The R Journal* 3: 5–10.
-<https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf>.
+<https://journal.r-project.org/articles/RJ-2011-002/>.
 
 </div>
 
 <div id="ref-tidyverse" class="csl-entry">
 
-Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy
-D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019.
-“Welcome to the <span class="nocase">tidyverse</span>.” *Journal of Open
-Source Software* 4 (43): 1686. <https://doi.org/10.21105/joss.01686>.
+Wickham, Hadley, Mara Averick, Jennifer Bryan, et al. 2019. “Welcome to
+the <span class="nocase">tidyverse</span>.” *Journal of Open Source
+Software* 4 (43): 1686. <https://doi.org/10.21105/joss.01686>.
 
 </div>
 
 <div id="ref-pkgload" class="csl-entry">
 
-Wickham, Hadley, Winston Chang, Jim Hester, and Lionel Henry. 2025.
+Wickham, Hadley, Winston Chang, Jim Hester, and Lionel Henry. 2026.
 *<span class="nocase">pkgload</span>: Simulate Package Installation and
 Attach*. <https://doi.org/10.32614/CRAN.package.pkgload>.
 
@@ -233,31 +289,29 @@ and Roger D. Peng. Chapman; Hall/CRC.
 
 <div id="ref-knitr2015" class="csl-entry">
 
-———. 2015. *Dynamic Documents with R and Knitr*. 2nd ed. Boca Raton,
-Florida: Chapman; Hall/CRC. <https://yihui.org/knitr/>.
+Xie, Yihui. 2015. *Dynamic Documents with R and Knitr*. 2nd ed. Chapman;
+Hall/CRC. <https://yihui.org/knitr/>.
 
 </div>
 
 <div id="ref-knitr2025" class="csl-entry">
 
-———. 2025. *<span class="nocase">knitr</span>: A General-Purpose Package
-for Dynamic Report Generation in R*. <https://yihui.org/knitr/>.
+Xie, Yihui. 2025. *<span class="nocase">knitr</span>: A General-Purpose
+Package for Dynamic Report Generation in R*. <https://yihui.org/knitr/>.
 
 </div>
 
 <div id="ref-rmarkdown2018" class="csl-entry">
 
 Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. *R Markdown: The
-Definitive Guide*. Boca Raton, Florida: Chapman; Hall/CRC.
-<https://bookdown.org/yihui/rmarkdown>.
+Definitive Guide*. Chapman; Hall/CRC. <https://yihui.org/rmarkdown/>.
 
 </div>
 
 <div id="ref-rmarkdown2020" class="csl-entry">
 
 Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. *R Markdown
-Cookbook*. Boca Raton, Florida: Chapman; Hall/CRC.
-<https://bookdown.org/yihui/rmarkdown-cookbook>.
+Cookbook*. Chapman; Hall/CRC. <https://yihui.org/rmarkdown-cookbook>.
 
 </div>
 

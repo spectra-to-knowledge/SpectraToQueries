@@ -352,8 +352,13 @@ spectra_to_queries <- function(
   # Combination merging
   message("Merging diagnostic ions with combinations.")
 
-  # Pre-process diagnostic ions
-  has_diagnostic <- names(ions_list) %in% names(ions_list_diagnostic)
+  # Pre-process diagnostic ions using fastmatch for efficiency
+  has_diagnostic <- fastmatch::fmatch(
+    names(ions_list),
+    names(ions_list_diagnostic),
+    nomatch = 0L
+  ) >
+    0L
 
   if (any(has_diagnostic)) {
     # Only process items that have diagnostic ions

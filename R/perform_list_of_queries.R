@@ -1,3 +1,29 @@
+#' @title Check if spectrum contains all target m/z values (internal variant with pre-computed tolerances)
+#'
+#' @param spec_mz Numeric vector of spectrum m/z values
+#' @param target_mz Numeric vector of target m/z values to find
+#' @param tol Numeric vector of pre-computed tolerances (length must match target_mz)
+#'
+#' @return Logical indicating if all targets are found
+#'
+#' @examples NULL
+contains_all_mz_tol <- function(spec_mz, target_mz, tol) {
+  spec_mz <- spec_mz[is.finite(spec_mz)]
+  target_mz <- target_mz[is.finite(target_mz)]
+
+  if (length(spec_mz) == 0L || length(target_mz) == 0L) {
+    return(FALSE)
+  }
+
+  all(vapply(
+    X = seq_along(target_mz),
+    FUN = function(i) {
+      any(abs(spec_mz - target_mz[i]) <= tol[i])
+    },
+    FUN.VALUE = logical(1)
+  ))
+}
+
 #' @title Check if spectrum contains all target m/z values
 #'
 #' @param spec_mz Numeric vector of spectrum m/z values
@@ -9,22 +35,14 @@
 #'
 #' @examples NULL
 contains_all_mz <- function(spec_mz, target_mz, dalton, ppm) {
-  spec_mz <- spec_mz[is.finite(spec_mz)]
-  target_mz <- target_mz[is.finite(target_mz)]
+  target_mz <- target_mz[cheapr::which_not_na(target_mz)]
 
-  if (length(spec_mz) == 0L || length(target_mz) == 0L) {
+  if (length(target_mz) == 0L) {
     return(FALSE)
   }
 
   tol <- dalton + target_mz * ppm / 1e6
-
-  all(vapply(
-    X = seq_along(target_mz),
-    FUN = function(i) {
-      any(abs(spec_mz - target_mz[i]) <= tol[i])
-    },
-    FUN.VALUE = logical(1)
-  ))
+  contains_all_mz_tol(spec_mz, target_mz, tol)
 }
 
 #' @title Perform query
@@ -48,16 +66,18 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
 
   # --- Filter by fragments ---
   if (length(frags) > 0L) {
-    frags <- frags[is.finite(frags)]
+    frags <- frags[cheapr::which_not_na(frags)]
     if (length(frags) > 0L) {
+      # Pre-compute tolerances for fragments to avoid recalculating for each spectrum
+      frags_tol <- dalton + frags * ppm / 1e6
+
       keep <- keep &
         vapply(
           X = all_mz,
-          FUN = contains_all_mz,
+          FUN = contains_all_mz_tol,
           FUN.VALUE = logical(1),
           target_mz = frags,
-          dalton = dalton,
-          ppm = ppm
+          tol = frags_tol
         )
     }
   }
@@ -65,21 +85,27 @@ perform_query <- function(spectra, frags, nls, dalton, ppm) {
   # --- Filter by neutral losses (per spectrum) ---
   if (length(nls) > 0L) {
     precursor_mz <- Spectra::precursorMz(spectra)
-    valid <- is.finite(precursor_mz)
+    valid <- cheapr::which_not_na(precursor_mz)
 
     keep <- keep &
       vapply(
         X = seq_along(spectra),
         FUN = function(i) {
-          if (!valid[i]) {
+          if (!(i %in% valid)) {
             return(FALSE)
           }
           spec <- all_mz[[i]]
-          if (length(spec) == 0L || all(is.na(spec))) {
+          if (length(spec) == 0L || cheapr::all_na(spec)) {
             return(FALSE)
           }
           target_mz <- precursor_mz[i] - nls
-          target_mz <- target_mz[is.finite(target_mz) & target_mz > 0]
+          # Filter for finite and positive values
+          valid_idx <- cheapr::which_not_na(target_mz)
+          if (length(valid_idx) == 0L) {
+            return(FALSE)
+          }
+          target_mz <- target_mz[valid_idx]
+          target_mz <- target_mz[target_mz > 0]
           if (length(target_mz) == 0L) {
             return(FALSE)
           }
@@ -114,19 +140,27 @@ perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
     return(tidytable::tidytable(target = target, value = character(0)))
   }
 
-  # Extract fragments and neutral losses
-  is_frag <- grepl("_frag$", ions)
-  is_nl <- grepl("_nl$", ions)
+  # Extract fragments and neutral losses using stringi (fixed-pattern detection)
+  is_frag <- stringi::stri_detect_fixed(ions, "_frag")
+  is_nl <- stringi::stri_detect_fixed(ions, "_nl")
 
   frags <- if (any(is_frag)) {
-    vals <- suppressWarnings(as.numeric(sub("_frag$", "", ions[is_frag])))
+    vals <- suppressWarnings(as.numeric(stringi::stri_replace_all_fixed(
+      ions[is_frag],
+      "_frag",
+      ""
+    )))
     vals[is.finite(vals)]
   } else {
     numeric(0)
   }
 
   nls <- if (any(is_nl)) {
-    vals <- suppressWarnings(as.numeric(sub("_nl$", "", ions[is_nl])))
+    vals <- suppressWarnings(as.numeric(stringi::stri_replace_all_fixed(
+      ions[is_nl],
+      "_nl",
+      ""
+    )))
     vals[is.finite(vals)]
   } else {
     numeric(0)
@@ -162,10 +196,13 @@ perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
   value <- tryCatch(
     {
       spectra_data <- Spectra::spectraData(result_spectra)
-      if (nrow(spectra_data) > 0L && "SKELETON" %in% names(spectra_data)) {
+      if (
+        nrow(spectra_data) > 0L &&
+          fastmatch::fmatch("SKELETON", names(spectra_data), nomatch = 0L) > 0L
+      ) {
         skeleton <- spectra_data$SKELETON
-        if (length(skeleton) > 0L && !all(is.na(skeleton))) {
-          gsub("+", ".", as.character(skeleton), fixed = TRUE)
+        if (length(skeleton) > 0L && !cheapr::all_na(skeleton)) {
+          stringi::stri_replace_all_fixed(as.character(skeleton), "+", ".")
         } else {
           character(0)
         }

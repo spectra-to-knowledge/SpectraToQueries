@@ -1,12 +1,10 @@
 start <- Sys.time()
 
-pkgload::load_all()
-
 message("This program extract diagnostic ions from groups of spectra.")
 message("Authors: \n", "AR")
 message("Contributors: \n", "...")
 
-spectra_to_queries()
+SpectraToQueries::spectra_to_queries()
 
 end <- Sys.time()
 

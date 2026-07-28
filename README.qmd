@@ -37,6 +37,7 @@ Here is what you *minimally* need:
 As the package is not (yet) available on CRAN, you will need to install with:
 
 ```r
+#| label: "install"
 install.packages(
   "SpectraToQueries",
   repos = c(
@@ -53,6 +54,7 @@ To reproduce the example that uses the Monoterpene Indole Alkaloids Database
 (.mgf) file by default, which includes the annotation of spectral skeletons:
 
 ```r
+#| label: "run"
 SpectraToQueries::spectra_to_queries()
 ```
 
@@ -61,6 +63,7 @@ expert-based annotation of spectral "super skeletons" (combination of skeletons
 exhibiting a high structural similarity):
 
 ```r
+#| label: "run_grouped"
 SpectraToQueries::spectra_to_queries(
   spectra = system.file(
     "extdata",
@@ -74,6 +77,7 @@ SpectraToQueries::spectra_to_queries(
 To generate diagnostic ions queries from your spectra:
 
 ```r
+#| label: "run_own"
 SpectraToQueries::spectra_to_queries(
   spectra = "yourAwesomeSpectra.mgf",
   export = "path/yourEvenBetterResults.tsv"
@@ -83,6 +87,7 @@ SpectraToQueries::spectra_to_queries(
 Showing all parameters:
 
 ```r
+#| label: "run_arguments"
 SpectraToQueries::spectra_to_queries(
   spectra = NULL,
   export = "data/interim/queries.tsv",
@@ -111,6 +116,7 @@ a proof of concept with monoterpene indole alkaloids:
 ## Additional software credits
 
 ```{r}
+#| label: "grateful"
 #| echo: false
 #| message: false
 
