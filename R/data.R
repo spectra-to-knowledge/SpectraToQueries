@@ -37,7 +37,7 @@
 #'   # Load the raw spectra
 #'   utils::data(mia_spectra_df)
 #'   nrow(mia_spectra_df)  # 321 spectra
-#'   
+#'
 #'   # Convert to Spectra object (for advanced users)
 #'   # spectra_obj <- SpectraToQueries:::df_to_spectra(mia_spectra_df)
 #' }
@@ -84,7 +84,7 @@
 #'   utils::data(mia_spectra_grouped_df)
 #'   nrow(mia_spectra_grouped_df)  # 321 spectra
 #'   table(mia_spectra_grouped_df$SKELETON)  # Skeleton distribution
-#'   
+#'
 #'   # Convert to Spectra object (for advanced users)
 #'   # spectra_obj <- SpectraToQueries:::df_to_spectra(mia_spectra_grouped_df)
 #' }
