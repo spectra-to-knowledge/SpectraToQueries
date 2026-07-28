@@ -4,7 +4,12 @@
 \alias{generate_combinations_progress}
 \title{Generate combinations with progress}
 \usage{
-generate_combinations_progress(indices, ions_list, max_ions)
+generate_combinations_progress(
+  indices,
+  ions_list,
+  max_ions,
+  show_progress = TRUE
+)
 }
 \arguments{
 \item{indices}{Vector of indices to process}
@@ -12,6 +17,8 @@ generate_combinations_progress(indices, ions_list, max_ions)
 \item{ions_list}{List of ions for each index}
 
 \item{max_ions}{Maximum number of ions in combinations}
+
+\item{show_progress}{Logical: show progress bar (default TRUE)}
 }
 \value{
 List of all combinations for each index

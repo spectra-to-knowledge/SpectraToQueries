@@ -50,27 +50,21 @@ spectra_to_queries <- function(
     message("No spectra given, loading example spectra.")
     utils::data(
       mia_spectra_df,
-      package = "SpectraToQueries",
-      envir = environment()
+      package = "SpectraToQueries"
     )
     mia_spectra <- df_to_spectra(mia_spectra_df)
   } else if (is.character(spectra) && spectra == "grouped") {
     message("Loading grouped example spectra.")
     utils::data(
       mia_spectra_grouped_df,
-      package = "SpectraToQueries",
-      envir = environment()
+      package = "SpectraToQueries"
     )
     mia_spectra <- df_to_spectra(mia_spectra_grouped_df)
   } else if (is.character(spectra)) {
     message("Loading spectra from file.")
     mia_spectra <- spectra |>
       MsBackendMgf::readMgf() |>
-      Spectra::Spectra(BPPARAM = BiocParallel::SerialParam()) |>
-      Spectra::setBackend(
-        backend = Spectra::MsBackendMemory(),
-        BPPARAM = BiocParallel::SerialParam()
-      )
+      Spectra::Spectra()
   } else {
     # Assume it's already a Spectra object
     mia_spectra <- spectra
@@ -92,8 +86,7 @@ spectra_to_queries <- function(
     Spectra::filterMsLevel(2L) |>
     Spectra::reduceSpectra(tolerance = dalton, ppm = ppm) |>
     Spectra::combineSpectra(
-      f = mia_spectra$TITLE,
-      BPPARAM = BiocParallel::SerialParam()
+      f = mia_spectra$TITLE
     ) |>
     Spectra::deisotopeSpectra(tolerance = dalton, ppm = ppm) |>
     Spectra::filterPrecursorPeaks(
@@ -103,8 +96,7 @@ spectra_to_queries <- function(
     ) |>
     Spectra::filterEmptySpectra() |>
     Spectra::addProcessing(
-      normalize_peaks(),
-      BPPARAM = BiocParallel::SerialParam()
+      normalize_peaks()
     ) |>
     Spectra::filterIntensity(intensity = c(intensity_min, Inf)) |>
     Spectra::applyProcessing()
@@ -138,8 +130,7 @@ spectra_to_queries <- function(
     ) |>
     Spectra::reduceSpectra(tolerance = dalton, ppm = ppm) |>
     Spectra::combineSpectra(
-      f = mia_spectra$TITLE,
-      BPPARAM = BiocParallel::SerialParam()
+      f = mia_spectra$TITLE
     ) |>
     Spectra::deisotopeSpectra(tolerance = dalton, ppm = ppm) |>
     Spectra::filterPrecursorPeaks(
@@ -149,8 +140,7 @@ spectra_to_queries <- function(
     ) |>
     Spectra::filterEmptySpectra() |>
     Spectra::addProcessing(
-      normalize_peaks(),
-      BPPARAM = BiocParallel::SerialParam()
+      normalize_peaks()
     ) |>
     Spectra::filterIntensity(intensity = c(intensity_min, Inf)) |>
     Spectra::applyProcessing()
@@ -239,7 +229,11 @@ spectra_to_queries <- function(
   message("Count the number of members per skeleton and pivot the matrix.")
   ions_table <- merged_mat |>
     as.data.frame() |>
-    tibble::rownames_to_column(var = "group") |>
+    (\(df) {
+      df$group <- rownames(df)
+      df <- df[, c("group", setdiff(names(df), "group"))]
+      df
+    })() |>
     tidytable::mutate(
       group = gsub(
         pattern = "\\.[0-9]{1,3}",
@@ -322,7 +316,12 @@ spectra_to_queries <- function(
       values_from = value,
       values_fn = mean
     ) |>
-    tibble::column_to_rownames("group")
+    (\(df) {
+      row_names <- df$group
+      df$group <- NULL
+      rownames(df) <- row_names
+      df
+    })()
 
   # Pivot back again.
   ions_table_final <- ions_table_filtered_1 |>
@@ -339,7 +338,12 @@ spectra_to_queries <- function(
       values_from = value,
       values_fn = mean
     ) |>
-    tibble::column_to_rownames("group")
+    (\(df) {
+      row_names <- df$group
+      df$group <- NULL
+      rownames(df) <- row_names
+      df
+    })()
 
   # Extract the matching ions per skeleton
   ions_list_diagnostic <- split(
@@ -358,7 +362,11 @@ spectra_to_queries <- function(
 
   message("Generate all combinations of queries.")
   combinations <- names(ions_list) |>
-    generate_combinations_progress(ions_list = ions_list, max_ions = ions_max)
+    generate_combinations_progress(
+      ions_list = ions_list,
+      max_ions = ions_max,
+      show_progress = TRUE
+    )
   names(combinations) <- names(ions_list)
 
   # Combination merging
@@ -403,50 +411,46 @@ spectra_to_queries <- function(
     perform_list_of_queries_progress(
       spectra = mia_spectra,
       dalton = dalton,
-      ppm = ppm
+      ppm = ppm,
+      show_progress = TRUE
     )
   names(queries_results) <- names(all_combinations)
 
   message("Evaluate the performance of each query using MCC.")
-  results_stats <- queries_results |>
-    seq_along() |>
-    purrr::map(
-      .f = function(result) {
-        # -----------------------------------------------------------------------
-        # Per-query confusion matrix entries:
-        #   TP = query hits that belong to the target skeleton
-        #   FP = query hits that belong to a different skeleton
-        #   FN = members of the target skeleton missed by the query
-        #   TN = all other spectra (not the target skeleton, not hit by query)
-        # -----------------------------------------------------------------------
-        tp <- nrow(
-          queries_results[[result]] |>
-            tidytable::filter(target == value)
-        )
-        fp <- nrow(
-          queries_results[[result]] |>
-            tidytable::filter(target != value)
-        )
-        fn_ <-
-          length(mia_spectra$SKELETON[
-            mia_spectra$SKELETON |>
-              gsub(
-                pattern = "+",
-                replacement = ".",
-                fixed = TRUE
-              ) ==
-              names(queries_results)[result]
-          ]) -
-          tp
-        tn <- total_spectra - tp - fp - fn_
 
-        # MCC — returns 0 for degenerate partitions (zero denominator)
-        denom <- sqrt((tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_))
-        mcc <- if (denom > 0) (tp * tn - fp * fn_) / denom else 0.0
+  # Computed once, not once per query result.
+  normalized_skeleton <- gsub(
+    pattern = "+",
+    replacement = ".",
+    x = mia_spectra$SKELETON,
+    fixed = TRUE
+  )
+  skeleton_counts <- table(normalized_skeleton)
 
-        return(round(mcc, decimals))
-      }
-    )
+  results_stats <- lapply(
+    seq_along(queries_results),
+    function(result) {
+      # -----------------------------------------------------------------------
+      # Per-query confusion matrix entries:
+      #   TP = query hits that belong to the target skeleton
+      #   FP = query hits that belong to a different skeleton
+      #   FN = members of the target skeleton missed by the query
+      #   TN = all other spectra (not the target skeleton, not hit by query)
+      # -----------------------------------------------------------------------
+      target_name <- names(queries_results)[result]
+      vals <- queries_results[[result]]$value
+      tp <- sum(vals == target_name)
+      fp <- length(vals) - tp
+      group_total <- skeleton_counts[[target_name]] %||% 0L
+      fn_ <- group_total - tp
+      tn <- total_spectra - tp - fp - fn_
+
+      denom <- sqrt((tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_))
+      # MCC — returns 0 for degenerate partitions (zero denominator)
+      mcc <- if (denom > 0) (tp * tn - fp * fn_) / denom else 0.0
+      round(mcc, decimals)
+    }
+  )
 
   best_queries <- data.frame(
     skeleton = names(all_combinations),

@@ -4,10 +4,12 @@
 \alias{perform_query}
 \title{Perform query}
 \usage{
-perform_query(spectra, frags, nls, dalton, ppm)
+perform_query(all_mz, precursor_mz, frags, nls, dalton, ppm)
 }
 \arguments{
-\item{spectra}{Spectra object}
+\item{all_mz}{List of numeric vectors of m/z values for each spectrum}
+
+\item{precursor_mz}{Numeric vector of precursor m/z values for each spectrum}
 
 \item{frags}{Fragment masses to search for}
 

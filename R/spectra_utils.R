@@ -39,5 +39,6 @@ spectra_to_df <- function(spectra) {
 #' @keywords internal
 df_to_spectra <- function(df) {
   # Create Spectra object directly with the data.frame
-  Spectra::Spectra(df, backend = Spectra::MsBackendMemory())
+  df |>
+    Spectra::Spectra()
 }

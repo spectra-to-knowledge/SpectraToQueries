@@ -2,9 +2,15 @@
 % Please edit documentation in R/perform_list_of_queries.R
 \name{perform_list_of_queries_progress}
 \alias{perform_list_of_queries_progress}
-\title{Perform list of queries (progress)}
+\title{Perform list of queries}
 \usage{
-perform_list_of_queries_progress(ions_list, spectra, dalton, ppm)
+perform_list_of_queries_progress(
+  ions_list,
+  spectra,
+  dalton,
+  ppm,
+  show_progress = TRUE
+)
 }
 \arguments{
 \item{ions_list}{List of ion combinations for queries}
@@ -14,12 +20,14 @@ perform_list_of_queries_progress(ions_list, spectra, dalton, ppm)
 \item{dalton}{Tolerance in Dalton}
 
 \item{ppm}{Tolerance in parts per million}
+
+\item{show_progress}{Logical: show progress bar (default TRUE)}
 }
 \value{
 List of query results
 }
 \description{
-Perform list of queries (progress)
+Perform list of queries
 }
 \examples{
 NULL

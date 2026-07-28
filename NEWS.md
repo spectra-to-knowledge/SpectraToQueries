@@ -28,9 +28,8 @@
 - All fastverse toolkit already declared:
   - `fastmatch` (set membership) in `combine_ions_minimal.R`
   - `stringi` (fixed-string operations) across multiple functions
-  - `cheapr` (NA handling) in `perform_list_of_queries.R`
   - `tidytable` (grouping/summarization) now used in `fix_binned_mzs.R`
-- Removed direct `data.table` dependency (tidytable already in imports)
+- Removed direct `BiocParallel`, `data.table`, `progress`, `purrr`, and `tibble` dependency (tidytable already in imports)
 
 # SpectraToQueries 0.0.9001
 

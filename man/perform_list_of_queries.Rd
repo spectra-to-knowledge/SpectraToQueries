@@ -4,14 +4,14 @@
 \alias{perform_list_of_queries}
 \title{Perform list of queries}
 \usage{
-perform_list_of_queries(index, ions_list, spectra, dalton, ppm)
+perform_list_of_queries(index, ions_list, query_data, dalton, ppm)
 }
 \arguments{
 \item{index}{Index of the ion list to process}
 
 \item{ions_list}{List of ions for queries}
 
-\item{spectra}{Spectra object to search}
+\item{query_data}{Data frame with columns \code{mz}, \code{precursor_mz}, and \code{skeleton}}
 
 \item{dalton}{Tolerance in Dalton}
 

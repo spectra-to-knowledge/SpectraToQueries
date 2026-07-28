@@ -1,3 +1,20 @@
+#' @title Prepare spectra data for querying
+#' @param spectra Spectra object
+#' @description Extracts mz, precursor m/z, and skeleton labels once, so
+#'   perform_query() never has to touch the Spectra backend again.
+#' @examples NULL
+prepare_query_data <- function(spectra) {
+  list(
+    mz = Spectra::mz(spectra),
+    precursor_mz = Spectra::precursorMz(spectra),
+    skeleton = stringi::stri_replace_all_fixed(
+      as.character(Spectra::spectraData(spectra)$SKELETON),
+      "+",
+      "."
+    )
+  )
+}
+
 #' @title Check if spectrum contains all target m/z values (internal variant with pre-computed tolerances)
 #'
 #' @param spec_mz Numeric vector of spectrum m/z values
@@ -9,7 +26,6 @@
 #' @examples NULL
 contains_all_mz_tol <- function(spec_mz, target_mz, tol) {
   spec_mz <- spec_mz[is.finite(spec_mz)]
-  target_mz <- target_mz[is.finite(target_mz)]
 
   if (length(spec_mz) == 0L || length(target_mz) == 0L) {
     return(FALSE)
@@ -35,7 +51,7 @@ contains_all_mz_tol <- function(spec_mz, target_mz, tol) {
 #'
 #' @examples NULL
 contains_all_mz <- function(spec_mz, target_mz, dalton, ppm) {
-  target_mz <- target_mz[cheapr::which_not_na(target_mz)]
+  target_mz <- target_mz[!is.na(target_mz)]
 
   if (length(target_mz) == 0L) {
     return(FALSE)
@@ -47,7 +63,8 @@ contains_all_mz <- function(spec_mz, target_mz, dalton, ppm) {
 
 #' @title Perform query
 #'
-#' @param spectra Spectra object
+#' @param all_mz List of numeric vectors of m/z values for each spectrum
+#' @param precursor_mz Numeric vector of precursor m/z values for each spectrum
 #' @param frags Fragment masses to search for
 #' @param nls Neutral losses to search for
 #' @param dalton Tolerance in Dalton
@@ -56,80 +73,62 @@ contains_all_mz <- function(spec_mz, target_mz, dalton, ppm) {
 #' @return Filtered spectra object
 #'
 #' @examples NULL
-perform_query <- function(spectra, frags, nls, dalton, ppm) {
-  if (length(spectra) == 0L) {
-    return(spectra)
+perform_query <- function(all_mz, precursor_mz, frags, nls, dalton, ppm) {
+  n <- length(all_mz)
+  if (n == 0L) {
+    return(logical(0))
   }
 
-  all_mz <- Spectra::mz(spectra)
-  keep <- rep(TRUE, length(spectra))
+  keep <- rep(TRUE, n)
 
-  # --- Filter by fragments ---
   if (length(frags) > 0L) {
-    frags <- frags[cheapr::which_not_na(frags)]
+    frags <- frags[!is.na(frags)]
     if (length(frags) > 0L) {
-      # Pre-compute tolerances for fragments to avoid recalculating for each spectrum
       frags_tol <- dalton + frags * ppm / 1e6
-
-      keep <- keep &
-        vapply(
-          X = all_mz,
-          FUN = contains_all_mz_tol,
-          FUN.VALUE = logical(1),
-          target_mz = frags,
-          tol = frags_tol
-        )
+      keep <- vapply(
+        all_mz,
+        contains_all_mz_tol,
+        FUN.VALUE = logical(1),
+        target_mz = frags,
+        tol = frags_tol
+      )
     }
   }
 
-  # --- Filter by neutral losses (per spectrum) ---
-  if (length(nls) > 0L) {
-    precursor_mz <- Spectra::precursorMz(spectra)
-    valid <- cheapr::which_not_na(precursor_mz)
-
-    keep <- keep &
-      vapply(
-        X = seq_along(spectra),
-        FUN = function(i) {
-          if (!(i %in% valid)) {
-            return(FALSE)
-          }
-          spec <- all_mz[[i]]
-          if (length(spec) == 0L || cheapr::all_na(spec)) {
-            return(FALSE)
-          }
-          target_mz <- precursor_mz[i] - nls
-          # Filter for finite and positive values
-          valid_idx <- cheapr::which_not_na(target_mz)
-          if (length(valid_idx) == 0L) {
-            return(FALSE)
-          }
-          target_mz <- target_mz[valid_idx]
-          target_mz <- target_mz[target_mz > 0]
-          if (length(target_mz) == 0L) {
-            return(FALSE)
-          }
-          contains_all_mz(spec, target_mz, dalton, ppm)
-        },
-        FUN.VALUE = logical(1)
-      )
+  if (length(nls) > 0L && any(keep)) {
+    valid_mask <- !is.na(precursor_mz)
+    # Only test the spectra that are still candidates — skip anything
+    # already ruled out by the fragment filter.
+    idx <- which(keep & valid_mask)
+    for (i in idx) {
+      spec <- all_mz[[i]]
+      if (length(spec) == 0L || all(is.na(spec))) {
+        keep[i] <- FALSE
+        next
+      }
+      target_mz <- precursor_mz[i] - nls
+      target_mz <- target_mz[is.finite(target_mz) & target_mz > 0]
+      keep[i] <- length(target_mz) > 0L &&
+        contains_all_mz(spec, target_mz, dalton, ppm)
+    }
+    keep[!valid_mask] <- FALSE
   }
 
-  spectra[keep]
+  keep
 }
 
 #' @title Perform list of queries
 #'
 #' @param index Index of the ion list to process
 #' @param ions_list List of ions for queries
-#' @param spectra Spectra object to search
+#' @param query_data Data frame with columns `mz`, `precursor_mz`, and `skeleton`
 #' @param dalton Tolerance in Dalton
 #' @param ppm Tolerance in parts per million
 #'
 #' @return Data frame with target and value columns
 #'
 #' @examples NULL
-perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
+perform_list_of_queries <- function(index, ions_list, query_data, dalton, ppm) {
   target <- names(ions_list)[index]
   if (is.null(target) || is.na(target) || target == "") {
     target <- paste0("query_", index)
@@ -140,112 +139,83 @@ perform_list_of_queries <- function(index, ions_list, spectra, dalton, ppm) {
     return(tidytable::tidytable(target = target, value = character(0)))
   }
 
-  # Extract fragments and neutral losses using stringi (fixed-pattern detection)
   is_frag <- stringi::stri_detect_fixed(ions, "_frag")
   is_nl <- stringi::stri_detect_fixed(ions, "_nl")
 
   frags <- if (any(is_frag)) {
-    vals <- suppressWarnings(as.numeric(stringi::stri_replace_all_fixed(
-      ions[is_frag],
-      "_frag",
-      ""
-    )))
+    vals <- suppressWarnings(as.numeric(
+      stringi::stri_replace_all_fixed(ions[is_frag], "_frag", "")
+    ))
     vals[is.finite(vals)]
   } else {
     numeric(0)
   }
 
   nls <- if (any(is_nl)) {
-    vals <- suppressWarnings(as.numeric(stringi::stri_replace_all_fixed(
-      ions[is_nl],
-      "_nl",
-      ""
-    )))
+    vals <- suppressWarnings(as.numeric(
+      stringi::stri_replace_all_fixed(ions[is_nl], "_nl", "")
+    ))
     vals[is.finite(vals)]
   } else {
     numeric(0)
   }
 
-  # Early return if no valid ions
   if (length(frags) == 0L && length(nls) == 0L) {
     return(tidytable::tidytable(target = target, value = character(0)))
   }
 
-  # Perform query with error handling
-  result_spectra <- tryCatch(
-    {
-      perform_query(
-        spectra = spectra,
-        frags = frags,
-        nls = nls,
-        dalton = dalton,
-        ppm = ppm
-      )
-    },
+  keep <- tryCatch(
+    perform_query(
+      all_mz = query_data$mz,
+      precursor_mz = query_data$precursor_mz,
+      frags = frags,
+      nls = nls,
+      dalton = dalton,
+      ppm = ppm
+    ),
     error = function(e) {
       warning("Error in perform_query for ", target, ": ", e$message)
-      return(spectra[FALSE])
+      rep(FALSE, length(query_data$mz))
     }
   )
 
-  if (length(result_spectra) == 0L) {
+  if (!any(keep)) {
     return(tidytable::tidytable(target = target, value = character(0)))
   }
 
-  # Extract skeleton values with error handling
-  value <- tryCatch(
-    {
-      spectra_data <- Spectra::spectraData(result_spectra)
-      if (
-        nrow(spectra_data) > 0L &&
-          fastmatch::fmatch("SKELETON", names(spectra_data), nomatch = 0L) > 0L
-      ) {
-        skeleton <- spectra_data$SKELETON
-        if (length(skeleton) > 0L && !cheapr::all_na(skeleton)) {
-          stringi::stri_replace_all_fixed(as.character(skeleton), "+", ".")
-        } else {
-          character(0)
-        }
-      } else {
-        character(0)
-      }
-    },
-    error = function(e) {
-      warning("Error extracting SKELETON for ", target, ": ", e$message)
-      character(0)
-    }
-  )
+  value <- query_data$skeleton[keep]
+  value <- value[!is.na(value)]
 
   tidytable::tidytable(target = target, value = value)
 }
 
-#' @title Perform list of queries (progress)
+#' @title Perform list of queries
 #'
 #' @param ions_list List of ion combinations for queries
 #' @param spectra Spectra object to search
 #' @param dalton Tolerance in Dalton
 #' @param ppm Tolerance in parts per million
+#' @param show_progress Logical: show progress bar (default TRUE)
 #'
 #' @return List of query results
 #'
 #' @examples NULL
-perform_list_of_queries_progress <- function(ions_list, spectra, dalton, ppm) {
-  invisible(gc(verbose = FALSE, full = TRUE))
+perform_list_of_queries_progress <- function(
+  ions_list,
+  spectra,
+  dalton,
+  ppm,
+  show_progress = TRUE
+) {
   n <- length(ions_list)
   results <- vector("list", n)
 
-  pb <- if (requireNamespace("progress", quietly = TRUE)) {
-    progress::progress_bar$new(
-      total = n,
-      format = "[:bar] :current/:total (:percent) eta: :eta"
-    )
-  } else {
-    NULL
-  }
+  # Extracted once — this used to happen inside perform_query() on every
+  # single query.
+  query_data <- prepare_query_data(spectra)
 
-  # Process in batches to allow periodic garbage collection
-  batch_size <- 100L
-  n_batches <- ceiling(n / batch_size)
+  batch_size <- max(50L, min(200L, n %/% 10L + 1L))
+  n_batches <- (n + batch_size - 1L) %/% batch_size
 
   for (batch in seq_len(n_batches)) {
     start_idx <- (batch - 1L) * batch_size + 1L
@@ -253,9 +223,7 @@ perform_list_of_queries_progress <- function(ions_list, spectra, dalton, ppm) {
 
     for (i in start_idx:end_idx) {
       results[[i]] <- tryCatch(
-        {
-          perform_list_of_queries(i, ions_list, spectra, dalton, ppm)
-        },
+        perform_list_of_queries(i, ions_list, query_data, dalton, ppm),
         error = function(e) {
           warning("Error in query ", i, ": ", e$message)
           tidytable::tidytable(
@@ -264,13 +232,10 @@ perform_list_of_queries_progress <- function(ions_list, spectra, dalton, ppm) {
           )
         }
       )
-      if (!is.null(pb)) pb$tick()
+      if (show_progress) show_progress(i, n)
     }
-
-    # Garbage collect after each batch
-    if (batch < n_batches) {
-      invisible(gc(verbose = FALSE))
-    }
+    # No more per-batch gc() — we're no longer creating/discarding large
+    # Spectra subsets each iteration, so it was pure overhead here.
   }
 
   results

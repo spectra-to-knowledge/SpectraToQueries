@@ -10,8 +10,7 @@
 create_matrix <- function(spectra, zero_val = 0, name) {
   # Get intensity data
   intensity_list <- Spectra::intensity(
-    spectra,
-    BPPARAM = BiocParallel::SerialParam()
+    spectra
   )
 
   # Pre-allocate matrix
@@ -43,8 +42,7 @@ create_matrix <- function(spectra, zero_val = 0, name) {
 
   # Get mz values only once and filter
   mz_vals <- Spectra::mz(
-    spectra,
-    BPPARAM = BiocParallel::SerialParam()
+    spectra
   )[[1L]][keep_cols]
 
   colnames(spectra_mat) <- mz_vals

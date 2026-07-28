@@ -7,7 +7,6 @@
 
 library(Spectra)
 library(MsBackendMgf)
-library(BiocParallel)
 
 # Paths (assumes script is run from package root)
 pkg_root <- here::here()
@@ -26,22 +25,15 @@ cat("========================================\n\n")
 
 # 1. Load raw spectra from MGF file
 cat("Step 1: Loading raw spectra from MGF...\n")
-spectra_obj <- MsBackendMgf::readMgf(mgf_raw)
-spectra_obj <- Spectra::Spectra(
-  spectra_obj,
-  BPPARAM = BiocParallel::SerialParam()
-)
-spectra_obj <- Spectra::setBackend(
-  spectra_obj,
-  backend = Spectra::MsBackendMemory(),
-  BPPARAM = BiocParallel::SerialParam()
-)
+spectra_obj <- mgf_raw |>
+  MsBackendMgf::readMgf() |>
+  Spectra::Spectra()
 cat("  ✓ Loaded", length(spectra_obj), "raw spectra\n\n")
 
 # 2. Convert raw Spectra to portable data.frame
 cat("Step 2: Converting spectra to portable data.frame...\n")
-source(file.path(pkg_root, "R/spectra_utils.R"))
-mia_spectra_df <- spectra_to_df(spectra_obj)
+mia_spectra_df <- spectra_obj |>
+  spectra_to_df()
 cat("  ✓ Created data.frame with", nrow(mia_spectra_df), "rows\n")
 cat(
   "  ✓ Columns:",
@@ -51,21 +43,15 @@ cat(
 
 # 3. Load grouped spectra from MGF file
 cat("Step 3: Loading grouped spectra from MGF...\n")
-spectra_grouped_obj <- MsBackendMgf::readMgf(mgf_grouped)
-spectra_grouped_obj <- Spectra::Spectra(
-  spectra_grouped_obj,
-  BPPARAM = BiocParallel::SerialParam()
-)
-spectra_grouped_obj <- Spectra::setBackend(
-  spectra_grouped_obj,
-  backend = Spectra::MsBackendMemory(),
-  BPPARAM = BiocParallel::SerialParam()
-)
+spectra_grouped_obj <- mgf_grouped |>
+  MsBackendMgf::readMgf() |>
+  Spectra::Spectra()
 cat("  ✓ Loaded", length(spectra_grouped_obj), "grouped spectra\n\n")
 
 # 4. Convert grouped Spectra to portable data.frame
 cat("Step 4: Converting grouped spectra to portable data.frame...\n")
-mia_spectra_grouped_df <- spectra_to_df(spectra_grouped_obj)
+mia_spectra_grouped_df <- spectra_grouped_obj |>
+  spectra_to_df()
 cat("  ✓ Created data.frame with", nrow(mia_spectra_grouped_df), "rows\n\n")
 
 # 5. Save as RDA files in data/ directory
