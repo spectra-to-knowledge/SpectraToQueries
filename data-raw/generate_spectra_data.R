@@ -1,10 +1,3 @@
-# Generate package data from raw MGF spectra files
-# This script demonstrates how to create the mia_spectra_df and mia_spectra_grouped_df
-# data objects from the raw MGF source files in data/source/spectra/
-#
-# To reproduce:
-#   Rscript inst/scripts/generate_spectra_data.R
-
 library(Spectra)
 library(MsBackendMgf)
 
@@ -62,7 +55,7 @@ cat("  ✓ Saved data/mia_spectra_df.rda\n")
 cat("  ✓ Saved data/mia_spectra_grouped_df.rda\n\n")
 
 cat("========================================\n")
-cat("✅ Data generation complete!\n")
+cat("  ✓ Data generation complete!\n")
 cat("========================================\n")
 cat("\nGenerated files:\n")
 cat("  - data/mia_spectra_df.rda (raw spectra as portable data.frame)\n")
