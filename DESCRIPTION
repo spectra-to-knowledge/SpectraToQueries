@@ -2,17 +2,22 @@ Package: SpectraToQueries
 Title: Spectra to queries
 Version: 0.0.0.9002
 Authors@R: c(
-    person(given = "Adriano",
-           family = "Rutz",
-           email = "adafede@gmail.com",
-           role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-0443-9902")),
-    person(given = "Sarah",
-           family = "Szwarc",
-           email = "sarah.szwarc@universite-paris-saclay.fr",
-           role = "ctb",
-           comment = c(ORCID = "0000-0001-6369-5522"))
-  )
+    person(
+        given = "Adriano",
+        family = "Rutz",
+        email = "adafede@gmail.com",
+        role = c("aut", "cre"),
+        comment = c(ORCID = "0000-0003-0443-9902")
+        )
+    ),
+    person(
+        given = "Sarah",
+        family = "Szwarc",
+        email = "sarah.szwarc@universite-paris-saclay.fr",
+        role = "ctb",
+        comment = c(ORCID = "0000-0001-6369-5522")
+        )
+    )
 Maintainer: Adriano Rutz <adafede@gmail.com>
 Description: SpectraToQueries provides the infrastructure to translate spectra to queries.
 License: AGPL (>= 3)
