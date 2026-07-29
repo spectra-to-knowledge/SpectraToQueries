@@ -13,8 +13,8 @@ CITATION.cff
 ^codecov\.yml$
 ^codemeta\.json$
 ^cran-comments\.md$
-^data/interim$
 ^data-raw$
+^data/interim$
 ^data/source$
 ^docs$
 ^grateful-refs\.bib$

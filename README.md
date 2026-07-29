@@ -114,14 +114,10 @@ a proof of concept with monoterpene indole alkaloids:
   | :--------------- | :--------- | :----------------------------------------------------------------------- |
   | base             | 4.6.1      | R Core Team (2026)                                                       |
   | BiocManager      | 1.30.27    | Morgan and Ramos (2025)                                                  |
-  | BiocParallel     | 1.46.0     | Wang et al. (2026)                                                       |
   | BiocVersion      | 3.23.1     | Morgan (2025)                                                            |
-  | cheapr           | 1.5.2      | Christofides (2026)                                                      |
   | fastmatch        | 1.1.8      | Urbanek (2026)                                                           |
-  | here             | 1.0.2      | Müller (2025)                                                            |
   | knitr            | 1.51       | Xie (2014); Xie (2015); Xie (2025)                                       |
   | MsBackendMgf     | 1.20.0     | Gatto et al. (2026)                                                      |
-  | progress         | 1.2.3      | Csárdi and FitzJohn (2023)                                               |
   | rmarkdown        | 2.31       | Xie et al. (2018); Xie et al. (2020); Allaire et al. (2026)              |
   | Spectra          | 1.22.2     | Rainer et al. (2022)                                                     |
   | SpectraToQueries | 0.0.0.9002 | Rutz and Szwarc (2025); <span class="nocase">Szwarc et al.</span> (2025) |
@@ -129,8 +125,6 @@ a proof of concept with monoterpene indole alkaloids:
   | stringi          | 1.8.7      | Gagolewski (2022)                                                        |
   | testthat         | 3.3.2      | Wickham (2011)                                                           |
   | tidytable        | 0.11.2     | Fairbanks (2024)                                                         |
-  | tidyverse        | 2.0.0      | Wickham et al. (2019)                                                    |
-  | usethis          | 3.2.1      | Wickham et al. (2025)                                                    |
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 
@@ -139,22 +133,6 @@ a proof of concept with monoterpene indole alkaloids:
 Allaire, JJ, Yihui Xie, Christophe Dervieux, et al. 2026.
 *<span class="nocase">rmarkdown</span>: Dynamic Documents for r*.
 <https://github.com/rstudio/rmarkdown>.
-
-</div>
-
-<div id="ref-cheapr" class="csl-entry">
-
-Christofides, Nick. 2026. *<span class="nocase">cheapr</span>: Simple
-Functions to Save Time and Memory*.
-<https://doi.org/10.32614/CRAN.package.cheapr>.
-
-</div>
-
-<div id="ref-progress" class="csl-entry">
-
-Csárdi, Gábor, and Rich FitzJohn. 2023.
-*<span class="nocase">progress</span>: Terminal Progress Bars*.
-<https://doi.org/10.32614/CRAN.package.progress>.
 
 </div>
 
@@ -194,13 +172,6 @@ Bioconductor Packages*.
 Morgan, Martin, and Marcel Ramos. 2025. *BiocManager: Access the
 Bioconductor Project Package Repository*.
 <https://doi.org/10.32614/CRAN.package.BiocManager>.
-
-</div>
-
-<div id="ref-here" class="csl-entry">
-
-Müller, Kirill. 2025. *<span class="nocase">here</span>: A Simpler Way
-to Find Your Files*. <https://doi.org/10.32614/CRAN.package.here>.
 
 </div>
 
@@ -254,36 +225,11 @@ Urbanek, Simon. 2026. *<span class="nocase">fastmatch</span>: Fast
 
 </div>
 
-<div id="ref-BiocParallel" class="csl-entry">
-
-Wang, Jiefei, Martin Morgan, Valerie Obenchain, Michel Lang, Ryan
-Thompson, and Nitesh Turaga. 2026. *BiocParallel: Bioconductor
-Facilities for Parallel Evaluation*.
-<https://doi.org/10.18129/B9.bioc.BiocParallel>.
-
-</div>
-
 <div id="ref-testthat" class="csl-entry">
 
 Wickham, Hadley. 2011. “<span class="nocase">testthat</span>: Get
 Started with Testing.” *The R Journal* 3: 5–10.
 <https://journal.r-project.org/articles/RJ-2011-002/>.
-
-</div>
-
-<div id="ref-tidyverse" class="csl-entry">
-
-Wickham, Hadley, Mara Averick, Jennifer Bryan, et al. 2019. “Welcome to
-the <span class="nocase">tidyverse</span>.” *Journal of Open Source
-Software* 4 (43): 1686. <https://doi.org/10.21105/joss.01686>.
-
-</div>
-
-<div id="ref-usethis" class="csl-entry">
-
-Wickham, Hadley, Jennifer Bryan, Malcolm Barrett, and Andy Teucher.
-2025. *<span class="nocase">usethis</span>: Automate Package and Project
-Setup*. <https://doi.org/10.32614/CRAN.package.usethis>.
 
 </div>
 
