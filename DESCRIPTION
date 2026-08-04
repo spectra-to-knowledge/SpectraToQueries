@@ -25,10 +25,10 @@ BugReports: https://github.com/spectra-to-knowledge/spectra-to-queries/issues
 Depends:
     R (>= 4.5.0)
 Imports:
-    fastmatch (>= 1.1.0),
+    fastmatch (>= 1.1.8),
     MsBackendMgf (>= 1.18.0),
     Spectra (>= 1.20.1),
-    stringi (>= 1.8.0),
+    stringi (>= 1.8.9),
     tidytable (>= 0.11.2)
 Suggests:
     testthat (>= 3.3.2)
