@@ -12,11 +12,11 @@ combine_ions_minimal <- function(ion_lists) {
 
   # Helper to split and sort fragments/nls, return only non-empty
   sort_ions <- function(ions) {
-    frags <- ions[stringi::stri_detect_fixed(ions, "_frag")]
-    nls <- ions[stringi::stri_detect_fixed(ions, "_nl")]
+    frags <- ions[grepl("_frag", ions, fixed = TRUE)]
+    nls <- ions[grepl("_nl", ions, fixed = TRUE)]
     frags_sorted <- if (length(frags)) {
       paste0(
-        sort(as.numeric(stringi::stri_replace_all_fixed(frags, "_frag", ""))),
+        sort(as.numeric(gsub("_frag", "", frags, fixed = TRUE))),
         "_frag"
       )
     } else {
@@ -24,7 +24,7 @@ combine_ions_minimal <- function(ion_lists) {
     }
     nls_sorted <- if (length(nls)) {
       paste0(
-        sort(as.numeric(stringi::stri_replace_all_fixed(nls, "_nl", ""))),
+        sort(as.numeric(gsub("_nl", "", nls, fixed = TRUE))),
         "_nl"
       )
     } else {
@@ -33,16 +33,14 @@ combine_ions_minimal <- function(ion_lists) {
     c(frags_sorted, nls_sorted)
   }
 
-  # Find common ions using fastmatch for set operations
   common <- Reduce(
-    function(x, y) x[fastmatch::fmatch(x, y, nomatch = 0L) > 0L],
+    function(x, y) x[match(x, y, nomatch = 0L) > 0L],
     ion_lists
   )
   common_sorted <- sort_ions(common)
 
-  # Remove common from each list using fastmatch
   remaining <- lapply(ion_lists, function(x) {
-    x[fastmatch::fmatch(x, common, nomatch = 0L) == 0L]
+    x[match(x, common, nomatch = 0L) == 0L]
   })
 
   if (all(lengths(remaining) == 0)) {

@@ -25,10 +25,9 @@
 
 ## Dependencies
 
-- All fastverse toolkit already declared:
-  - `fastmatch` (set membership) in `combine_ions_minimal.R`
-  - `stringi` (fixed-string operations) across multiple functions
-  - `tidytable` (grouping/summarization) now used in `fix_binned_mzs.R`
+- Removed unnecessary `fastmatch` and `stringi` dependencies by switching those
+  fixed-string and set-membership operations to base R.
+- `tidytable` remains for grouping/summarization in `fix_binned_mzs.R`.
 - Removed direct `BiocParallel`, `data.table`, `progress`, `purrr`, and `tibble`
   dependency (tidytable already in imports)
 

@@ -66,19 +66,6 @@
     },
     "2": {
       "@type": "SoftwareApplication",
-      "identifier": "fastmatch",
-      "name": "fastmatch",
-      "version": ">= 1.1.0",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=fastmatch"
-    },
-    "3": {
-      "@type": "SoftwareApplication",
       "identifier": "MsBackendMgf",
       "name": "MsBackendMgf",
       "version": ">= 1.18.0",
@@ -90,7 +77,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/MsBackendMgf.html"
     },
-    "4": {
+    "3": {
       "@type": "SoftwareApplication",
       "identifier": "Spectra",
       "name": "Spectra",
@@ -103,20 +90,7 @@
       },
       "sameAs": "https://bioconductor.org/packages/release/bioc/html/Spectra.html"
     },
-    "5": {
-      "@type": "SoftwareApplication",
-      "identifier": "stringi",
-      "name": "stringi",
-      "version": ">= 1.8.0",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=stringi"
-    },
-    "6": {
+    "4": {
       "@type": "SoftwareApplication",
       "identifier": "tidytable",
       "name": "tidytable",
@@ -132,7 +106,7 @@
     "SystemRequirements": null
   },
   "keywords": ["knowledgeExtraction", "spectralInformation", "queryingSystem", "knowledge-extraction", "spectral-library", "tandem-ms", "monoterpene-indole-alkaloids", "querying-system", "spectral-information"],
-  "fileSize": "1391.021KB",
+  "fileSize": "1424.81KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

@@ -27,7 +27,7 @@ with monoterpene indole alkaloids." \emph{Journal of Cheminformatics}, 17:62.
 https://doi.org/10.1186/s13321-025-01009-0
 }
 \usage{
-data(mia_spectra_grouped_df)
+mia_spectra_grouped_df
 }
 \description{
 A \code{data.frame} containing 321 grouped mass spectra from the MIADB

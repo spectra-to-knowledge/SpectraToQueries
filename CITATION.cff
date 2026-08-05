@@ -1,7 +1,7 @@
-# --------------------------------------------
-# CITATION file created with {cffr} R package
+# ------------------------------------------------
+# CITATION.cff file created with {cffr} R package
 # See also: https://docs.ropensci.org/cffr/
-# --------------------------------------------
+# ------------------------------------------------
 
 cff-version: 1.2.0
 message: 'To cite package "SpectraToQueries" in publications use:'
@@ -126,38 +126,14 @@ references:
   url: https://www.R-project.org/
   authors:
   - name: R Core Team
+    website: https://ror.org/02zz1nj61
   institution:
-    name: 'R Foundation for Statistical Computing (ROR: <https://ror.org/05qewa988>)'
+    name: R Foundation for Statistical Computing
+    website: https://ror.org/05qewa988
     address: Vienna, Austria
   year: '2026'
   doi: 10.32614/R.manuals
   version: '>= 4.5.0'
-- type: software
-  title: BiocParallel
-  abstract: 'BiocParallel: Bioconductor facilities for parallel evaluation'
-  notes: Imports
-  url: https://github.com/Bioconductor/BiocParallel
-  repository: https://bioconductor.org/
-  authors:
-  - family-names: Wang
-    given-names: Jiefei
-    email: jiefei0804@gmail.com
-  - family-names: Morgan
-    given-names: Martin
-    email: mtmorgan.bioc@gmail.com
-  - family-names: Obenchain
-    given-names: Valerie
-  - family-names: Lang
-    given-names: Michel
-    email: michellang@gmail.com
-  - family-names: Thompson
-    given-names: Ryan
-    email: rct@thompsonclan.org
-  - family-names: Turaga
-    given-names: Nitesh
-  year: '2026'
-  doi: 10.18129/B9.bioc.BiocParallel
-  version: '>= 1.44.0'
 - type: software
   title: MsBackendMgf
   abstract: 'MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format
@@ -179,46 +155,13 @@ references:
     email: mail@sebastiangibb.de
     orcid: https://orcid.org/0000-0001-7406-4443
   year: '2026'
-  doi: 10.18129/B9.bioc.MsBackendMgf
   version: '>= 1.18.0'
-- type: software
-  title: progress
-  abstract: 'progress: Terminal Progress Bars'
-  notes: Imports
-  url: https://github.com/r-lib/progress#readme
-  repository: https://CRAN.R-project.org/package=progress
-  authors:
-  - family-names: Csárdi
-    given-names: Gábor
-    email: csardi.gabor@gmail.com
-  - family-names: FitzJohn
-    given-names: Rich
-  year: '2026'
-  doi: 10.32614/CRAN.package.progress
-  version: '>= 1.2.3'
-- type: software
-  title: purrr
-  abstract: 'purrr: Functional Programming Tools'
-  notes: Imports
-  url: https://purrr.tidyverse.org/
-  repository: https://CRAN.R-project.org/package=purrr
-  authors:
-  - family-names: Wickham
-    given-names: Hadley
-    email: hadley@posit.co
-    orcid: https://orcid.org/0000-0003-4757-117X
-  - family-names: Henry
-    given-names: Lionel
-    email: lionel@posit.co
-  year: '2026'
-  doi: 10.32614/CRAN.package.purrr
-  version: '>= 1.2.2'
 - type: software
   title: Spectra
   abstract: 'Spectra: Spectra Infrastructure for Mass Spectrometry Data'
   notes: Imports
   url: https://github.com/RforMassSpectrometry/Spectra
-  repository: https://bioconductor.org/
+  repository: https://bioc-release.r-universe.dev
   authors:
   - family-names: Gatto
     given-names: Laurent
@@ -237,7 +180,6 @@ references:
     email: philippine.louail@eurac.edu
     orcid: https://orcid.org/0009-0007-5429-6846
   year: '2026'
-  doi: 10.18129/B9.bioc.Spectra
   version: '>= 1.20.1'
 - type: software
   title: tidytable
@@ -252,118 +194,6 @@ references:
   year: '2026'
   doi: 10.32614/CRAN.package.tidytable
   version: '>= 0.11.2'
-- type: software
-  title: tibble
-  abstract: 'tibble: Simple Data Frames'
-  notes: Imports
-  url: https://tibble.tidyverse.org/
-  repository: https://CRAN.R-project.org/package=tibble
-  authors:
-  - family-names: Müller
-    given-names: Kirill
-    email: kirill@cynkra.com
-    orcid: https://orcid.org/0000-0002-1416-3412
-  - family-names: Wickham
-    given-names: Hadley
-    email: hadley@rstudio.com
-  year: '2026'
-  doi: 10.32614/CRAN.package.tibble
-  version: '>= 3.3.0'
-- type: software
-  title: altdoc
-  abstract: 'altdoc: Package Documentation Websites with ''Quarto'', ''Docsify'',
-    ''Docute'', or ''MkDocs'''
-  notes: Suggests
-  url: https://altdoc.etiennebacher.com
-  repository: https://CRAN.R-project.org/package=altdoc
-  authors:
-  - family-names: Bacher
-    given-names: Etienne
-    email: etienne.bacher@protonmail.com
-  - family-names: Arel-Bundock
-    given-names: Vincent
-    email: vincent.arel-bundock@umontreal.ca
-    orcid: https://orcid.org/0000-0003-2042-7063
-  year: '2026'
-  doi: 10.32614/CRAN.package.altdoc
-  version: '>= 0.7.2'
-- type: software
-  title: BiocManager
-  abstract: 'BiocManager: Access the Bioconductor Project Package Repository'
-  notes: Suggests
-  url: https://bioconductor.github.io/BiocManager/
-  repository: https://CRAN.R-project.org/package=BiocManager
-  authors:
-  - family-names: Morgan
-    given-names: Martin
-    email: martin.morgan@roswellpark.org
-    orcid: https://orcid.org/0000-0002-5874-8148
-  - family-names: Ramos
-    given-names: Marcel
-    email: marcel.ramos@sph.cuny.edu
-    orcid: https://orcid.org/0000-0002-3242-0582
-  year: '2026'
-  doi: 10.32614/CRAN.package.BiocManager
-  version: '>= 1.30.27'
-- type: software
-  title: BiocVersion
-  abstract: 'BiocVersion: Set the appropriate version of Bioconductor packages'
-  notes: Suggests
-  repository: https://bioc.r-universe.dev
-  authors:
-  - family-names: Morgan
-    given-names: Martin
-    email: martin.morgan@roswellpark.org
-  year: '2026'
-  version: '>= 3.22.0'
-- type: software
-  title: grateful
-  abstract: 'grateful: Facilitate Citation of R Packages'
-  notes: Suggests
-  url: https://pakillo.github.io/grateful/
-  repository: https://CRAN.R-project.org/package=grateful
-  authors:
-  - family-names: Rodriguez-Sanchez
-    given-names: Francisco
-    email: f.rodriguez.sanc@gmail.com
-    orcid: https://orcid.org/0000-0002-7981-1599
-  - family-names: Jackson
-    given-names: Connor P.
-    email: connor@cpjackson.net
-    orcid: https://orcid.org/0000-0002-4220-5210
-  year: '2026'
-  doi: 10.32614/CRAN.package.grateful
-  version: '>= 0.3.0'
-- type: software
-  title: R.utils
-  abstract: 'R.utils: Various Programming Utilities'
-  notes: Suggests
-  url: https://henrikbengtsson.github.io/R.utils/
-  repository: https://CRAN.R-project.org/package=R.utils
-  authors:
-  - family-names: Bengtsson
-    given-names: Henrik
-    email: henrikb@braju.com
-  year: '2026'
-  doi: 10.32614/CRAN.package.R.utils
-  version: '>= 2.13.0'
-- type: software
-  title: spelling
-  abstract: 'spelling: Tools for Spell Checking in R'
-  notes: Suggests
-  url: https://ropensci.r-universe.dev/spelling
-  repository: https://CRAN.R-project.org/package=spelling
-  authors:
-  - family-names: Ooms
-    given-names: Jeroen
-    email: jeroenooms@gmail.com
-    orcid: https://orcid.org/0000-0002-4035-0289
-  - family-names: Hester
-    given-names: Jim
-    email: james.hester@rstudio.com
-  year: '2026'
-  doi: 10.32614/CRAN.package.spelling
-  version: '>= 2.3.2'
 - type: software
   title: testthat
   abstract: 'testthat: Unit Testing for R'

@@ -115,14 +115,11 @@ a proof of concept with monoterpene indole alkaloids:
   | base             | 4.6.1      | R Core Team (2026)                                                       |
   | BiocManager      | 1.30.27    | Morgan and Ramos (2025)                                                  |
   | BiocVersion      | 3.23.1     | Morgan (2025)                                                            |
-  | fastmatch        | 1.1.8      | Urbanek (2026)                                                           |
   | knitr            | 1.51       | Xie (2014); Xie (2015); Xie (2025)                                       |
-  | MsBackendMgf     | 1.20.0     | Gatto et al. (2026)                                                      |
+  | MsBackendMgf     | 1.20.1     | Gatto et al. (2026)                                                      |
   | rmarkdown        | 2.31       | Xie et al. (2018); Xie et al. (2020); Allaire et al. (2026)              |
   | Spectra          | 1.22.2     | Rainer et al. (2022)                                                     |
   | SpectraToQueries | 0.0.0.9002 | Rutz and Szwarc (2025); <span class="nocase">Szwarc et al.</span> (2025) |
-  | spelling         | 2.3.2      | Ooms and Hester (2025)                                                   |
-  | stringi          | 1.8.7      | Gagolewski (2022)                                                        |
   | testthat         | 3.3.2      | Wickham (2011)                                                           |
   | tidytable        | 0.11.2     | Fairbanks (2024)                                                         |
 
@@ -144,19 +141,11 @@ Interface to “<span class="nocase">data.table</span>”*.
 
 </div>
 
-<div id="ref-stringi" class="csl-entry">
-
-Gagolewski, Marek. 2022. “<span class="nocase">stringi</span>: Fast and
-Portable Character String Processing in R.” *Journal of Statistical
-Software* 103 (2): 1–59. <https://doi.org/10.18637/jss.v103.i02>.
-
-</div>
-
 <div id="ref-MsBackendMgf" class="csl-entry">
 
 Gatto, Laurent, Johannes Rainer, and Sebastian Gibb. 2026.
 *MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format
-(Mgf) Files*. <https://doi.org/10.18129/B9.bioc.MsBackendMgf>.
+(Mgf) Files*. <https://github.com/RforMassSpectrometry/MsBackendMgf>.
 
 </div>
 
@@ -172,14 +161,6 @@ Bioconductor Packages*.
 Morgan, Martin, and Marcel Ramos. 2025. *BiocManager: Access the
 Bioconductor Project Package Repository*.
 <https://doi.org/10.32614/CRAN.package.BiocManager>.
-
-</div>
-
-<div id="ref-spelling" class="csl-entry">
-
-Ooms, Jeroen, and Jim Hester. 2025.
-*<span class="nocase">spelling</span>: Tools for Spell Checking in r*.
-<https://doi.org/10.32614/CRAN.package.spelling>.
 
 </div>
 
@@ -214,14 +195,6 @@ al.</span> 2025. “Translating Community-Wide Spectral Library into
 Actionable Chemical Knowledge: A Proof of Concept with Monoterpene
 Indole Alkaloids.” *J. Cheminform.* 17.
 <https://doi.org/10.1186/s13321-025-01009-0>.
-
-</div>
-
-<div id="ref-fastmatch" class="csl-entry">
-
-Urbanek, Simon. 2026. *<span class="nocase">fastmatch</span>: Fast
-“<span class="nocase">match()</span>” Function*.
-<https://doi.org/10.32614/CRAN.package.fastmatch>.
 
 </div>
 

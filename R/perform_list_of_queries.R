@@ -7,10 +7,11 @@ prepare_query_data <- function(spectra) {
   list(
     mz = Spectra::mz(spectra),
     precursor_mz = Spectra::precursorMz(spectra),
-    skeleton = stringi::stri_replace_all_fixed(
-      as.character(Spectra::spectraData(spectra)$SKELETON),
+    skeleton = gsub(
       "+",
-      "."
+      ".",
+      as.character(Spectra::spectraData(spectra)$SKELETON),
+      fixed = TRUE
     )
   )
 }
@@ -139,12 +140,12 @@ perform_list_of_queries <- function(index, ions_list, query_data, dalton, ppm) {
     return(tidytable::tidytable(target = target, value = character(0)))
   }
 
-  is_frag <- stringi::stri_detect_fixed(ions, "_frag")
-  is_nl <- stringi::stri_detect_fixed(ions, "_nl")
+  is_frag <- grepl("_frag", ions, fixed = TRUE)
+  is_nl <- grepl("_nl", ions, fixed = TRUE)
 
   frags <- if (any(is_frag)) {
     vals <- suppressWarnings(as.numeric(
-      stringi::stri_replace_all_fixed(ions[is_frag], "_frag", "")
+      gsub("_frag", "", ions[is_frag], fixed = TRUE)
     ))
     vals[is.finite(vals)]
   } else {
@@ -153,7 +154,7 @@ perform_list_of_queries <- function(index, ions_list, query_data, dalton, ppm) {
 
   nls <- if (any(is_nl)) {
     vals <- suppressWarnings(as.numeric(
-      stringi::stri_replace_all_fixed(ions[is_nl], "_nl", "")
+      gsub("_nl", "", ions[is_nl], fixed = TRUE)
     ))
     vals[is.finite(vals)]
   } else {
