@@ -184,12 +184,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="dependencies" class="level2">
 <h2 class="anchored" data-anchor-id="dependencies">Dependencies</h2>
 <ul>
-<li>All fastverse toolkit already declared:
-<ul>
-<li><code>fastmatch</code> (set membership) in <code>combine_ions_minimal.R</code></li>
-<li><code>stringi</code> (fixed-string operations) across multiple functions</li>
-<li><code>tidytable</code> (grouping/summarization) now used in <code>fix_binned_mzs.R</code></li>
-</ul></li>
+<li>Removed unnecessary <code>fastmatch</code> and <code>stringi</code> dependencies by switching those fixed-string and set-membership operations to base R.</li>
+<li><code>tidytable</code> remains for grouping/summarization in <code>fix_binned_mzs.R</code>.</li>
 <li>Removed direct <code>BiocParallel</code>, <code>data.table</code>, <code>progress</code>, <code>purrr</code>, and <code>tibble</code> dependency (tidytable already in imports)</li>
 </ul>
 </section>
