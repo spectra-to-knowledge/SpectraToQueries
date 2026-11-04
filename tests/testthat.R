@@ -1,4 +1,5 @@
 library(testthat)
+library(SpectraToQueries)
 
 ## Test the package
-testthat::test_package(package = "SpectraToQueries")
+testthat::test_check(package = "SpectraToQueries")

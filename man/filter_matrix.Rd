@@ -12,7 +12,7 @@ filter_matrix(matrix, n)
 \item{n}{Minimum number of non-zero values per column}
 }
 \value{
-Filtered matrix with columns having at least n non-zero values
+Filtered matrix with columns having at least \code{n} non-zero values
 }
 \description{
 Filter matrix

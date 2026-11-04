@@ -8,50 +8,46 @@
 A \code{data.frame} with 321 rows and 37 columns:
 \itemize{
 \item \strong{Metadata columns}: \code{msLevel}, \code{rtime}, \code{acquisitionNum}, \code{TITLE},
-\code{PRECURSOR_MZ}, \code{SKELETON}, and other MS/MS spectrum attributes
+\code{PRECURSOR_MZ}, \code{SKELETON} (81 unique skeletons), and other MS/MS
+spectrum attributes
 \item \strong{\code{mz}} (list): Fragment m/z values for each spectrum
 \item \strong{\code{intensity}} (list): Fragment intensities for each spectrum
 }
 
-Total of approximately 48,510 peaks across all spectra.
+Total of 24,255 peaks across all 321 spectra (median 66 peaks per spectrum).
 }
 \source{
 Data extracted from MIADB, a public spectral library
-of monoterpene indole alkaloids. Original source:
-https://miadb.imsb.qcb.usp.br/
+of monoterpene indole alkaloids.
 
 Accompanying publication:
 Szwarc, S., Rutz, A., Lee, K. et al. (2025). "Translating community-wide
 spectral library into actionable chemical knowledge: a proof of concept
 with monoterpene indole alkaloids." \emph{Journal of Cheminformatics}, 17:62.
-https://doi.org/10.1186/s13321-025-01009-0
+\doi{10.1186/s13321-025-01009-0}
 }
 \usage{
 mia_spectra_df
 }
 \description{
-A \code{data.frame} containing 321 spectra of monoterpene
+A \code{data.frame} containing 321 MS/MS spectra of monoterpene
 indole alkaloids (MIAs) from the MIADB (Monoterpene Indole Alkaloid
-Database). This is stored as a portable data.frame with m/z and intensity
-peaks as list columns, and is automatically converted to a \code{Spectra} object
-when used in \code{spectra_to_queries()}.
+Database) across 81 fine-grained chemical skeletons (\code{SKELETON}). This is
+stored as a portable \code{data.frame} with \code{mz} and \code{intensity} peaks as list
+columns, and is automatically converted to a \link[Spectra:Spectra]{Spectra::Spectra} object
+when used in \code{\link[=spectra_to_queries]{spectra_to_queries()}}.
 }
 \details{
-The \code{mia_spectra_df} object represents the raw spectral data with
-minimal preprocessing. Use \code{mia_spectra_grouped_df} for the pre-grouped variant.
+The \code{mia_spectra_df} object represents the spectral data with fine-grained
+skeleton annotations. Use \code{mia_spectra_grouped_df} for the variant with
+broader grouped skeleton annotations.
 
-This portable data.frame format enables export to CSV, Parquet, JSON, and
-other formats for cross-platform distribution via r-universe. It is
-automatically converted to a \code{Spectra} object by \code{spectra_to_queries()}.
+This portable \code{data.frame} format enables cross-platform distribution and
+is automatically converted to a \link[Spectra:Spectra]{Spectra::Spectra} object by
+\code{\link[=spectra_to_queries]{spectra_to_queries()}}.
 }
 \examples{
-\dontrun{
-  # Load the raw spectra
-  utils::data(mia_spectra_df)
-  nrow(mia_spectra_df)  # 321 spectra
-
-  # Convert to Spectra object (for advanced users)
-  # spectra_obj <- SpectraToQueries:::df_to_spectra(mia_spectra_df)
-}
+utils::data(mia_spectra_df, package = "SpectraToQueries")
+nrow(mia_spectra_df) # 321 spectra
 }
 \keyword{datasets}

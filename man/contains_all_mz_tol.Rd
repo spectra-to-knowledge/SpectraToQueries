@@ -11,7 +11,7 @@ contains_all_mz_tol(spec_mz, target_mz, tol)
 
 \item{target_mz}{Numeric vector of target m/z values to find}
 
-\item{tol}{Numeric vector of pre-computed tolerances (length must match target_mz)}
+\item{tol}{Numeric vector of pre-computed tolerances (length must match \code{target_mz})}
 }
 \value{
 Logical indicating if all targets are found

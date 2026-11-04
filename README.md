@@ -89,11 +89,12 @@ SpectraToQueries::spectra_to_queries(
 
 The package includes two example datasets from MIADB:
 
-- `mia_spectra_df` --- Raw spectra (321 spectra)
-- `mia_spectra_grouped_df` --- Pre-grouped spectra (321 spectra)
+- `mia_spectra_df` --- Raw spectra (321 MS/MS spectra across 81 skeletons)
+- `mia_spectra_grouped_df` --- Grouped spectra (321 MS/MS spectra across 53
+  grouped skeleton classes)
 
-These are stored as portable data.frames (with `mz` and `intensity` as list
-columns) and automatically converted to Spectra objects when loaded.
+These are stored as portable `data.frame` objects (with `mz` and `intensity` as
+list columns) and automatically converted to `Spectra` objects when loaded.
 
 To access them directly:
 
@@ -111,35 +112,16 @@ a proof of concept with monoterpene indole alkaloids:
 ## Additional software credits
 
   | Package          | Version    | Citation                                                                 |
-  | :--------------- | :--------- | :----------------------------------------------------------------------- |
-  | base             | 4.6.1      | R Core Team (2026)                                                       |
+  | :---             | :---       | :---                                                                     |
+  | base             | 4.6.2      | R Core Team (2026)                                                       |
   | BiocManager      | 1.30.27    | Morgan and Ramos (2025)                                                  |
   | BiocVersion      | 3.23.1     | Morgan (2025)                                                            |
-  | knitr            | 1.51       | Xie (2014); Xie (2015); Xie (2025)                                       |
+  | grateful         | 0.3.0      | Rodriguez-Sanchez and Jackson (2025)                                     |
   | MsBackendMgf     | 1.20.1     | Gatto et al. (2026)                                                      |
-  | rmarkdown        | 2.31       | Xie et al. (2018); Xie et al. (2020); Allaire et al. (2026)              |
   | Spectra          | 1.22.2     | Rainer et al. (2022)                                                     |
   | SpectraToQueries | 0.0.0.9002 | Rutz and Szwarc (2025); <span class="nocase">Szwarc et al.</span> (2025) |
-  | testthat         | 3.3.2      | Wickham (2011)                                                           |
-  | tidytable        | 0.11.2     | Fairbanks (2024)                                                         |
 
 <div id="refs" class="references csl-bib-body hanging-indent">
-
-<div id="ref-rmarkdown2026" class="csl-entry">
-
-Allaire, JJ, Yihui Xie, Christophe Dervieux, et al. 2026.
-*<span class="nocase">rmarkdown</span>: Dynamic Documents for r*.
-<https://github.com/rstudio/rmarkdown>.
-
-</div>
-
-<div id="ref-tidytable" class="csl-entry">
-
-Fairbanks, Mark. 2024. *<span class="nocase">tidytable</span>: Tidy
-Interface to “<span class="nocase">data.table</span>”*.
-<https://doi.org/10.32614/CRAN.package.tidytable>.
-
-</div>
 
 <div id="ref-MsBackendMgf" class="csl-entry">
 
@@ -180,6 +162,14 @@ and Expandable Ecosystem for Metabolomics Data Annotation in r.”
 
 </div>
 
+<div id="ref-grateful" class="csl-entry">
+
+Rodriguez-Sanchez, Francisco, and Connor P. Jackson. 2025.
+*<span class="nocase">grateful</span>: Facilitate Citation of R
+Packages*. <https://pakillo.github.io/grateful/>.
+
+</div>
+
 <div id="ref-SpectraToQueries2025a" class="csl-entry">
 
 Rutz, Adriano, and Sarah Szwarc. 2025. *SpectraToQueries:
@@ -195,51 +185,6 @@ al.</span> 2025. “Translating Community-Wide Spectral Library into
 Actionable Chemical Knowledge: A Proof of Concept with Monoterpene
 Indole Alkaloids.” *J. Cheminform.* 17.
 <https://doi.org/10.1186/s13321-025-01009-0>.
-
-</div>
-
-<div id="ref-testthat" class="csl-entry">
-
-Wickham, Hadley. 2011. “<span class="nocase">testthat</span>: Get
-Started with Testing.” *The R Journal* 3: 5–10.
-<https://journal.r-project.org/articles/RJ-2011-002/>.
-
-</div>
-
-<div id="ref-knitr2014" class="csl-entry">
-
-Xie, Yihui. 2014. “<span class="nocase">knitr</span>: A Comprehensive
-Tool for Reproducible Research in R.” In *Implementing Reproducible
-Computational Research*, edited by Victoria Stodden, Friedrich Leisch,
-and Roger D. Peng. Chapman; Hall/CRC.
-
-</div>
-
-<div id="ref-knitr2015" class="csl-entry">
-
-Xie, Yihui. 2015. *Dynamic Documents with R and Knitr*. 2nd ed. Chapman;
-Hall/CRC. <https://yihui.org/knitr/>.
-
-</div>
-
-<div id="ref-knitr2025" class="csl-entry">
-
-Xie, Yihui. 2025. *<span class="nocase">knitr</span>: A General-Purpose
-Package for Dynamic Report Generation in R*. <https://yihui.org/knitr/>.
-
-</div>
-
-<div id="ref-rmarkdown2018" class="csl-entry">
-
-Xie, Yihui, J. J. Allaire, and Garrett Grolemund. 2018. *R Markdown: The
-Definitive Guide*. Chapman; Hall/CRC. <https://yihui.org/rmarkdown/>.
-
-</div>
-
-<div id="ref-rmarkdown2020" class="csl-entry">
-
-Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. *R Markdown
-Cookbook*. Chapman; Hall/CRC. <https://yihui.org/rmarkdown-cookbook>.
 
 </div>
 

@@ -1,8 +1,7 @@
 start <- Sys.time()
 
-message("This program extract diagnostic ions from groups of spectra.")
-message("Authors: \n", "AR")
-message("Contributors: \n", "...")
+message("This program extracts diagnostic ions from groups of spectra.")
+message("Authors: Adriano Rutz, Sarah Szwarc")
 
 SpectraToQueries::spectra_to_queries()
 

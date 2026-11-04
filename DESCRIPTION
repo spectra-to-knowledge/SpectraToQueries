@@ -17,18 +17,19 @@ Authors@R: c(
         comment = c(ORCID = "0000-0001-6369-5522")
         ))
 Maintainer: Adriano Rutz <adafede@gmail.com>
-Description: SpectraToQueries provides the infrastructure to translate spectra to queries.
+Description: Translates tandem mass spectrometry (MS/MS) spectral libraries into diagnostic fragment and neutral-loss ion queries for chemical structure and skeleton classification, ranked by Matthews Correlation Coefficient (MCC).
 License: AGPL (>= 3)
-URL: https://github.com/spectra-to-knowledge/spectra-to-queries,
-    https://spectra-to-knowledge.github.io/SpectraToQueries
-BugReports: https://github.com/spectra-to-knowledge/spectra-to-queries/issues
+URL: https://github.com/spectra-to-knowledge/SpectraToQueries,
+    https://spectra-to-knowledge.github.io/SpectraToQueries/
+BugReports: https://github.com/spectra-to-knowledge/SpectraToQueries/issues
 Depends:
     R (>= 4.5.0)
 Imports:
     MsBackendMgf (>= 1.18.0),
     Spectra (>= 1.20.1),
-    tidytable (>= 0.11.2)
+    utils
 Suggests:
+    spelling,
     testthat (>= 3.3.2)
 ByteCompile: TRUE
 Collate:
@@ -40,7 +41,6 @@ Collate:
     'filter_matrix.R'
     'fix_binned_mzs.R'
     'generate_combinations.R'
-    'globals.R'
     'harmonize_mzs.R'
     'normalize_peaks.R'
     'perform_list_of_queries.R'
@@ -48,11 +48,35 @@ Collate:
     'spectra_to_queries.R'
     'spectra_utils.R'
 Config/roxygen2/markdown: TRUE
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
 LazyData: TRUE
 LazyDataCompression: bzip2
-biocViews: knowledgeExtraction, spectralInformation, queryingSystem
-X-schema.org-keywords: knowledgeExtraction, spectralInformation, queryingSystem
+biocViews: MassSpectrometry, Metabolomics, Cheminformatics
+X-schema.org-keywords: mass-spectrometry, metabolomics, cheminformatics,
+    natural-products, spectral-analysis, diagnostic-ions, query-generation,
+    edam:topic_3172, edam:topic_0154, edam:topic_3370, edam:topic_2258,
+    edam:topic_0780, edam:operation_3214, edam:operation_3803,
+    edam:operation_4074, edam:operation_3629, edam:operation_3695,
+    edam:operation_2990, edam:operation_0224, edam:data_2536, edam:data_0943,
+    edam:data_0962, edam:data_2048, edam:format_3651, edam:format_3475
+X-EDAM-Topic: http://edamontology.org/topic_3172 (Metabolomics),
+    http://edamontology.org/topic_0154 (Small molecules),
+    http://edamontology.org/topic_3370 (Analytical chemistry),
+    http://edamontology.org/topic_2258 (Cheminformatics),
+    http://edamontology.org/topic_0780 (Plant biology)
+X-EDAM-Operation: http://edamontology.org/operation_3214 (Spectral analysis),
+    http://edamontology.org/operation_3803 (Natural product identification),
+    http://edamontology.org/operation_4074 (Compound identification),
+    http://edamontology.org/operation_3629 (Deisotoping),
+    http://edamontology.org/operation_3695 (Data filtering),
+    http://edamontology.org/operation_2990 (Classification),
+    http://edamontology.org/operation_0224 (Query and retrieval)
+X-EDAM-Data: http://edamontology.org/data_2536 (Mass spectrometry data),
+    http://edamontology.org/data_0943 (Mass spectrum),
+    http://edamontology.org/data_0962 (Small molecule report),
+    http://edamontology.org/data_2048 (Report)
+X-EDAM-Format: http://edamontology.org/format_3651 (MGF),
+    http://edamontology.org/format_3475 (TSV)

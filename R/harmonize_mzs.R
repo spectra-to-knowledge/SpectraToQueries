@@ -10,40 +10,43 @@
 harmonize_mzs <- function(spectra, dalton, ppm) {
   spectra_new <- spectra
 
-  # Averaged m/z values from combined spectra
-  averaged_intensities <- spectra_new |>
+  combined_peaks <- spectra_new |>
     Spectra::peaksData() |>
     Spectra::combinePeaksData(
       tolerance = dalton,
       ppm = ppm,
       peaks = "union"
-    ) |>
-    data.frame() |>
-    tidytable::pull("mz")
+    )
+  averaged_intensities <- combined_peaks[, "mz"]
+  n_avg <- length(averaged_intensities)
 
-  # Process all spectra more efficiently
-  for (i in seq_along(spectra_new)) {
-    # Direct access to mz values without intermediate data frame
-    mzs <- spectra_new@backend@peaksData[[i]][, 1]
-
-    # Vectorized matching for all m/z values at once
-    if (length(mzs) > 0L) {
-      # For each mz, find the closest averaged value
-      for (j in seq_along(mzs)) {
-        # Calculate distances to all averaged values
-        diffs <- abs(mzs[j] - averaged_intensities)
-        min_idx <- which.min(diffs)
-
-        # Only update if within tolerance (dalton only, matching original semantics)
-        if (diffs[min_idx] <= dalton) {
-          mzs[j] <- averaged_intensities[min_idx]
-        }
-      }
-
-      # Update the m/z values in place
-      spectra_new@backend@peaksData[[i]][, 1] <- mzs
-    }
+  if (n_avg == 0L) {
+    return(spectra_new)
   }
 
-  return(spectra_new)
+  pks <- spectra_new@backend@peaksData
+  for (i in seq_along(pks)) {
+    mzs <- pks[[i]][, 1L]
+    if (length(mzs) > 0L) {
+      idx_left <- findInterval(mzs, averaged_intensities)
+      idx_left_clamped <- pmax(1L, idx_left)
+      idx_right <- pmin(n_avg, idx_left + 1L)
+
+      d_left <- abs(mzs - averaged_intensities[idx_left_clamped])
+      d_right <- abs(mzs - averaged_intensities[idx_right])
+
+      use_right <- d_right < d_left
+      min_diff <- ifelse(use_right, d_right, d_left)
+      best_idx <- ifelse(use_right, idx_right, idx_left_clamped)
+
+      within <- min_diff <= dalton
+      if (any(within)) {
+        mzs[within] <- averaged_intensities[best_idx[within]]
+        pks[[i]][, 1L] <- mzs
+      }
+    }
+  }
+  spectra_new@backend@peaksData <- pks
+
+  spectra_new
 }

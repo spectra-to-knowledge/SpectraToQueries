@@ -12,7 +12,7 @@ show_progress(current, total)
 \item{total}{Total iterations}
 }
 \value{
-NULL (invisibly). Prints progress message at milestones.
+\code{NULL} (invisibly). Prints progress message at 10\% milestones.
 }
 \description{
 Simple progress indicator (base R only)

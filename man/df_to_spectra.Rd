@@ -7,15 +7,15 @@
 df_to_spectra(df)
 }
 \arguments{
-\item{df}{A data.frame with metadata columns plus \code{mz} and \code{intensity}
+\item{df}{A \code{data.frame} with metadata columns plus \code{mz} and \code{intensity}
 as list columns}
 }
 \value{
-A Spectra object
+A \link[Spectra:Spectra]{Spectra::Spectra} object
 }
 \description{
-Reconstructs a Spectra object from a portable data.frame format created by
-\code{\link[=spectra_to_df]{spectra_to_df()}}. The data.frame must have \code{mz} and \code{intensity} columns
-(as lists) along with metadata columns.
+Reconstructs a \link[Spectra:Spectra]{Spectra::Spectra} object from a portable \code{data.frame} format
+created by \code{\link[=spectra_to_df]{spectra_to_df()}}. The \code{data.frame} must have \code{mz} and \code{intensity}
+columns (as lists) along with metadata columns.
 }
 \keyword{internal}

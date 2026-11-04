@@ -11,14 +11,14 @@ perform_list_of_queries(index, ions_list, query_data, dalton, ppm)
 
 \item{ions_list}{List of ions for queries}
 
-\item{query_data}{Data frame with columns \code{mz}, \code{precursor_mz}, and \code{skeleton}}
+\item{query_data}{List with elements \code{mz}, \code{precursor_mz}, and \code{skeleton}}
 
 \item{dalton}{Tolerance in Dalton}
 
 \item{ppm}{Tolerance in parts per million}
 }
 \value{
-Data frame with target and value columns
+Data frame with \code{target} and \code{value} columns
 }
 \description{
 Perform list of queries

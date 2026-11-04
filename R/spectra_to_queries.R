@@ -1,35 +1,50 @@
 #' @title Spectra to queries
 #'
-#' @description This function converts spectra to diagnostic ion queries.
+#' @description This function converts tandem mass spectra into diagnostic
+#'   fragment and neutral-loss ion queries ranked by Matthews Correlation
+#'   Coefficient (MCC).
 #'
-#' @param spectra Spectra object or path to MGF file. If `NULL`, loads the example
-#'   `spectra` dataset. If the string `"grouped"`, loads the grouped example
-#'   spectra. Otherwise, a path to an MGF file or a Spectra object.
-#' @param export Export path
-#' @param dalton Tolerance in Dalton. Default to 0.01
-#' @param decimals Number of decimals for rounding. Default to 4L
-#' @param intensity_min Minimal intensity. Default to 0.0
-#' @param ions_max Maximal number of ions in the query. Default to 10L
-#' @param n_skel_min Minimal number of individuals per skeleton. Default to 5L
-#' @param n_spec_min Minimal number of individuals where a signal has to be found. Default to 3L
-#' @param ppm Tolerance in parts per million Default to 30.0
-#' @param mcc_min Minimal single-ion Matthews Correlation Coefficient. Default to 0.0
-#' @param precision_min Minimal single ion precision (pre-filter before MCC). Default to 0.0
-#' @param recall_min Minimal single ion recall (pre-filter before MCC). Default to 0.0
-#' @param zero_val Zero value for intensity. Default to 0.0
+#' @param spectra A [Spectra::Spectra] object, a portable `data.frame` (such as
+#'   [mia_spectra_df] or [mia_spectra_grouped_df]), or a file path to an MGF
+#'   file. If `NULL`, loads the example [mia_spectra_df] dataset. If the string
+#'   `"grouped"`, loads the grouped example [mia_spectra_grouped_df] dataset.
+#' @param export Export file path for the resulting TSV table (or `NULL` to
+#'   skip writing to disk). Default is `"data/interim/queries.tsv"`.
+#' @param dalton Tolerance in Dalton. Default is `0.01`.
+#' @param decimals Number of decimals for rounding. Default is `4L`.
+#' @param intensity_min Minimal relative intensity threshold (0 to 100). Default
+#'   is `0.0`.
+#' @param ions_max Maximal number of ions in a query combination. Default is
+#'   `10L`.
+#' @param n_skel_min Minimal number of spectra per skeleton class. Default is
+#'   `5L`.
+#' @param n_spec_min Minimal number of spectra where a signal has to be found.
+#'   Default is `3L`.
+#' @param ppm Tolerance in parts per million. Default is `30.0`.
+#' @param mcc_min Minimal single-ion Matthews Correlation Coefficient. Default
+#'   is `0.0`.
+#' @param precision_min Minimal single-ion precision (pre-filter before MCC).
+#'   Default is `0.0`.
+#' @param recall_min Minimal single-ion recall (pre-filter before MCC). Default
+#'   is `0.0`.
+#' @param zero_val Zero value threshold for intensity. Default is `0.0`.
 #'
-#' @return A file with diagnostic query ions
+#' @return Invisibly returns a `data.frame` with columns `skeleton`, `mcc`, and
+#'   `combined_ions`, and writes the TSV table to `export` when `export` is
+#'   non-`NULL`.
 #'
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#'   # Run with default spectra
-#'   spectra_to_queries()
+#'   # Run with default example spectra (mia_spectra_df)
+#'   spectra_to_queries(export = tempfile(fileext = ".tsv"))
 #'
-#'   # Or explicitly load and pass spectra_grouped
-#'   data(spectra_grouped)
-#'   spectra_to_queries(spectra = spectra_grouped)
+#'   # Run with grouped example spectra (mia_spectra_grouped_df)
+#'   spectra_to_queries(
+#'     spectra = "grouped",
+#'     export = tempfile(fileext = ".tsv")
+#'   )
 #' }
 spectra_to_queries <- function(
   spectra = NULL,
@@ -48,34 +63,52 @@ spectra_to_queries <- function(
 ) {
   if (is.null(spectra)) {
     message("No spectra given, loading example spectra.")
+    data_env <- new.env(parent = emptyenv())
     utils::data(
-      mia_spectra_df,
-      package = "SpectraToQueries"
+      "mia_spectra_df",
+      package = "SpectraToQueries",
+      envir = data_env
     )
-    mia_spectra <- df_to_spectra(mia_spectra_df)
-  } else if (is.character(spectra) && spectra == "grouped") {
+    mia_spectra <- df_to_spectra(data_env$mia_spectra_df)
+  } else if (
+    is.character(spectra) && length(spectra) == 1L && spectra == "grouped"
+  ) {
     message("Loading grouped example spectra.")
+    data_env <- new.env(parent = emptyenv())
     utils::data(
-      mia_spectra_grouped_df,
-      package = "SpectraToQueries"
+      "mia_spectra_grouped_df",
+      package = "SpectraToQueries",
+      envir = data_env
     )
-    mia_spectra <- df_to_spectra(mia_spectra_grouped_df)
+    mia_spectra <- df_to_spectra(data_env$mia_spectra_grouped_df)
   } else if (is.character(spectra)) {
     message("Loading spectra from file.")
     mia_spectra <- spectra |>
       MsBackendMgf::readMgf() |>
       Spectra::Spectra()
+  } else if (is.data.frame(spectra)) {
+    mia_spectra <- df_to_spectra(spectra)
   } else {
-    # Assume it's already a Spectra object
     mia_spectra <- spectra
   }
-  mia_spectra@backend@spectraData$precursorMz <-
-    mia_spectra@backend@spectraData$PRECURSOR_MZ |>
-    as.numeric()
 
-  # Total number of spectra — required as the denominator for TN in MCC:
+  if (!is.null(mia_spectra@backend@spectraData$PRECURSOR_MZ)) {
+    mia_spectra@backend@spectraData$precursorMz <-
+      as.numeric(mia_spectra@backend@spectraData$PRECURSOR_MZ)
+  }
+
+  # Total number of spectra (as numeric to prevent integer overflow in MCC):
   #   TN = total_spectra - TP - FP - FN
-  total_spectra <- length(mia_spectra)
+  total_spectra <- as.numeric(length(mia_spectra))
+
+  combine_by_title <- function(x) {
+    titles <- x$TITLE
+    if (!is.null(titles) && (anyDuplicated(titles) || is.unsorted(titles))) {
+      Spectra::combineSpectra(x, f = titles)
+    } else {
+      x
+    }
+  }
 
   message(
     "Cut the fragments lower than ",
@@ -85,21 +118,17 @@ spectra_to_queries <- function(
   mia_spectra_1 <- mia_spectra |>
     Spectra::filterMsLevel(2L) |>
     Spectra::reduceSpectra(tolerance = dalton, ppm = ppm) |>
-    Spectra::combineSpectra(
-      f = mia_spectra$TITLE
-    ) |>
+    combine_by_title() |>
     Spectra::deisotopeSpectra(tolerance = dalton, ppm = ppm) |>
     Spectra::filterPrecursorPeaks(
       tolerance = dalton,
       ppm = ppm,
       mz = ">="
     ) |>
-    Spectra::filterEmptySpectra() |>
-    Spectra::addProcessing(
-      normalize_peaks()
-    ) |>
+    Spectra::addProcessing(normalize_peaks()) |>
     Spectra::filterIntensity(intensity = c(intensity_min, Inf)) |>
-    Spectra::applyProcessing()
+    Spectra::applyProcessing() |>
+    Spectra::filterEmptySpectra()
 
   message(
     "Harmonize m/z values across spectra, given ",
@@ -129,21 +158,18 @@ spectra_to_queries <- function(
       )
     ) |>
     Spectra::reduceSpectra(tolerance = dalton, ppm = ppm) |>
-    Spectra::combineSpectra(
-      f = mia_spectra$TITLE
-    ) |>
+    combine_by_title() |>
     Spectra::deisotopeSpectra(tolerance = dalton, ppm = ppm) |>
     Spectra::filterPrecursorPeaks(
       tolerance = dalton,
       ppm = ppm,
       mz = ">="
     ) |>
-    Spectra::filterEmptySpectra() |>
-    Spectra::addProcessing(
-      normalize_peaks()
-    ) |>
+    Spectra::addProcessing(normalize_peaks()) |>
     Spectra::filterIntensity(intensity = c(intensity_min, Inf)) |>
-    Spectra::applyProcessing()
+    Spectra::applyProcessing() |>
+    Spectra::filterEmptySpectra()
+
   mia_spectra_w_nl <- mia_spectra_nl |>
     harmonize_mzs(dalton = dalton, ppm = ppm)
 
@@ -152,7 +178,7 @@ spectra_to_queries <- function(
   mia_spectra_binned <- mia_spectra_w |>
     Spectra::bin(
       binSize = dalton,
-      zero.rm = FALSE
+      zero.rm = TRUE
     ) |>
     Spectra::applyProcessing()
 
@@ -174,13 +200,12 @@ spectra_to_queries <- function(
       ppm = ppm
     )
   rm(mia_spectra_binned)
-  gc(verbose = FALSE)
 
   mia_spectra_binned_nl <- mia_spectra_w_nl |>
     Spectra::reset() |>
     Spectra::bin(
       binSize = dalton,
-      zero.rm = FALSE
+      zero.rm = TRUE
     ) |>
     Spectra::applyProcessing()
   spectra_nl_mat <- mia_spectra_binned_nl |>
@@ -195,170 +220,168 @@ spectra_to_queries <- function(
       ppm = ppm
     )
   rm(mia_spectra_binned_nl)
-  gc(verbose = FALSE)
 
   message("Create a matrix containing fragments and neutral losses.")
   message("Round the values to ", decimals, ".")
 
-  # Pre-calculate column names to avoid redundant operations
-  frag_names <- paste0(
-    round(as.numeric(colnames(spectra_mat)), decimals),
-    "_frag"
-  )
-  nl_names <- paste0(
-    round(as.numeric(colnames(spectra_nl_mat)), decimals),
-    "_nl"
-  )
+  frag_names <- if (ncol(spectra_mat) > 0L) {
+    paste0(round(as.numeric(colnames(spectra_mat)), decimals), "_frag")
+  } else {
+    character(0)
+  }
+  nl_names <- if (ncol(spectra_nl_mat) > 0L) {
+    paste0(round(as.numeric(colnames(spectra_nl_mat)), decimals), "_nl")
+  } else {
+    character(0)
+  }
 
-  # Merge matrices
   merged_mat <- cbind(spectra_mat, spectra_nl_mat)
+  rm(spectra_mat, spectra_nl_mat)
 
-  # Filter zero columns
   zeros <- colSums(merged_mat) <= zero_val
   if (!all(zeros)) {
     merged_mat <- merged_mat[, !zeros, drop = FALSE]
-    # Update column names for non-zero columns
     all_names <- c(frag_names, nl_names)
     colnames(merged_mat) <- all_names[!zeros]
   } else {
-    # Handle edge case where all columns are zeros
-    merged_mat <- matrix(0, nrow = nrow(merged_mat), ncol = 0)
+    merged_mat <- matrix(0, nrow = nrow(merged_mat), ncol = 0L)
     colnames(merged_mat) <- character(0)
   }
 
   message("Count the number of members per skeleton and pivot the matrix.")
-  ions_table <- merged_mat |>
-    as.data.frame() |>
-    (\(df) {
-      df$group <- rownames(df)
-      df <- df[, c("group", setdiff(names(df), "group"))]
-      df
-    })() |>
-    tidytable::mutate(
-      group = gsub(
-        pattern = "\\.[0-9]{1,3}",
-        replacement = "",
-        x = group
-      )
-    ) |>
-    tidytable::group_by(group) |>
-    tidytable::add_count(name = "group_count") |>
-    tidytable::ungroup() |>
-    tidytable::filter(group_count >= n_skel_min) |>
-    tidytable::pivot_longer(
-      cols = !tidytable::starts_with("group"),
-      names_to = "ion"
-    ) |>
-    tidytable::filter(value != 0)
+  groups_vec <- gsub(
+    pattern = "+",
+    replacement = ".",
+    x = as.character(rownames(merged_mat)),
+    fixed = TRUE
+  )
+  group_counts_tab <- table(groups_vec)
+  group_count_vec <- as.integer(group_counts_tab[groups_vec])
 
-  # Clean up large matrices to free memory
-  rm(merged_mat, spectra_mat, spectra_nl_mat)
-  gc(verbose = FALSE)
+  keep_rows <- group_count_vec >= n_skel_min
+  merged_sub <- merged_mat[keep_rows, , drop = FALSE]
+  groups_sub <- groups_vec[keep_rows]
+  group_count_sub <- group_count_vec[keep_rows]
+  rm(merged_mat)
+
+  # Pivot non-zero entries to long format (column-major order matching pivot_longer)
+  nz_mat <- merged_sub != 0
+  col_counts <- colSums(nz_mat)
+  keep_ions <- col_counts >= n_spec_min
+  nz_mat <- nz_mat[, keep_ions, drop = FALSE]
+  col_counts <- col_counts[keep_ions]
+  rm(merged_sub)
+
+  nz_idx <- which(nz_mat, arr.ind = TRUE)
+  row_idx <- nz_idx[, 1L]
+  col_idx <- nz_idx[, 2L]
+
+  ions_df <- data.frame(
+    group = groups_sub[row_idx],
+    group_count = group_count_sub[row_idx],
+    ion = colnames(nz_mat)[col_idx],
+    count_per_ion = as.integer(col_counts[col_idx]),
+    stringsAsFactors = FALSE
+  )
+  rm(nz_mat, nz_idx)
 
   message("Extract the best ions to perform a query.")
-  ions_table_filtered_1 <- ions_table |>
-    tidytable::group_by(ion) |>
-    tidytable::add_count(name = "count_per_ion") |>
-    tidytable::filter(count_per_ion >= n_spec_min) |>
-    tidytable::ungroup() |>
-    tidytable::group_by(group, ion) |>
-    tidytable::add_count(name = "count_per_ion_per_group") |>
-    tidytable::ungroup() |>
-    tidytable::select(-value) |>
-    tidytable::distinct() |>
-    # Optional pre-filters on precision and recall before MCC computation.
-    # These reduce the candidate set cheaply and remain meaningful on their own.
-    tidytable::mutate(
-      precision = count_per_ion_per_group / count_per_ion,
-      recall = count_per_ion_per_group / group_count
-    ) |>
-    tidytable::filter(precision >= precision_min) |>
-    tidytable::filter(recall >= recall_min) |>
-    # -----------------------------------------------------------------------
-    # Matthews Correlation Coefficient (MCC) for a single ion / group pair.
-    #
-    #   TP = spectra in this group that contain the ion
-    #   FP = spectra in other groups that contain the ion
-    #   FN = spectra in this group that do NOT contain the ion
-    #   TN = all remaining spectra (neither in this group nor containing the ion)
-    #
-    #   MCC = (TP*TN - FP*FN) / sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
-    #
-    # When the denominator is zero (degenerate partition), MCC is set to 0.
-    # -----------------------------------------------------------------------
-    tidytable::mutate(
-      tp = count_per_ion_per_group,
-      fp = count_per_ion - count_per_ion_per_group,
-      fn_ = group_count - count_per_ion_per_group, # fn_ avoids clash with base fn()
-      tn = total_spectra - tp - fp - fn_,
-      mcc = tidytable::if_else(
-        condition = (tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_) > 0,
-        true = (tp * tn - fp * fn_) /
-          sqrt((tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_)),
-        false = 0.0 # degenerate case: ion present in every or no spectrum
+  grp_ion_key <- paste(ions_df$group, ions_df$ion, sep = "\r")
+  grp_ion_tab <- tabulate(match(grp_ion_key, unique(grp_ion_key)))
+  is_first <- !duplicated(grp_ion_key)
+  ions_df <- ions_df[is_first, , drop = FALSE]
+  ions_df$count_per_ion_per_group <- grp_ion_tab
+
+  ions_df$precision <- ions_df$count_per_ion_per_group / ions_df$count_per_ion
+  ions_df$recall <- ions_df$count_per_ion_per_group / ions_df$group_count
+
+  ions_df <- ions_df[
+    ions_df$precision >= precision_min & ions_df$recall >= recall_min,
+    ,
+    drop = FALSE
+  ]
+
+  # -------------------------------------------------------------------------
+  # Matthews Correlation Coefficient (MCC) for a single ion / group pair:
+  #   MCC = (TP*TN - FP*FN) / sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
+  # -------------------------------------------------------------------------
+  tp <- as.numeric(ions_df$count_per_ion_per_group)
+  fp <- as.numeric(ions_df$count_per_ion) - tp
+  fn_ <- as.numeric(ions_df$group_count) - tp
+  tn <- total_spectra - tp - fp - fn_
+  denom_sq <- (tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_)
+  ions_df$mcc <- ifelse(
+    denom_sq > 0,
+    (tp * tn - fp * fn_) / sqrt(denom_sq),
+    0.0
+  )
+
+  ions_df <- ions_df[order(ions_df$mcc, decreasing = TRUE), , drop = FALSE]
+  ions_df <- ions_df[
+    ions_df$mcc >= mcc_min | ions_df$recall == 1,
+    ,
+    drop = FALSE
+  ]
+
+  extract_ions_by_group <- function(df_sub) {
+    if (nrow(df_sub) == 0L) {
+      return(list())
+    }
+    groups <- sort(unique(df_sub$group), method = "radix")
+    u_ions <- unique(df_sub$ion)
+    df_sub <- df_sub[order(match(df_sub$ion, u_ions)), , drop = FALSE]
+    res <- lapply(groups, function(g) {
+      unique(df_sub$ion[df_sub$group == g])
+    })
+    names(res) <- groups
+    res
+  }
+
+  diag_df <- ions_df[ions_df$recall == 1, c("group", "ion"), drop = FALSE]
+  ions_list_diagnostic <- extract_ions_by_group(diag_df)
+
+  non_diag_df <- ions_df[
+    ions_df$mcc >= mcc_min & ions_df$recall != 1,
+    ,
+    drop = FALSE
+  ]
+  non_diag_df <- non_diag_df[
+    order(non_diag_df$mcc, decreasing = TRUE),
+    ,
+    drop = FALSE
+  ]
+  if (nrow(non_diag_df) > 0L) {
+    u_grp <- unique(non_diag_df$group)
+    sliced_list <- lapply(u_grp, function(g) {
+      utils::head(
+        non_diag_df[non_diag_df$group == g, c("group", "ion"), drop = FALSE],
+        ions_max
       )
-    ) |>
-    tidytable::select(-tp, -fp, -fn_, -tn) |> # drop intermediate columns
-    tidytable::arrange(tidytable::desc(mcc)) |>
-    # Keep ions that pass the MCC threshold OR are perfectly diagnostic (recall == 1)
-    tidytable::filter(mcc >= mcc_min | recall == 1) |>
-    tidytable::mutate(value = 1)
+    })
+    non_diag_df <- do.call(rbind, sliced_list)
+  }
+  ions_list <- extract_ions_by_group(non_diag_df)
+  rm(ions_df, diag_df, non_diag_df)
 
-  # Clean up ions_table to free memory
-  rm(ions_table)
-  gc(verbose = FALSE)
-
-  ions_table_diagnostic <- ions_table_filtered_1 |>
-    tidytable::filter(recall == 1) |>
-    tidytable::distinct(group, ion, value) |>
-    tidytable::pivot_wider(
-      names_from = ion,
-      values_from = value,
-      values_fn = mean
-    ) |>
-    (\(df) {
-      row_names <- df$group
-      df$group <- NULL
-      rownames(df) <- row_names
-      df
-    })()
-
-  # Pivot back again.
-  ions_table_final <- ions_table_filtered_1 |>
-    tidytable::group_by(group) |>
-    # Retain only non-perfectly-diagnostic ions that clear the MCC threshold,
-    # keeping the top `ions_max` per skeleton ranked by MCC.
-    tidytable::filter(mcc >= mcc_min & recall != 1) |>
-    tidytable::arrange(tidytable::desc(mcc)) |>
-    tidytable::slice_head(n = ions_max) |>
-    tidytable::ungroup() |>
-    tidytable::distinct(group, ion, value) |>
-    tidytable::pivot_wider(
-      names_from = ion,
-      values_from = value,
-      values_fn = mean
-    ) |>
-    (\(df) {
-      row_names <- df$group
-      df$group <- NULL
-      rownames(df) <- row_names
-      df
-    })()
-
-  # Extract the matching ions per skeleton
-  ions_list_diagnostic <- split(
-    colnames(ions_table_diagnostic)[col(ions_table_diagnostic)[
-      ions_table_diagnostic > 0
-    ]],
-    row(ions_table_diagnostic)[ions_table_diagnostic > 0]
-  )
-  names(ions_list_diagnostic) <- rownames(ions_table_diagnostic)
-
-  ions_list <- split(
-    colnames(ions_table_final)[col(ions_table_final)[ions_table_final > 0]],
-    row(ions_table_final)[ions_table_final > 0]
-  )
-  names(ions_list) <- rownames(ions_table_final)
+  if (length(ions_list) == 0L) {
+    final_queries <- data.frame(
+      skeleton = character(0),
+      mcc = numeric(0),
+      combined_ions = character(0),
+      stringsAsFactors = FALSE
+    )
+    if (!is.null(export)) {
+      create_dir(export)
+      utils::write.table(
+        final_queries,
+        file = export,
+        sep = "\t",
+        row.names = FALSE,
+        quote = FALSE
+      )
+    }
+    return(invisible(final_queries))
+  }
 
   message("Generate all combinations of queries.")
   combinations <- names(ions_list) |>
@@ -369,9 +392,7 @@ spectra_to_queries <- function(
     )
   names(combinations) <- names(ions_list)
 
-  # Combination merging
   message("Merging diagnostic ions with combinations.")
-
   has_diagnostic <- match(
     names(ions_list),
     names(ions_list_diagnostic),
@@ -380,13 +401,11 @@ spectra_to_queries <- function(
     0L
 
   if (any(has_diagnostic)) {
-    # Only process items that have diagnostic ions
     for (name in names(combinations)[has_diagnostic]) {
       x <- combinations[[name]]
       diagnostic_ions <- ions_list_diagnostic[[name]]
 
-      if (length(diagnostic_ions) > 0) {
-        # In-place update more efficient than creating new list
+      if (length(diagnostic_ions) > 0L) {
         combinations[[name]] <- lapply(x, function(sublist) {
           unique(c(unlist(sublist), diagnostic_ions))
         })
@@ -394,16 +413,11 @@ spectra_to_queries <- function(
     }
   }
 
-  # Free memory from intermediate objects
   rm(ions_list, ions_list_diagnostic)
-  gc(verbose = FALSE)
 
   all_combinations <- unlist(combinations, recursive = FALSE)
   names(all_combinations) <- gsub("\\d+$", "", names(all_combinations))
-
-  # Clean up
   rm(combinations)
-  gc(verbose = FALSE)
 
   message("Test the queries. (This is the longest step)")
   queries_results <- all_combinations |>
@@ -416,8 +430,6 @@ spectra_to_queries <- function(
   names(queries_results) <- names(all_combinations)
 
   message("Evaluate the performance of each query using MCC.")
-
-  # Computed once, not once per query result.
   normalized_skeleton <- gsub(
     pattern = "+",
     replacement = ".",
@@ -426,54 +438,80 @@ spectra_to_queries <- function(
   )
   skeleton_counts <- table(normalized_skeleton)
 
-  results_stats <- lapply(
+  results_stats <- vapply(
     seq_along(queries_results),
     function(result) {
-      # -----------------------------------------------------------------------
-      # Per-query confusion matrix entries:
-      #   TP = query hits that belong to the target skeleton
-      #   FP = query hits that belong to a different skeleton
-      #   FN = members of the target skeleton missed by the query
-      #   TN = all other spectra (not the target skeleton, not hit by query)
-      # -----------------------------------------------------------------------
       target_name <- names(queries_results)[result]
       vals <- queries_results[[result]]$value
-      tp <- sum(vals == target_name)
-      fp <- length(vals) - tp
-      group_total <- skeleton_counts[[target_name]] %||% 0L
+      tp <- as.numeric(sum(vals == target_name))
+      fp <- as.numeric(length(vals)) - tp
+      group_total <- if (target_name %in% names(skeleton_counts)) {
+        as.numeric(skeleton_counts[[target_name]])
+      } else {
+        0.0
+      }
       fn_ <- group_total - tp
       tn <- total_spectra - tp - fp - fn_
 
       denom <- sqrt((tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_))
-      # MCC — returns 0 for degenerate partitions (zero denominator)
       mcc <- if (denom > 0) (tp * tn - fp * fn_) / denom else 0.0
       round(mcc, decimals)
-    }
+    },
+    numeric(1L)
   )
 
-  best_queries <- data.frame(
-    skeleton = names(all_combinations),
-    mcc = as.numeric(unlist(results_stats)),
-    ions = I(all_combinations)
-  ) |>
-    tidytable::filter(!is.nan(mcc)) |>
-    tidytable::arrange(tidytable::desc(mcc)) |>
-    tidytable::group_by(skeleton) |>
-    # For each skeleton keep only the query with the highest MCC
-    tidytable::mutate(id = match(mcc, unique(mcc))) |>
-    tidytable::filter(id == 1) |>
-    tidytable::select(-id)
+  valid_mcc <- !is.nan(results_stats)
+  skel_vec <- names(all_combinations)[valid_mcc]
+  mcc_vec <- results_stats[valid_mcc]
+  ions_vec <- all_combinations[valid_mcc]
 
-  final_queries <- best_queries |>
-    tidytable::group_by(skeleton, mcc) |>
-    tidytable::summarize(
-      combined_ions = combine_ions_minimal(ions),
-      .groups = "drop"
-    )
+  ord <- order(mcc_vec, decreasing = TRUE)
+  skel_vec <- skel_vec[ord]
+  mcc_vec <- mcc_vec[ord]
+  ions_vec <- ions_vec[ord]
+
+  max_mcc_by_skel <- tapply(mcc_vec, skel_vec, max)
+  keep_best <- mcc_vec == as.numeric(max_mcc_by_skel[skel_vec])
+
+  skel_best <- skel_vec[keep_best]
+  mcc_best <- mcc_vec[keep_best]
+  ions_best <- ions_vec[keep_best]
+
+  u_skel <- unique(skel_best)
+  final_queries <- data.frame(
+    skeleton = u_skel,
+    mcc = vapply(
+      u_skel,
+      function(s) mcc_best[skel_best == s][1L],
+      numeric(1L),
+      USE.NAMES = FALSE
+    ),
+    combined_ions = vapply(
+      u_skel,
+      function(s) combine_ions_minimal(ions_best[skel_best == s]),
+      character(1L),
+      USE.NAMES = FALSE
+    ),
+    stringsAsFactors = FALSE
+  )
+  final_queries <- final_queries[
+    order(final_queries$mcc, decreasing = TRUE),
+    ,
+    drop = FALSE
+  ]
+  rownames(final_queries) <- NULL
 
   message("Export the best queries for further use.")
-  create_dir(export)
-  final_queries |>
-    tidytable::arrange(tidytable::desc(mcc)) |>
-    tidytable::fwrite(file = export, sep = "\t")
+  if (!is.null(export)) {
+    create_dir(export)
+    utils::write.table(
+      final_queries,
+      file = export,
+      sep = "\t",
+      row.names = FALSE,
+      quote = FALSE
+    )
+  }
+
+  invisible(final_queries)
 }

@@ -95,11 +95,12 @@ SpectraToQueries::spectra_to_queries(
 
 The package includes two example datasets from MIADB:
 
-- `mia_spectra_df` --- Raw spectra (321 spectra)
-- `mia_spectra_grouped_df` --- Pre-grouped spectra (321 spectra)
+- `mia_spectra_df` --- Raw spectra (321 MS/MS spectra across 81 skeletons)
+- `mia_spectra_grouped_df` --- Grouped spectra (321 MS/MS spectra across 53
+  grouped skeleton classes)
 
-These are stored as portable data.frames (with `mz` and `intensity` as list
-columns) and automatically converted to Spectra objects when loaded.
+These are stored as portable `data.frame` objects (with `mz` and `intensity` as
+list columns) and automatically converted to `Spectra` objects when loaded.
 
 To access them directly:
 
@@ -131,7 +132,8 @@ desc_path <- if (file.exists("DESCRIPTION")) {
 grateful::cite_packages(
   output = "table",
   out.dir = getwd(),
-  path = desc_path
+  path = desc_path,
+  omit = c("knitr", "rmarkdown", "testthat")
 ) |>
   knitr::kable()
 ```

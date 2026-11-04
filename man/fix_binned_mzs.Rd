@@ -9,7 +9,7 @@ fix_binned_mzs(binned_m, original_mzs, dalton, ppm, decimals)
 \arguments{
 \item{binned_m}{Binned matrix}
 
-\item{original_mzs}{Original m/z values from spectra}
+\item{original_mzs}{Original \code{Spectra} object with unbinned m/z values}
 
 \item{dalton}{Tolerance in Dalton}
 

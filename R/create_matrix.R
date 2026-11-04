@@ -1,52 +1,67 @@
 #' @title Create matrix
 #'
-#' @param spectra Spectra
-#' @param zero_val Zero value
-#' @param name Name
+#' @param spectra Spectra object (binned)
+#' @param zero_val Zero value threshold for filtering columns
+#' @param name Row names for the resulting matrix
 #'
-#' @return A matrix with spectra intensity data
+#' @return A matrix with spectra intensity data and m/z column names
 #'
 #' @examples NULL
 create_matrix <- function(spectra, zero_val = 0, name) {
-  # Get intensity data
-  intensity_list <- Spectra::intensity(
-    spectra
-  )
+  pks <- Spectra::peaksData(spectra)
+  n_spectra <- length(pks)
 
-  # Pre-allocate matrix
-  n_spectra <- length(intensity_list)
-  n_peaks <- length(intensity_list[[1L]])
-
-  # Use colSums approach: create matrix directly and filter
-  # Initialize matrix with all values
-  spectra_mat <- matrix(0, nrow = n_spectra, ncol = n_peaks)
-
-  # Fill matrix row by row (more cache-friendly than column-wise)
-  for (i in seq_len(n_spectra)) {
-    spectra_mat[i, ] <- intensity_list[[i]]
+  if (n_spectra == 0L) {
+    return(matrix(0, nrow = 0L, ncol = 0L))
   }
 
-  # Vectorized: identify non-zero columns using colSums
-  col_sums <- colSums(spectra_mat)
-  keep_cols <- col_sums > zero_val
-
-  if (!any(keep_cols)) {
-    # Handle edge case where all columns are zeros
-    spectra_mat <- matrix(0, nrow = n_spectra, ncol = 0)
+  lens <- vapply(pks, nrow, integer(1L))
+  if (all(lens == 0L)) {
+    spectra_mat <- matrix(0, nrow = n_spectra, ncol = 0L)
     rownames(spectra_mat) <- name
     return(spectra_mat)
   }
 
-  # Subset matrix using logical indexing (vectorized)
+  # Fast column-major path when all spectra share the exact same m/z grid
+  if (
+    length(unique(lens)) == 1L &&
+      lens[1L] > 0L &&
+      identical(pks[[1L]][, 1L], pks[[n_spectra]][, 1L])
+  ) {
+    all_int <- unlist(lapply(pks, function(x) x[, 2L]), use.names = FALSE)
+    dim(all_int) <- c(lens[1L], n_spectra)
+    keep_cols <- rowSums(all_int) > zero_val
+    if (!any(keep_cols)) {
+      spectra_mat <- matrix(0, nrow = n_spectra, ncol = 0L)
+      rownames(spectra_mat) <- name
+      return(spectra_mat)
+    }
+    spectra_mat <- t(all_int[keep_cols, , drop = FALSE])
+    colnames(spectra_mat) <- pks[[1L]][keep_cols, 1L]
+    rownames(spectra_mat) <- name
+    return(spectra_mat)
+  }
+
+  # Sparse path (e.g. binned with zero.rm = TRUE)
+  all_mz <- unlist(lapply(pks, function(x) x[, 1L]), use.names = FALSE)
+  all_int <- unlist(lapply(pks, function(x) x[, 2L]), use.names = FALSE)
+  u_mz <- sort(unique(all_mz))
+  col_idx <- match(all_mz, u_mz)
+  row_idx <- rep.int(seq_len(n_spectra), lens)
+
+  spectra_mat <- matrix(0, nrow = n_spectra, ncol = length(u_mz))
+  spectra_mat[cbind(row_idx, col_idx)] <- all_int
+
+  keep_cols <- colSums(spectra_mat) > zero_val
+  if (!any(keep_cols)) {
+    spectra_mat <- matrix(0, nrow = n_spectra, ncol = 0L)
+    rownames(spectra_mat) <- name
+    return(spectra_mat)
+  }
+
   spectra_mat <- spectra_mat[, keep_cols, drop = FALSE]
-
-  # Get mz values only once and filter
-  mz_vals <- Spectra::mz(
-    spectra
-  )[[1L]][keep_cols]
-
-  colnames(spectra_mat) <- mz_vals
+  colnames(spectra_mat) <- u_mz[keep_cols]
   rownames(spectra_mat) <- name
 
-  return(spectra_mat)
+  spectra_mat
 }

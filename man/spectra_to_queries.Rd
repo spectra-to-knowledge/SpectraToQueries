@@ -21,47 +21,62 @@ spectra_to_queries(
 )
 }
 \arguments{
-\item{spectra}{Spectra object or path to MGF file. If \code{NULL}, loads the example
-\code{spectra} dataset. If the string \code{"grouped"}, loads the grouped example
-spectra. Otherwise, a path to an MGF file or a Spectra object.}
+\item{spectra}{A \link[Spectra:Spectra]{Spectra::Spectra} object, a portable \code{data.frame} (such as
+\link{mia_spectra_df} or \link{mia_spectra_grouped_df}), or a file path to an MGF
+file. If \code{NULL}, loads the example \link{mia_spectra_df} dataset. If the string
+\code{"grouped"}, loads the grouped example \link{mia_spectra_grouped_df} dataset.}
 
-\item{export}{Export path}
+\item{export}{Export file path for the resulting TSV table (or \code{NULL} to
+skip writing to disk). Default is \code{"data/interim/queries.tsv"}.}
 
-\item{dalton}{Tolerance in Dalton. Default to 0.01}
+\item{dalton}{Tolerance in Dalton. Default is \code{0.01}.}
 
-\item{decimals}{Number of decimals for rounding. Default to 4L}
+\item{decimals}{Number of decimals for rounding. Default is \code{4L}.}
 
-\item{intensity_min}{Minimal intensity. Default to 0.0}
+\item{intensity_min}{Minimal relative intensity threshold (0 to 100). Default
+is \code{0.0}.}
 
-\item{ions_max}{Maximal number of ions in the query. Default to 10L}
+\item{ions_max}{Maximal number of ions in a query combination. Default is
+\code{10L}.}
 
-\item{n_skel_min}{Minimal number of individuals per skeleton. Default to 5L}
+\item{n_skel_min}{Minimal number of spectra per skeleton class. Default is
+\code{5L}.}
 
-\item{n_spec_min}{Minimal number of individuals where a signal has to be found. Default to 3L}
+\item{n_spec_min}{Minimal number of spectra where a signal has to be found.
+Default is \code{3L}.}
 
-\item{ppm}{Tolerance in parts per million Default to 30.0}
+\item{ppm}{Tolerance in parts per million. Default is \code{30.0}.}
 
-\item{mcc_min}{Minimal single-ion Matthews Correlation Coefficient. Default to 0.0}
+\item{mcc_min}{Minimal single-ion Matthews Correlation Coefficient. Default
+is \code{0.0}.}
 
-\item{precision_min}{Minimal single ion precision (pre-filter before MCC). Default to 0.0}
+\item{precision_min}{Minimal single-ion precision (pre-filter before MCC).
+Default is \code{0.0}.}
 
-\item{recall_min}{Minimal single ion recall (pre-filter before MCC). Default to 0.0}
+\item{recall_min}{Minimal single-ion recall (pre-filter before MCC). Default
+is \code{0.0}.}
 
-\item{zero_val}{Zero value for intensity. Default to 0.0}
+\item{zero_val}{Zero value threshold for intensity. Default is \code{0.0}.}
 }
 \value{
-A file with diagnostic query ions
+Invisibly returns a \code{data.frame} with columns \code{skeleton}, \code{mcc}, and
+\code{combined_ions}, and writes the TSV table to \code{export} when \code{export} is
+non-\code{NULL}.
 }
 \description{
-This function converts spectra to diagnostic ion queries.
+This function converts tandem mass spectra into diagnostic
+fragment and neutral-loss ion queries ranked by Matthews Correlation
+Coefficient (MCC).
 }
 \examples{
 \dontrun{
-  # Run with default spectra
-  spectra_to_queries()
+  # Run with default example spectra (mia_spectra_df)
+  spectra_to_queries(export = tempfile(fileext = ".tsv"))
 
-  # Or explicitly load and pass spectra_grouped
-  data(spectra_grouped)
-  spectra_to_queries(spectra = spectra_grouped)
+  # Run with grouped example spectra (mia_spectra_grouped_df)
+  spectra_to_queries(
+    spectra = "grouped",
+    export = tempfile(fileext = ".tsv")
+  )
 }
 }

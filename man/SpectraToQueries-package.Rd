@@ -8,14 +8,14 @@
 \description{
 \if{html}{\figure{logo.svg}{options: style='float: right' alt='logo' width='120'}}
 
-SpectraToQueries provides the infrastructure to translate spectra to queries.
+Translates tandem mass spectrometry (MS/MS) spectral libraries into diagnostic fragment and neutral-loss ion queries for chemical structure and skeleton classification, ranked by Matthews Correlation Coefficient (MCC).
 }
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/spectra-to-knowledge/spectra-to-queries}
-  \item \url{https://spectra-to-knowledge.github.io/SpectraToQueries}
-  \item Report bugs at \url{https://github.com/spectra-to-knowledge/spectra-to-queries/issues}
+  \item \url{https://github.com/spectra-to-knowledge/SpectraToQueries}
+  \item \url{https://spectra-to-knowledge.github.io/SpectraToQueries/}
+  \item Report bugs at \url{https://github.com/spectra-to-knowledge/SpectraToQueries/issues}
 }
 
 }

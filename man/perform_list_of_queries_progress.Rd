@@ -2,7 +2,7 @@
 % Please edit documentation in R/perform_list_of_queries.R
 \name{perform_list_of_queries_progress}
 \alias{perform_list_of_queries_progress}
-\title{Perform list of queries}
+\title{Perform list of queries with progress}
 \usage{
 perform_list_of_queries_progress(
   ions_list,
@@ -21,13 +21,13 @@ perform_list_of_queries_progress(
 
 \item{ppm}{Tolerance in parts per million}
 
-\item{show_progress}{Logical: show progress bar (default TRUE)}
+\item{show_progress}{Logical: show progress bar (default \code{TRUE})}
 }
 \value{
-List of query results
+List of query result data frames
 }
 \description{
-Perform list of queries
+Perform list of queries with progress
 }
 \examples{
 NULL

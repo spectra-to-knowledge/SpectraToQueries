@@ -7,13 +7,19 @@
 #'
 #' @examples NULL
 generate_combinations <- function(x, max_ions) {
-  lapply(
-    1:min(length(x), max_ions),
-    function(k) {
-      utils::combn(x, k, simplify = FALSE)
-    }
-  ) |>
-    unlist(recursive = FALSE)
+  max_k <- min(length(x), as.integer(max_ions))
+  if (max_k <= 0L) {
+    return(list())
+  }
+  unlist(
+    lapply(
+      seq_len(max_k),
+      function(k) {
+        utils::combn(x, k, simplify = FALSE)
+      }
+    ),
+    recursive = FALSE
+  )
 }
 
 
@@ -22,7 +28,7 @@ generate_combinations <- function(x, max_ions) {
 #' @param indices Vector of indices to process
 #' @param ions_list List of ions for each index
 #' @param max_ions Maximum number of ions in combinations
-#' @param show_progress Logical: show progress bar (default TRUE)
+#' @param show_progress Logical: show progress bar (default `TRUE`)
 #'
 #' @return List of all combinations for each index
 #'

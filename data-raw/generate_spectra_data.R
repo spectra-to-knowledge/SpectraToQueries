@@ -3,6 +3,8 @@ library(MsBackendMgf)
 
 # Paths (assumes script is run from the package tree)
 pkg_root <- normalizePath(file.path("data-raw", ".."), mustWork = TRUE)
+source(file.path(pkg_root, "R", "spectra_utils.R"))
+
 mgf_raw <- file.path(
   pkg_root,
   "data/source/spectra/export_traitement_python_matchms-squelettes-tries.mgf"
@@ -30,7 +32,7 @@ mia_spectra_df <- spectra_obj |>
 cat("  ✓ Created data.frame with", nrow(mia_spectra_df), "rows\n")
 cat(
   "  ✓ Columns:",
-  paste(head(colnames(mia_spectra_df), 5), collapse = ", "),
+  paste(utils::head(colnames(mia_spectra_df), 5), collapse = ", "),
   "...\n\n"
 )
 
@@ -52,10 +54,12 @@ cat("Step 5: Saving as RDA files...\n")
 save(
   mia_spectra_df,
   file = file.path(pkg_root, "data", "mia_spectra_df.rda"),
+  compress = "bzip2"
 )
 save(
   mia_spectra_grouped_df,
   file = file.path(pkg_root, "data", "mia_spectra_grouped_df.rda"),
+  compress = "bzip2"
 )
 cat("  ✓ Saved data/mia_spectra_df.rda\n")
 cat("  ✓ Saved data/mia_spectra_grouped_df.rda\n\n")

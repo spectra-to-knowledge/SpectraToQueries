@@ -10,8 +10,8 @@ prepare_query_data(spectra)
 \item{spectra}{Spectra object}
 }
 \description{
-Extracts mz, precursor m/z, and skeleton labels once, so
-perform_query() never has to touch the Spectra backend again.
+Extracts mz, precursor m/z, and skeleton labels once as plain R
+vectors/lists so \code{perform_query()} never has to touch S4 objects again.
 }
 \examples{
 NULL

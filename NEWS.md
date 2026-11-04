@@ -1,35 +1,41 @@
 # SpectraToQueries
 
-# SpectraToQueries 0.0.9002
+# SpectraToQueries 0.0.0.9002
 
-## Data & Documentation
+## Performance & Optimization
 
-- **Added clean `data/` objects** for standard spectra:
-  - `spectra_grouped` (352KB): Example dataset, 321 grouped Spectra from MIADB,
-    53 unique skeletons
-  - `spectra` (354KB): Ungrouped variant for comparison
-  - Both fully documented with `@format`, `@source`, and usage examples
-  - Load via `data(spectra_grouped)` or `data(spectra)` instead of `readRDS()` +
-    `system.file()`
-
-- **`spectra_to_queries()` API improvements**:
-  - `spectra = NULL` now loads `spectra_grouped` automatically (cleaner default)
-  - `spectra = "grouped"` alias for explicit grouped-data loading
-  - Accepts file paths and Spectra objects as before
-  - Updated roxygen with concrete usage examples
-
-- **Cleaned `R/data.R`**:
-  - Removed all `inst/extdata/` system paths from examples
-  - Added concrete example showing `data(spectra_grouped)` usage
-  - Marked examples as `\dontrun` to avoid long test times in check
+- **~30x end-to-end speedup** in `spectra_to_queries()` with 100% identical
+  outputs:
+  - Precomputed single-ion logical hit vectors in
+    `perform_list_of_queries_progress()` and converted S4 `SimpleNumericList`
+    m/z lists to plain R vectors once in `prepare_query_data()`.
+  - Replaced nested loop linear scans in `harmonize_mzs()` with vectorized
+    `findInterval()` nearest-neighbor lookup.
+  - Switched `Spectra::bin()` to sparse mode (`zero.rm = TRUE`) with
+    sparse-aware `create_matrix()` and column-major distance calculation in
+    `fix_binned_mzs()`.
+  - Avoided redundant `Spectra::combineSpectra()` and duplicate lazy queue
+    evaluation before `Spectra::applyProcessing()`.
 
 ## Dependencies
 
-- Removed unnecessary `fastmatch` and `stringi` dependencies by switching those
-  fixed-string and set-membership operations to base R.
-- `tidytable` remains for grouping/summarization in `fix_binned_mzs.R`.
-- Removed direct `BiocParallel`, `data.table`, `progress`, `purrr`, and `tibble`
-  dependency (tidytable already in imports)
+- Removed `tidytable` from `Imports`, leaving only `MsBackendMgf`, `Spectra`,
+  and Base R `utils`.
+- Removed `fastmatch`, `stringi`, `BiocParallel`, `data.table`, `progress`,
+  `purrr`, and `tibble`.
+
+## Data, Documentation & Metadata
+
+- **Portable `data/` datasets** regenerated from source MGF files:
+  - `mia_spectra_df`: 321 MS/MS spectra from MIADB across 81 chemical skeletons
+    (24,255 total peaks, median 66 peaks per spectrum).
+  - `mia_spectra_grouped_df`: 321 MS/MS spectra from MIADB across 53 grouped
+    skeleton classes.
+- Regenerated `data/interim/queries.tsv` and `data/interim/queries-grouped.tsv`
+  using Matthews Correlation Coefficient (MCC) ranking.
+- Added verified EDAM ontology terms (`X-EDAM-Topic`, `X-EDAM-Operation`,
+  `X-EDAM-Data`, `X-EDAM-Format`, `X-schema.org-keywords`, `biocViews`) to
+  `DESCRIPTION`.
 
 # SpectraToQueries 0.0.9001
 

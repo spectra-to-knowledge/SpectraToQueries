@@ -6,6 +6,9 @@
 \usage{
 normalize_peaks()
 }
+\value{
+A function that normalizes a spectrum peak matrix to a maximum intensity of 100
+}
 \description{
 Normalize peaks
 }

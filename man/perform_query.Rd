@@ -20,7 +20,7 @@ perform_query(all_mz, precursor_mz, frags, nls, dalton, ppm)
 \item{ppm}{Tolerance in parts per million}
 }
 \value{
-Filtered spectra object
+Logical vector indicating matching spectra
 }
 \description{
 Perform query

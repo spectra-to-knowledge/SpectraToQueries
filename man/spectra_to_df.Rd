@@ -7,16 +7,16 @@
 spectra_to_df(spectra)
 }
 \arguments{
-\item{spectra}{A Spectra object}
+\item{spectra}{A \link[Spectra:Spectra]{Spectra::Spectra} object}
 }
 \value{
-A data.frame with metadata columns plus \code{mz} and \code{intensity}
+A \code{data.frame} with metadata columns plus \code{mz} and \code{intensity}
 as list columns (one entry per spectrum)
 }
 \description{
-Converts a Spectra object to a portable data.frame format where metadata
-columns are preserved and peaks (mz/intensity) are added as list columns.
-This format is ideal for export to portable formats and can be easily
-converted back to a Spectra object.
+Converts a \link[Spectra:Spectra]{Spectra::Spectra} object to a portable \code{data.frame} format where
+metadata columns are preserved and peaks (\code{mz}/\code{intensity}) are added as list
+columns. This format is ideal for export to portable formats and can be
+converted back to a \link[Spectra:Spectra]{Spectra::Spectra} object via \code{\link[=df_to_spectra]{df_to_spectra()}}.
 }
 \keyword{internal}

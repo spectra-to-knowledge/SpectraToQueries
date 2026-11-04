@@ -18,7 +18,7 @@ generate_combinations_progress(
 
 \item{max_ions}{Maximum number of ions in combinations}
 
-\item{show_progress}{Logical: show progress bar (default TRUE)}
+\item{show_progress}{Logical: show progress bar (default \code{TRUE})}
 }
 \value{
 List of all combinations for each index

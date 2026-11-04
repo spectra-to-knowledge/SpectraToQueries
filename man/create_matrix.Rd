@@ -7,14 +7,14 @@
 create_matrix(spectra, zero_val = 0, name)
 }
 \arguments{
-\item{spectra}{Spectra}
+\item{spectra}{Spectra object (binned)}
 
-\item{zero_val}{Zero value}
+\item{zero_val}{Zero value threshold for filtering columns}
 
-\item{name}{Name}
+\item{name}{Row names for the resulting matrix}
 }
 \value{
-A matrix with spectra intensity data
+A matrix with spectra intensity data and m/z column names
 }
 \description{
 Create matrix
