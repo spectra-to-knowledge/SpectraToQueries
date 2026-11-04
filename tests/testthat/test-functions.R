@@ -122,6 +122,39 @@ testthat::test_that("spectra_to_df, df_to_spectra, create_matrix, harmonize_mzs,
   testthat::expect_true(ncol(m_fixed) <= ncol(m_filt))
 })
 
+testthat::test_that("create_matrix detects middle-spectrum grid differences and unsorted m/z", {
+  df_mid_diff <- data.frame(
+    msLevel = c(2L, 2L, 2L),
+    SKELETON = c("S1", "S2", "S3")
+  )
+  df_mid_diff$mz <- list(c(100, 200), c(100, 300), c(100, 200))
+  df_mid_diff$intensity <- list(c(10, 20), c(30, 40), c(50, 60))
+  sp_mid_diff <- df_to_spectra(df_mid_diff)
+
+  mat_mid <- create_matrix(
+    sp_mid_diff,
+    zero_val = 0,
+    name = df_mid_diff$SKELETON
+  )
+  expected_mid <- matrix(
+    c(
+      10,
+      30,
+      50,
+      20,
+      0,
+      60,
+      0,
+      40,
+      0
+    ),
+    nrow = 3L,
+    ncol = 3L,
+    dimnames = list(c("S1", "S2", "S3"), c("100", "200", "300"))
+  )
+  testthat::expect_identical(mat_mid, expected_mid)
+})
+
 testthat::test_that("query matching helpers work accurately", {
   spec_mz <- c(100.001, 150.0, 200.0)
   testthat::expect_true(contains_all_mz(
