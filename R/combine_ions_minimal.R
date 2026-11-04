@@ -4,15 +4,9 @@
 #'
 #' @return Single character string representing nested AND/OR expression
 combine_ions_minimal <- function(ion_lists) {
-  # Remove empty/NA entries
-  ion_lists <- lapply(ion_lists, function(x) x[!is.na(x) & nzchar(x)])
-  ion_lists <- Filter(length, ion_lists)
-  if (length(ion_lists) == 0L) {
-    return("")
-  }
-
-  # Helper to split and sort fragments/nls, return only non-empty
+  # Helper to split and sort fragments/nls, return only non-empty unique ions
   sort_ions <- function(ions) {
+    ions <- unique(ions[!is.na(ions) & nzchar(ions)])
     frags <- ions[grepl("_frag", ions, fixed = TRUE)]
     nls <- ions[grepl("_nl", ions, fixed = TRUE)]
     frags_sorted <- if (length(frags) > 0L) {
@@ -34,14 +28,20 @@ combine_ions_minimal <- function(ion_lists) {
     c(frags_sorted, nls_sorted)
   }
 
-  common <- Reduce(
+  # Canonicalize and remove empty entries
+  ion_lists <- lapply(ion_lists, sort_ions)
+  ion_lists <- Filter(length, ion_lists)
+  if (length(ion_lists) == 0L) {
+    return("")
+  }
+
+  common_sorted <- Reduce(
     function(x, y) x[match(x, y, nomatch = 0L) > 0L],
     ion_lists
   )
-  common_sorted <- sort_ions(common)
 
   remaining <- lapply(ion_lists, function(x) {
-    x[match(x, common, nomatch = 0L) == 0L]
+    x[match(x, common_sorted, nomatch = 0L) == 0L]
   })
 
   # If all or any query is reduced to the common set, the OR branch simplifies
@@ -50,15 +50,11 @@ combine_ions_minimal <- function(ion_lists) {
     return(paste(common_sorted, collapse = " & "))
   }
 
-  # Generate unique remaining sets
+  # Generate unique remaining sets (already canonically sorted)
   unique_sets <- unique(remaining)
 
   # Build AND expression
-  build_and <- function(vec) {
-    sorted <- sort_ions(vec)
-    if (length(sorted) == 0L) {
-      return(NA_character_)
-    }
+  build_and <- function(sorted) {
     if (length(sorted) == 1L) {
       return(sorted)
     }
@@ -67,14 +63,10 @@ combine_ions_minimal <- function(ion_lists) {
 
   # Combine unique sets with OR
   or_parts <- vapply(unique_sets, build_and, character(1L))
-  or_parts <- or_parts[!is.na(or_parts) & nzchar(or_parts)]
 
   # Combine with common ions
   if (length(common_sorted) > 0L) {
     common_expr <- paste(common_sorted, collapse = " & ")
-    if (length(or_parts) == 0L) {
-      return(common_expr)
-    }
     paste(common_expr, paste(or_parts, collapse = " | "), sep = " & ")
   } else {
     paste(or_parts, collapse = " | ")
