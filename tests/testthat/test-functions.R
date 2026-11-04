@@ -873,6 +873,129 @@ testthat::test_that("pipeline functions handle empty and filtered-out inputs", {
   )
 })
 
+testthat::test_that("extracted pipeline helpers handle boundaries and ties", {
+  # parse_query_ions
+  parsed <- parse_query_ions(c("100.5_frag", "bad_frag", "50.25_nl", "Inf_nl"))
+  testthat::expect_identical(parsed$frags, 100.5)
+  testthat::expect_identical(parsed$nls, 50.25)
+  parsed_empty <- parse_query_ions(character(0))
+  testthat::expect_identical(parsed_empty$frags, numeric(0))
+  testthat::expect_identical(parsed_empty$nls, numeric(0))
+
+  # extract_candidate_ions:
+  # 4 spectra total: 2 in G+1 ("G.1"), 2 in G2
+  # - "100_frag": in all 4 spectra -> denom_sq == 0 (tn + fn_ == 0) -> mcc = 0
+  #   for G.1: precision = 0.5, recall = 1.0 (diagnostic!)
+  # - "200_frag": in 1 G.1 spectrum and 1 G2 spectrum -> precision = 0.5,
+  #   recall = 0.5, tp=1, fp=1, fn=1, tn=1 -> mcc = 0.0
+  # - "300_frag": in 1 G.1 spectrum and 1 G2 spectrum -> mcc = 0.0
+  mat_cand <- matrix(
+    c(
+      10,
+      10,
+      10,
+      10,
+      10,
+      0,
+      10,
+      0,
+      0,
+      10,
+      0,
+      10
+    ),
+    nrow = 4L,
+    ncol = 3L,
+    dimnames = list(
+      c("G+1", "G+1", "G2", "G2"),
+      c("100_frag", "200_frag", "300_frag")
+    )
+  )
+  cand <- suppressMessages(extract_candidate_ions(
+    merged_mat = mat_cand,
+    total_spectra = 4,
+    n_skel_min = 2L,
+    n_spec_min = 2L,
+    ions_max = 1L,
+    precision_min = 0.5,
+    recall_min = 0.5,
+    mcc_min = 0.0
+  ))
+  testthat::expect_identical(
+    cand$ions_list_diagnostic,
+    list(G.1 = "100_frag", G2 = "100_frag")
+  )
+  # ions_max = 1L slices non-diagnostic ions per group to 1 ion
+  testthat::expect_identical(lengths(cand$ions_list), c(G.1 = 1L, G2 = 1L))
+
+  # Strict precision_min / recall_min filtering (> 0.5 drops 0.5)
+  cand_filtered <- suppressMessages(extract_candidate_ions(
+    merged_mat = mat_cand,
+    total_spectra = 4,
+    n_skel_min = 2L,
+    n_spec_min = 2L,
+    ions_max = 5L,
+    precision_min = 0.6,
+    recall_min = 0.5,
+    mcc_min = 0.0
+  ))
+  testthat::expect_identical(cand_filtered$ions_list, list())
+  testthat::expect_identical(cand_filtered$ions_list_diagnostic, list())
+
+  # merge_diagnostic_ions
+  combs_in <- list(
+    G.1 = list("200_frag", "300_frag"),
+    G3 = list("400_frag")
+  )
+  merged_combs <- merge_diagnostic_ions(
+    combs_in,
+    list(G.1 = "100_frag", G2 = character(0))
+  )
+  testthat::expect_identical(
+    merged_combs$G.1,
+    list(c("200_frag", "100_frag"), c("300_frag", "100_frag"))
+  )
+  testthat::expect_identical(merged_combs$G3, list("400_frag"))
+
+  # summarize_best_queries: tie-combining and denom == 0 (empty hit list)
+  q_res <- stats::setNames(
+    list(
+      data.frame(
+        target = c("SkelA", "SkelA"),
+        value = c("SkelA", "SkelA")
+      ),
+      data.frame(
+        target = c("SkelA", "SkelA"),
+        value = c("SkelA", "SkelA")
+      ),
+      data.frame(target = character(0), value = character(0))
+    ),
+    c("SkelA", "SkelA", "SkelB")
+  )
+  all_combs <- stats::setNames(
+    list(
+      c("100_frag", "200_frag"),
+      c("100_frag", "300_frag"),
+      c("400_frag")
+    ),
+    c("SkelA", "SkelA", "SkelB")
+  )
+  skel_counts <- table(c("SkelA", "SkelA", "SkelB", "SkelB"))
+  summary_df <- summarize_best_queries(
+    queries_results = q_res,
+    all_combinations = all_combs,
+    skeleton_counts = skel_counts,
+    total_spectra = 4,
+    decimals = 4L
+  )
+  testthat::expect_identical(summary_df$skeleton, c("SkelA", "SkelB"))
+  testthat::expect_equal(summary_df$mcc, c(1.0, 0.0))
+  testthat::expect_identical(
+    summary_df$combined_ions,
+    c("100_frag & 200_frag | 300_frag", "400_frag")
+  )
+})
+
 testthat::test_that("spectra_to_queries reproduces raw and grouped results", {
   tmp_raw <- tempfile(fileext = ".tsv")
   tmp_grp <- tempfile(fileext = ".tsv")
