@@ -266,3 +266,56 @@ testthat::test_that("spectra_to_queries reproduces exact raw and grouped results
   testthat::expect_identical(res_grp$skeleton[1L], "Lapidilectine.Lunduran")
   testthat::expect_equal(res_grp$mcc[1L], 1.0)
 })
+
+testthat::test_that("harmonize_mzs, fix_binned_mzs, and spectra_to_queries handle empty/filtered-out inputs", {
+  sp_empty <- Spectra::Spectra()
+  testthat::expect_s4_class(
+    harmonize_mzs(sp_empty, dalton = 0.01, ppm = 30),
+    "Spectra"
+  )
+  mat_one <- matrix(1, nrow = 1L, ncol = 1L, dimnames = list("S1", "100.12345"))
+  fixed_empty <- fix_binned_mzs(
+    mat_one,
+    original_mzs = sp_empty,
+    dalton = 0.01,
+    ppm = 30,
+    decimals = 2L
+  )
+  testthat::expect_identical(colnames(fixed_empty), "100.12")
+
+  utils::data(
+    "mia_spectra_df",
+    package = "SpectraToQueries",
+    envir = environment()
+  )
+  sub_df <- mia_spectra_df[1:10, ]
+  res_no_skel <- spectra_to_queries(
+    sub_df,
+    export = NULL,
+    n_skel_min = 100L
+  )
+  testthat::expect_identical(
+    res_no_skel,
+    data.frame(
+      skeleton = character(0),
+      mcc = numeric(0),
+      combined_ions = character(0),
+      stringsAsFactors = FALSE
+    )
+  )
+
+  res_no_peaks <- spectra_to_queries(
+    sub_df,
+    export = NULL,
+    intensity_min = 101
+  )
+  testthat::expect_identical(
+    res_no_peaks,
+    data.frame(
+      skeleton = character(0),
+      mcc = numeric(0),
+      combined_ions = character(0),
+      stringsAsFactors = FALSE
+    )
+  )
+})
