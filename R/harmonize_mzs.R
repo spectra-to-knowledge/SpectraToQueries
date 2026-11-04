@@ -21,6 +21,7 @@ harmonize_mzs <- function(spectra, dalton, ppm) {
       peaks = "union"
     )
   averaged_intensities <- combined_peaks[, "mz"]
+  averaged_intensities <- averaged_intensities[is.finite(averaged_intensities)]
   n_avg <- length(averaged_intensities)
 
   if (n_avg == 0L) {

@@ -22,7 +22,8 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
         ppm = ppm,
         peaks = "union"
       )
-    combined_peaks[, "mz"]
+    mz_vals <- combined_peaks[, "mz"]
+    mz_vals[is.finite(mz_vals)]
   } else {
     numeric(0)
   }
