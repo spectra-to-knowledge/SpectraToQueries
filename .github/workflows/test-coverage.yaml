@@ -37,6 +37,11 @@ jobs:
             clean = FALSE,
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
           )
+          print(cov)
+          pct <- covr::percent_coverage(cov)
+          if (pct < 95) {
+            stop(sprintf("Package line coverage (%.2f%%) is below the 95%% floor.", pct))
+          }
           covr::to_cobertura(cov)
         shell: Rscript {0}
 
