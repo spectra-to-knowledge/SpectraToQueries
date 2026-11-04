@@ -29,17 +29,24 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
   }
 
   old_colnames <- as.numeric(colnames(binned_m))
-  tolerance_vec <- dalton + all_mzs * (ppm / 1e6)
-
-  # Column-major distance matrix: rows = all_mzs, cols = old_colnames
-  diffs_matrix <- abs(outer(all_mzs, old_colnames, "-"))
-
-  # For each old column, find matching m/z values within tolerance and average
   new_colnames <- old_colnames
-  for (i in seq_along(old_colnames)) {
-    within_tolerance <- diffs_matrix[, i] <= tolerance_vec
-    if (any(within_tolerance)) {
-      new_colnames[i] <- mean(all_mzs[within_tolerance])
+
+  if (length(all_mzs) > 0L) {
+    tolerance_vec <- dalton + all_mzs * (ppm / 1e6)
+    max_tol <- max(tolerance_vec)
+    left_bounds <- pmax(1L, findInterval(old_colnames - max_tol, all_mzs))
+    right_bounds <- findInterval(old_colnames + max_tol, all_mzs)
+
+    for (i in seq_along(old_colnames)) {
+      lo <- left_bounds[i]
+      hi <- right_bounds[i]
+      if (hi >= lo) {
+        idx <- lo:hi
+        within <- abs(all_mzs[idx] - old_colnames[i]) <= tolerance_vec[idx]
+        if (any(within)) {
+          new_colnames[i] <- mean(all_mzs[idx[within]])
+        }
+      }
     }
   }
 
