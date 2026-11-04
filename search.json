@@ -312,14 +312,14 @@
     "href": "man/contains_all_mz_tol.html",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Check if spectrum contains all target m/z values (internal variant with pre-computed tolerances)\n\n\n\ncontains_all_mz_tol(spec_mz, target_mz, tol)\n\n\n\n\n\n\n\nspec_mz\n\n\nNumeric vector of spectrum m/z values\n\n\n\n\ntarget_mz\n\n\nNumeric vector of target m/z values to find\n\n\n\n\ntol\n\n\nNumeric vector of pre-computed tolerances (length must match target_mz)\n\n\n\n\n\n\nLogical indicating if all targets are found\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Check if spectrum contains all target m/z values (pre-computed tolerances)\n\n\n\ncontains_all_mz_tol(spec_mz, target_mz, tol)\n\n\n\n\n\n\n\nspec_mz\n\n\nNumeric vector of spectrum m/z values\n\n\n\n\ntarget_mz\n\n\nNumeric vector of target m/z values to find\n\n\n\n\ntol\n\n\nNumeric vector of pre-computed tolerances (same length as target_mz)\n\n\n\n\n\n\nLogical indicating if all targets are found\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
-    "objectID": "man/contains_all_mz_tol.html#check-if-spectrum-contains-all-target-mz-values-internal-variant-with-pre-computed-tolerances",
-    "href": "man/contains_all_mz_tol.html#check-if-spectrum-contains-all-target-mz-values-internal-variant-with-pre-computed-tolerances",
+    "objectID": "man/contains_all_mz_tol.html#check-if-spectrum-contains-all-target-mz-values-pre-computed-tolerances",
+    "href": "man/contains_all_mz_tol.html#check-if-spectrum-contains-all-target-mz-values-pre-computed-tolerances",
     "title": "SpectraToQueries",
     "section": "",
-    "text": "Check if spectrum contains all target m/z values (internal variant with pre-computed tolerances)\n\n\n\ncontains_all_mz_tol(spec_mz, target_mz, tol)\n\n\n\n\n\n\n\nspec_mz\n\n\nNumeric vector of spectrum m/z values\n\n\n\n\ntarget_mz\n\n\nNumeric vector of target m/z values to find\n\n\n\n\ntol\n\n\nNumeric vector of pre-computed tolerances (length must match target_mz)\n\n\n\n\n\n\nLogical indicating if all targets are found\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
+    "text": "Check if spectrum contains all target m/z values (pre-computed tolerances)\n\n\n\ncontains_all_mz_tol(spec_mz, target_mz, tol)\n\n\n\n\n\n\n\nspec_mz\n\n\nNumeric vector of spectrum m/z values\n\n\n\n\ntarget_mz\n\n\nNumeric vector of target m/z values to find\n\n\n\n\ntol\n\n\nNumeric vector of pre-computed tolerances (same length as target_mz)\n\n\n\n\n\n\nLogical indicating if all targets are found\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nNULL\n\nNULL"
   },
   {
     "objectID": "man/create_matrix.html",
