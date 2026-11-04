@@ -216,6 +216,31 @@ testthat::test_that("query matching helpers work accurately", {
   testthat::expect_identical(r1$value, c("S1", "S2"))
   r2 <- perform_list_of_queries(2L, ions_list, qd, dalton = 0.01, ppm = 10)
   testthat::expect_identical(nrow(r2), 0L)
+
+  # Non-finite target_mz or precursor_mz must not produce false-positive matches
+  testthat::expect_false(contains_all_mz(
+    c(100.0, 200.0),
+    Inf,
+    dalton = 0.01,
+    ppm = 10
+  ))
+  df_inf <- data.frame(
+    msLevel = c(2L, 2L),
+    SKELETON = c("S1", "S2"),
+    PRECURSOR_MZ = c(Inf, 250.0)
+  )
+  df_inf$mz <- list(c(100.0, 150.0), c(100.0, 200.0))
+  df_inf$intensity <- list(c(50.0, 100.0), c(50.0, 100.0))
+  sp_inf <- df_to_spectra(df_inf)
+  sp_inf@backend@spectraData$precursorMz <- df_inf$PRECURSOR_MZ
+  res_inf <- perform_list_of_queries_progress(
+    list(Q1 = "50_nl"),
+    spectra = sp_inf,
+    dalton = 0.01,
+    ppm = 10,
+    show_progress = FALSE
+  )
+  testthat::expect_identical(res_inf[[1L]]$value, "S2")
 })
 
 testthat::test_that("spectra_to_queries reproduces exact raw and grouped results", {
