@@ -22,11 +22,17 @@ create_matrix <- function(spectra, zero_val = 0, name) {
     return(spectra_mat)
   }
 
-  # Fast column-major path when all spectra share the exact same m/z grid
+  # Fast column-major path when all spectra share the exact same sorted m/z grid
+  ref_mz <- pks[[1L]][, 1L]
   if (
     length(unique(lens)) == 1L &&
       lens[1L] > 0L &&
-      identical(pks[[1L]][, 1L], pks[[n_spectra]][, 1L])
+      !is.unsorted(ref_mz, strictly = TRUE) &&
+      all(vapply(
+        pks[-1L],
+        function(x) identical(x[, 1L], ref_mz),
+        logical(1L)
+      ))
   ) {
     all_int <- unlist(lapply(pks, function(x) x[, 2L]), use.names = FALSE)
     dim(all_int) <- c(lens[1L], n_spectra)
