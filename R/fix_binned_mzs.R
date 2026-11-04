@@ -14,14 +14,18 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
     return(binned_m)
   }
 
-  combined_peaks <- original_mzs |>
-    Spectra::peaksData() |>
-    Spectra::combinePeaksData(
-      tolerance = dalton,
-      ppm = ppm,
-      peaks = "union"
-    )
-  all_mzs <- combined_peaks[, "mz"]
+  all_mzs <- if (length(original_mzs) > 0L) {
+    combined_peaks <- original_mzs |>
+      Spectra::peaksData() |>
+      Spectra::combinePeaksData(
+        tolerance = dalton,
+        ppm = ppm,
+        peaks = "union"
+      )
+    combined_peaks[, "mz"]
+  } else {
+    numeric(0)
+  }
 
   old_colnames <- as.numeric(colnames(binned_m))
   tolerance_vec <- dalton + all_mzs * (ppm / 1e6)

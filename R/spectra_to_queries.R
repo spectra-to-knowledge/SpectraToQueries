@@ -175,51 +175,71 @@ spectra_to_queries <- function(
 
   message("Bin spectra to get a matrix.")
   message("The window is ", dalton, " Dalton")
-  mia_spectra_binned <- mia_spectra_w |>
-    Spectra::bin(
-      binSize = dalton,
-      zero.rm = TRUE
-    ) |>
-    Spectra::applyProcessing()
-
   message("Create fragments and neutral losses matrices.")
   message(
     "Remove features not appearing in at least ",
     n_spec_min,
     " spectra."
   )
-  spectra_mat <- mia_spectra_binned |>
-    create_matrix(name = mia_spectra_binned$SKELETON) |>
-    filter_matrix(n = n_spec_min)
-  message("Fixing mzs (fragments)")
-  spectra_mat <- spectra_mat |>
-    fix_binned_mzs(
-      original_mzs = mia_spectra_w,
-      decimals = decimals,
-      dalton = dalton,
-      ppm = ppm
-    )
-  rm(mia_spectra_binned)
+  if (sum(lengths(mia_spectra_w)) > 0L) {
+    mia_spectra_binned <- mia_spectra_w |>
+      Spectra::bin(
+        binSize = dalton,
+        zero.rm = TRUE
+      ) |>
+      Spectra::applyProcessing()
 
-  mia_spectra_binned_nl <- mia_spectra_w_nl |>
-    Spectra::reset() |>
-    Spectra::bin(
-      binSize = dalton,
-      zero.rm = TRUE
-    ) |>
-    Spectra::applyProcessing()
-  spectra_nl_mat <- mia_spectra_binned_nl |>
-    create_matrix(name = mia_spectra_binned_nl$SKELETON) |>
-    filter_matrix(n = n_spec_min)
-  message("Fixing mzs (losses)")
-  spectra_nl_mat <- spectra_nl_mat |>
-    fix_binned_mzs(
-      original_mzs = mia_spectra_w_nl,
-      decimals = decimals,
-      dalton = dalton,
-      ppm = ppm
+    spectra_mat <- mia_spectra_binned |>
+      create_matrix(name = mia_spectra_binned$SKELETON) |>
+      filter_matrix(n = n_spec_min)
+    message("Fixing mzs (fragments)")
+    spectra_mat <- spectra_mat |>
+      fix_binned_mzs(
+        original_mzs = mia_spectra_w,
+        decimals = decimals,
+        dalton = dalton,
+        ppm = ppm
+      )
+    rm(mia_spectra_binned)
+  } else {
+    message("Fixing mzs (fragments)")
+    spectra_mat <- matrix(
+      0,
+      nrow = length(mia_spectra_w),
+      ncol = 0L,
+      dimnames = list(mia_spectra_w$SKELETON, character(0))
     )
-  rm(mia_spectra_binned_nl)
+  }
+
+  if (sum(lengths(mia_spectra_w_nl)) > 0L) {
+    mia_spectra_binned_nl <- mia_spectra_w_nl |>
+      Spectra::reset() |>
+      Spectra::bin(
+        binSize = dalton,
+        zero.rm = TRUE
+      ) |>
+      Spectra::applyProcessing()
+    spectra_nl_mat <- mia_spectra_binned_nl |>
+      create_matrix(name = mia_spectra_binned_nl$SKELETON) |>
+      filter_matrix(n = n_spec_min)
+    message("Fixing mzs (losses)")
+    spectra_nl_mat <- spectra_nl_mat |>
+      fix_binned_mzs(
+        original_mzs = mia_spectra_w_nl,
+        decimals = decimals,
+        dalton = dalton,
+        ppm = ppm
+      )
+    rm(mia_spectra_binned_nl)
+  } else {
+    message("Fixing mzs (losses)")
+    spectra_nl_mat <- matrix(
+      0,
+      nrow = length(mia_spectra_w_nl),
+      ncol = 0L,
+      dimnames = list(mia_spectra_w_nl$SKELETON, character(0))
+    )
+  }
 
   message("Create a matrix containing fragments and neutral losses.")
   message("Round the values to ", decimals, ".")
@@ -279,7 +299,7 @@ spectra_to_queries <- function(
   ions_df <- data.frame(
     group = groups_sub[row_idx],
     group_count = group_count_sub[row_idx],
-    ion = colnames(nz_mat)[col_idx],
+    ion = as.character(colnames(nz_mat))[col_idx],
     count_per_ion = as.integer(col_counts[col_idx]),
     stringsAsFactors = FALSE
   )
@@ -287,7 +307,11 @@ spectra_to_queries <- function(
 
   message("Extract the best ions to perform a query.")
   grp_ion_key <- paste(ions_df$group, ions_df$ion, sep = "\r")
-  grp_ion_tab <- tabulate(match(grp_ion_key, unique(grp_ion_key)))
+  u_grp_ion <- unique(grp_ion_key)
+  grp_ion_tab <- tabulate(
+    match(grp_ion_key, u_grp_ion),
+    nbins = length(u_grp_ion)
+  )
   is_first <- !duplicated(grp_ion_key)
   ions_df <- ions_df[is_first, , drop = FALSE]
   ions_df$count_per_ion_per_group <- grp_ion_tab

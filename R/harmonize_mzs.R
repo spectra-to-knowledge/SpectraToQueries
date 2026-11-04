@@ -9,6 +9,9 @@
 #' @examples NULL
 harmonize_mzs <- function(spectra, dalton, ppm) {
   spectra_new <- spectra
+  if (length(spectra_new) == 0L) {
+    return(spectra_new)
+  }
 
   combined_peaks <- spectra_new |>
     Spectra::peaksData() |>
