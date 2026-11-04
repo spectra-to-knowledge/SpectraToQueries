@@ -25,6 +25,23 @@ testthat::test_that("combine_ions_minimal simplifies and sorts ion expressions",
     )),
     "100_frag"
   )
+
+  # Duplicate ions within a query and order-variant remaining sets are deduplicated
+  testthat::expect_identical(
+    combine_ions_minimal(list(
+      c("100_frag", "100_frag", "200_frag"),
+      c("100_frag", "300_frag")
+    )),
+    "100_frag & 200_frag | 300_frag"
+  )
+  testthat::expect_identical(
+    combine_ions_minimal(list(
+      c("100_frag", "200_frag"),
+      c("300_frag", "400_frag"),
+      c("400_frag", "300_frag")
+    )),
+    "(100_frag & 200_frag) | (300_frag & 400_frag)"
+  )
 })
 
 testthat::test_that("create_dir creates parent or target directories", {
