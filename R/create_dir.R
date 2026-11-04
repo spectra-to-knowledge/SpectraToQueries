@@ -3,11 +3,14 @@
 #' @description This function creates a directory at the specified path
 #'   if it does not already exist.
 #'
-#' @param export Path to the directory or file whose parent directory is to be created
+#' @param export Path to the directory or file whose parent directory is to be
+#'   created
 #'
 #' @return Path to the directory (invisibly)
 #'
+# nolint start: line_length_linter.
 #' @source https://github.com/taxonomicallyinformedannotation/tima/blob/main/R/create_dir.R
+# nolint end
 create_dir <- function(export) {
   ## Check if the export path includes a file name
   if (

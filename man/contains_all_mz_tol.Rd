@@ -2,7 +2,8 @@
 % Please edit documentation in R/perform_list_of_queries.R
 \name{contains_all_mz_tol}
 \alias{contains_all_mz_tol}
-\title{Check if spectrum contains all target m/z values (internal variant with pre-computed tolerances)}
+\title{Check if spectrum contains all target m/z values (pre-computed
+tolerances)}
 \usage{
 contains_all_mz_tol(spec_mz, target_mz, tol)
 }
@@ -11,13 +12,15 @@ contains_all_mz_tol(spec_mz, target_mz, tol)
 
 \item{target_mz}{Numeric vector of target m/z values to find}
 
-\item{tol}{Numeric vector of pre-computed tolerances (length must match \code{target_mz})}
+\item{tol}{Numeric vector of pre-computed tolerances (same length as
+\code{target_mz})}
 }
 \value{
 Logical indicating if all targets are found
 }
 \description{
-Check if spectrum contains all target m/z values (internal variant with pre-computed tolerances)
+Check if spectrum contains all target m/z values (pre-computed
+tolerances)
 }
 \examples{
 NULL

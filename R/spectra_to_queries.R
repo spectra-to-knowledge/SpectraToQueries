@@ -1,3 +1,79 @@
+#' @title Validate inputs for `spectra_to_queries`
+#' @keywords internal
+#' @noRd
+validate_stq_inputs <- function(
+  spectra,
+  export,
+  dalton,
+  decimals,
+  intensity_min,
+  ions_max,
+  n_skel_min,
+  n_spec_min,
+  ppm,
+  mcc_min,
+  precision_min,
+  recall_min,
+  zero_val
+) {
+  abort_input <- function(msg) {
+    stop(errorCondition(msg, class = "stq_input_error"))
+  }
+  is_scalar_num <- function(x) {
+    is.numeric(x) && length(x) == 1L && is.finite(x)
+  }
+  is_valid_str <- function(x) {
+    is.character(x) && length(x) == 1L && !is.na(x) && nzchar(x)
+  }
+
+  valid_spectra <- is.null(spectra) ||
+    is.data.frame(spectra) ||
+    inherits(spectra, "Spectra") ||
+    is_valid_str(spectra)
+  if (!valid_spectra) {
+    abort_input(
+      paste(
+        "`spectra` must be NULL, a non-empty string,",
+        "a data.frame, or a Spectra object."
+      )
+    )
+  }
+  if (!is.null(export) && !is_valid_str(export)) {
+    abort_input("`export` must be NULL or a non-empty character string.")
+  }
+  if (!is_scalar_num(dalton) || dalton < 0) {
+    abort_input("`dalton` must be a single finite non-negative number.")
+  }
+  if (!is_scalar_num(ppm) || ppm < 0) {
+    abort_input("`ppm` must be a single finite non-negative number.")
+  }
+  if (!is_scalar_num(decimals) || decimals < 0) {
+    abort_input("`decimals` must be a single finite non-negative number.")
+  }
+  if (!is_scalar_num(ions_max) || ions_max < 1) {
+    abort_input("`ions_max` must be a single finite number >= 1.")
+  }
+  if (!is_scalar_num(n_skel_min) || n_skel_min < 1) {
+    abort_input("`n_skel_min` must be a single finite number >= 1.")
+  }
+  if (!is_scalar_num(n_spec_min) || n_spec_min < 1) {
+    abort_input("`n_spec_min` must be a single finite number >= 1.")
+  }
+  if (!is_scalar_num(precision_min) || precision_min < 0 || precision_min > 1) {
+    abort_input("`precision_min` must be a single finite number in [0, 1].")
+  }
+  if (!is_scalar_num(recall_min) || recall_min < 0 || recall_min > 1) {
+    abort_input("`recall_min` must be a single finite number in [0, 1].")
+  }
+  if (!is_scalar_num(mcc_min) || mcc_min < -1 || mcc_min > 1) {
+    abort_input("`mcc_min` must be a single finite number in [-1, 1].")
+  }
+  if (!is_scalar_num(intensity_min) || !is_scalar_num(zero_val)) {
+    abort_input("`intensity_min` and `zero_val` must be single finite numbers.")
+  }
+  invisible(TRUE)
+}
+
 #' @title Spectra to queries
 #'
 #' @description This function converts tandem mass spectra into diagnostic
@@ -61,6 +137,22 @@ spectra_to_queries <- function(
   recall_min = 0.0,
   zero_val = 0.0
 ) {
+  validate_stq_inputs(
+    spectra = spectra,
+    export = export,
+    dalton = dalton,
+    decimals = decimals,
+    intensity_min = intensity_min,
+    ions_max = ions_max,
+    n_skel_min = n_skel_min,
+    n_spec_min = n_spec_min,
+    ppm = ppm,
+    mcc_min = mcc_min,
+    precision_min = precision_min,
+    recall_min = recall_min,
+    zero_val = zero_val
+  )
+
   if (is.null(spectra)) {
     message("No spectra given, loading example spectra.")
     data_env <- new.env(parent = emptyenv())
@@ -97,8 +189,8 @@ spectra_to_queries <- function(
       as.numeric(mia_spectra@backend@spectraData$PRECURSOR_MZ)
   }
 
-  # Total number of spectra (as numeric to prevent integer overflow in MCC):
-  #   TN = total_spectra - TP - FP - FN
+  # Total number of spectra (as numeric to prevent integer overflow in MCC
+  # when computing true negatives from total_spectra minus TP, FP, and FN)
   total_spectra <- as.numeric(length(mia_spectra))
 
   combine_by_title <- function(x) {
@@ -284,7 +376,7 @@ spectra_to_queries <- function(
   group_count_sub <- group_count_vec[keep_rows]
   rm(merged_mat)
 
-  # Pivot non-zero entries to long format (column-major order matching pivot_longer)
+  # Pivot non-zero entries to long format (column-major order)
   nz_mat <- merged_sub != 0
   col_counts <- colSums(nz_mat)
   keep_ions <- col_counts >= n_spec_min
@@ -326,8 +418,7 @@ spectra_to_queries <- function(
   ]
 
   # -------------------------------------------------------------------------
-  # Matthews Correlation Coefficient (MCC) for a single ion / group pair:
-  #   MCC = (TP*TN - FP*FN) / sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN))
+  # Matthews Correlation Coefficient (MCC) for a single ion and group pair
   # -------------------------------------------------------------------------
   tp <- as.numeric(ions_df$count_per_ion_per_group)
   fp <- as.numeric(ions_df$count_per_ion) - tp
@@ -469,11 +560,7 @@ spectra_to_queries <- function(
       vals <- queries_results[[result]]$value
       tp <- as.numeric(sum(vals == target_name))
       fp <- as.numeric(length(vals)) - tp
-      group_total <- if (target_name %in% names(skeleton_counts)) {
-        as.numeric(skeleton_counts[[target_name]])
-      } else {
-        0.0
-      }
+      group_total <- as.numeric(skeleton_counts[[target_name]])
       fn_ <- group_total - tp
       tn <- total_spectra - tp - fp - fn_
 

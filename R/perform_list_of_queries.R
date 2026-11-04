@@ -20,11 +20,13 @@ prepare_query_data <- function(spectra) {
   )
 }
 
-#' @title Check if spectrum contains all target m/z values (internal variant with pre-computed tolerances)
+#' @title Check if spectrum contains all target m/z values (pre-computed
+#'   tolerances)
 #'
 #' @param spec_mz Numeric vector of spectrum m/z values
 #' @param target_mz Numeric vector of target m/z values to find
-#' @param tol Numeric vector of pre-computed tolerances (length must match `target_mz`)
+#' @param tol Numeric vector of pre-computed tolerances (same length as
+#'   `target_mz`)
 #'
 #' @return Logical indicating if all targets are found
 #'
@@ -225,7 +227,9 @@ perform_list_of_queries <- function(index, ions_list, query_data, dalton, ppm) {
 #' @return List of query result data frames
 #'
 #' @examples NULL
+# nolint start: object_length_linter.
 perform_list_of_queries_progress <- function(
+  # nolint end
   ions_list,
   spectra,
   dalton,

@@ -14,7 +14,8 @@ MS/MS spectrum attributes
 \item \strong{\code{intensity}} (list): Fragment intensities for each spectrum
 }
 
-Total of 24,255 peaks across all 321 spectra (median 66 peaks per spectrum).
+Total of 24,255 peaks across all 321 spectra (median 66 peaks per
+spectrum).
 }
 \source{
 Data extracted from MIADB, a public spectral library

@@ -11,7 +11,10 @@ mgf_raw <- file.path(
 )
 mgf_grouped <- file.path(
   pkg_root,
-  "data/source/spectra/export_traitement_python_matchms-squelettes-tries-grouped.mgf"
+  "data",
+  "source",
+  "spectra",
+  "export_traitement_python_matchms-squelettes-tries-grouped.mgf"
 )
 
 cat("========================================\n")
@@ -70,7 +73,8 @@ cat("========================================\n")
 cat("\nGenerated files:\n")
 cat("  - data/mia_spectra_df.rda (raw spectra as portable data.frame)\n")
 cat(
-  "  - data/mia_spectra_grouped_df.rda (grouped spectra as portable data.frame)\n"
+  "  - data/mia_spectra_grouped_df.rda",
+  "(grouped spectra as portable data.frame)\n"
 )
 cat("\nThese can be loaded via:\n")
 cat("  utils::data(mia_spectra_df, package = 'SpectraToQueries')\n")

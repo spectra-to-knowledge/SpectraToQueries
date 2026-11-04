@@ -10,7 +10,8 @@ https://github.com/taxonomicallyinformedannotation/tima/blob/main/R/create_dir.R
 create_dir(export)
 }
 \arguments{
-\item{export}{Path to the directory or file whose parent directory is to be created}
+\item{export}{Path to the directory or file whose parent directory is to be
+created}
 }
 \value{
 Path to the directory (invisibly)
