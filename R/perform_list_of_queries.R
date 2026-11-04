@@ -57,7 +57,7 @@ contains_all_mz_tol <- function(spec_mz, target_mz, tol) {
 #'
 #' @examples NULL
 contains_all_mz <- function(spec_mz, target_mz, dalton, ppm) {
-  target_mz <- target_mz[!is.na(target_mz)]
+  target_mz <- target_mz[is.finite(target_mz)]
 
   if (length(target_mz) == 0L) {
     return(FALSE)
@@ -92,7 +92,7 @@ perform_query <- function(all_mz, precursor_mz, frags, nls, dalton, ppm) {
   keep <- rep(TRUE, n)
 
   if (length(frags) > 0L) {
-    frags <- frags[!is.na(frags)]
+    frags <- frags[is.finite(frags)]
     if (length(frags) > 0L) {
       frags_tol <- dalton + frags * (ppm / 1e6)
       keep <- vapply(
@@ -106,13 +106,13 @@ perform_query <- function(all_mz, precursor_mz, frags, nls, dalton, ppm) {
   }
 
   if (length(nls) > 0L && any(keep)) {
-    nls <- nls[!is.na(nls)]
+    nls <- nls[is.finite(nls)]
     if (length(nls) > 0L) {
-      valid_mask <- !is.na(precursor_mz)
+      valid_mask <- is.finite(precursor_mz)
       idx <- which(keep & valid_mask)
       for (i in idx) {
         spec <- all_mz[[i]]
-        if (length(spec) == 0L || all(is.na(spec))) {
+        if (length(spec) == 0L || !any(is.finite(spec))) {
           keep[i] <- FALSE
           next
         }
@@ -248,7 +248,7 @@ perform_list_of_queries_progress <- function(
   unique_ions <- unique_ions[!is.na(unique_ions) & nzchar(unique_ions)]
 
   n_spec <- length(all_mz)
-  valid_prec_and_spec <- !is.na(precursor_mz) & (lengths(all_mz) > 0L)
+  valid_prec_and_spec <- is.finite(precursor_mz) & (lengths(all_mz) > 0L)
 
   frag_hits <- list()
   nl_hits <- list()
