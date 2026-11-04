@@ -130,6 +130,34 @@ perform_query <- function(all_mz, precursor_mz, frags, nls, dalton, ppm) {
   keep
 }
 
+#' @title Parse fragment and neutral-loss ions from query character vector
+#' @keywords internal
+#' @noRd
+parse_query_ions <- function(ions) {
+  is_frag <- grepl("_frag", ions, fixed = TRUE)
+  is_nl <- grepl("_nl", ions, fixed = TRUE)
+
+  frags <- if (any(is_frag)) {
+    vals <- suppressWarnings(as.numeric(
+      sub("_frag", "", ions[is_frag], fixed = TRUE)
+    ))
+    vals[is.finite(vals)]
+  } else {
+    numeric(0)
+  }
+
+  nls <- if (any(is_nl)) {
+    vals <- suppressWarnings(as.numeric(
+      sub("_nl", "", ions[is_nl], fixed = TRUE)
+    ))
+    vals[is.finite(vals)]
+  } else {
+    numeric(0)
+  }
+
+  list(frags = frags, nls = nls)
+}
+
 #' @title Perform list of queries
 #'
 #' @param index Index of the ion list to process
@@ -158,26 +186,9 @@ perform_list_of_queries <- function(index, ions_list, query_data, dalton, ppm) {
     return(empty_df)
   }
 
-  is_frag <- grepl("_frag", ions, fixed = TRUE)
-  is_nl <- grepl("_nl", ions, fixed = TRUE)
-
-  frags <- if (any(is_frag)) {
-    vals <- suppressWarnings(as.numeric(
-      sub("_frag", "", ions[is_frag], fixed = TRUE)
-    ))
-    vals[is.finite(vals)]
-  } else {
-    numeric(0)
-  }
-
-  nls <- if (any(is_nl)) {
-    vals <- suppressWarnings(as.numeric(
-      sub("_nl", "", ions[is_nl], fixed = TRUE)
-    ))
-    vals[is.finite(vals)]
-  } else {
-    numeric(0)
-  }
+  parsed <- parse_query_ions(ions)
+  frags <- parsed$frags
+  nls <- parsed$nls
 
   if (length(frags) == 0L && length(nls) == 0L) {
     return(empty_df)
@@ -216,6 +227,61 @@ perform_list_of_queries <- function(index, ions_list, query_data, dalton, ppm) {
   )
 }
 
+#' @title Precompute single-ion logical hit vectors across all spectra
+#' @keywords internal
+#' @noRd
+precompute_ion_hits <- function(
+  unique_ions,
+  all_mz,
+  precursor_mz,
+  valid_prec_and_spec,
+  dalton,
+  ppm
+) {
+  n_spec <- length(all_mz)
+  frag_hits <- list()
+  nl_hits <- list()
+  nl_vals <- list()
+
+  for (u in unique_ions) {
+    if (grepl("_frag", u, fixed = TRUE)) {
+      val <- suppressWarnings(as.numeric(sub("_frag", "", u, fixed = TRUE)))
+      if (is.finite(val)) {
+        frag_hits[[u]] <- perform_query(
+          all_mz = all_mz,
+          precursor_mz = precursor_mz,
+          frags = val,
+          nls = numeric(0),
+          dalton = dalton,
+          ppm = ppm
+        )
+      }
+    } else if (grepl("_nl", u, fixed = TRUE)) {
+      val <- suppressWarnings(as.numeric(sub("_nl", "", u, fixed = TRUE)))
+      if (is.finite(val)) {
+        nl_vals[[u]] <- val
+        hit_vec <- logical(n_spec)
+        for (idx in which(valid_prec_and_spec)) {
+          tmz <- precursor_mz[idx] - val
+          if (tmz <= 0) {
+            hit_vec[idx] <- TRUE
+          } else {
+            hit_vec[idx] <- contains_all_mz(
+              all_mz[[idx]],
+              tmz,
+              dalton = dalton,
+              ppm = ppm
+            )
+          }
+        }
+        nl_hits[[u]] <- hit_vec
+      }
+    }
+  }
+
+  list(frag_hits = frag_hits, nl_hits = nl_hits, nl_vals = nl_vals)
+}
+
 #' @title Perform list of queries with progress
 #'
 #' @param ions_list List of ion combinations for queries
@@ -251,50 +317,18 @@ perform_list_of_queries_progress <- function(
   unique_ions <- unique(unlist(ions_list, use.names = FALSE))
   unique_ions <- unique_ions[!is.na(unique_ions) & nzchar(unique_ions)]
 
-  n_spec <- length(all_mz)
   valid_prec_and_spec <- is.finite(precursor_mz) & (lengths(all_mz) > 0L)
-
-  frag_hits <- list()
-  nl_hits <- list()
-  nl_vals <- list()
-
-  for (u in unique_ions) {
-    if (grepl("_frag", u, fixed = TRUE)) {
-      val <- suppressWarnings(as.numeric(sub("_frag", "", u, fixed = TRUE)))
-      if (is.finite(val)) {
-        frag_hits[[u]] <- perform_query(
-          all_mz = all_mz,
-          precursor_mz = precursor_mz,
-          frags = val,
-          nls = numeric(0),
-          dalton = dalton,
-          ppm = ppm
-        )
-      }
-    } else if (grepl("_nl", u, fixed = TRUE)) {
-      val <- suppressWarnings(as.numeric(sub("_nl", "", u, fixed = TRUE)))
-      if (is.finite(val)) {
-        nl_vals[[u]] <- val
-        hit_vec <- logical(n_spec)
-        for (idx in which(valid_prec_and_spec)) {
-          tmz <- precursor_mz[idx] - val
-          if (tmz <= 0) {
-            # In multi-NL queries, target_mz filters to > 0; non-emptiness of
-            # target_mz is enforced below via precursor_mz > min(nls).
-            hit_vec[idx] <- TRUE
-          } else {
-            hit_vec[idx] <- contains_all_mz(
-              all_mz[[idx]],
-              tmz,
-              dalton = dalton,
-              ppm = ppm
-            )
-          }
-        }
-        nl_hits[[u]] <- hit_vec
-      }
-    }
-  }
+  precomp <- precompute_ion_hits(
+    unique_ions = unique_ions,
+    all_mz = all_mz,
+    precursor_mz = precursor_mz,
+    valid_prec_and_spec = valid_prec_and_spec,
+    dalton = dalton,
+    ppm = ppm
+  )
+  frag_hits <- precomp$frag_hits
+  nl_hits <- precomp$nl_hits
+  nl_vals <- precomp$nl_vals
 
   empty_df <- data.frame(
     target = character(0),

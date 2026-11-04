@@ -29,11 +29,7 @@ combine_ions_minimal <- function(ion_lists) {
   }
 
   # Canonicalize and remove empty entries
-  ion_lists <- lapply(ion_lists, sort_ions)
-  ion_lists <- Filter(length, ion_lists)
-  if (length(ion_lists) == 0L) {
-    return("")
-  }
+  ion_lists <- Filter(length, lapply(ion_lists, sort_ions))
 
   common_sorted <- Reduce(
     function(x, y) x[match(x, y, nomatch = 0L) > 0L],

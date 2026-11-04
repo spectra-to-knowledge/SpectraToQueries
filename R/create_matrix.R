@@ -11,10 +11,6 @@ create_matrix <- function(spectra, zero_val = 0, name) {
   pks <- Spectra::peaksData(spectra)
   n_spectra <- length(pks)
 
-  if (n_spectra == 0L) {
-    return(matrix(0, nrow = 0L, ncol = 0L))
-  }
-
   lens <- vapply(pks, nrow, integer(1L))
   if (all(lens == 0L)) {
     spectra_mat <- matrix(0, nrow = n_spectra, ncol = 0L)
