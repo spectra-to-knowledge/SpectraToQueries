@@ -186,8 +186,13 @@ testthat::test_that("generate_combinations and show_progress work", {
     show_progress(10L, 100L),
     "Progress: 10/100 \\(10%\\)"
   )
-  testthat::expect_no_message(show_progress(11L, 100L))
+  testthat::expect_no_message(show_progress(10L, 100L + 1L))
   testthat::expect_no_message(show_progress(10L, 9L))
+  testthat::expect_no_message(show_progress(9.5, 9))
+  testthat::expect_message(
+    show_progress(9L, 10L),
+    "Progress: 9/10 \\(90%\\)"
+  )
   testthat::expect_message(
     vis_done <- withVisible(show_progress(10L, 10L)),
     "Progress: 10/10 \\(100%\\) - Done!"
@@ -204,12 +209,13 @@ testthat::test_that("spectra conversion and matrix helpers round-trip", {
   )
   sub_df <- mia_spectra_df[3:12, ]
   sp <- df_to_spectra(sub_df)
+  rownames(sp@backend@spectraData) <- paste0("custom_", seq_along(sp))
   testthat::expect_s4_class(sp, "Spectra")
   testthat::expect_identical(length(sp), 10L)
 
   roundtrip_df <- spectra_to_df(sp)
   testthat::expect_identical(nrow(roundtrip_df), 10L)
-  testthat::expect_identical(rownames(roundtrip_df), as.character(1:10))
+  testthat::expect_identical(.row_names_info(roundtrip_df, type = 1L), -10L)
   testthat::expect_equal(roundtrip_df$mz, sub_df$mz)
   testthat::expect_equal(roundtrip_df$intensity, sub_df$intensity)
 
@@ -253,6 +259,25 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
   )
   testthat::expect_identical(dim(mat_no_pks), c(2L, 0L))
   testthat::expect_identical(rownames(mat_no_pks), c("A", "B"))
+
+  # Mix of non-empty and empty spectra (all(lens == 0L) vs any(lens == 0L))
+  df_one_empty <- data.frame(msLevel = c(2L, 2L), SKELETON = c("A", "B"))
+  df_one_empty$mz <- list(c(100, 200), numeric(0))
+  df_one_empty$intensity <- list(c(10, 20), numeric(0))
+  mat_one_empty <- create_matrix(
+    df_to_spectra(df_one_empty),
+    zero_val = 0,
+    name = c("A", "B")
+  )
+  testthat::expect_identical(
+    mat_one_empty,
+    matrix(
+      c(10, 0, 20, 0),
+      nrow = 2L,
+      ncol = 2L,
+      dimnames = list(c("A", "B"), c("100", "200"))
+    )
+  )
 
   # Fast path (shared sorted m/z grid) zero_val boundary
   df_same <- data.frame(msLevel = c(2L, 2L), SKELETON = c("S1", "S2"))
@@ -337,11 +362,11 @@ testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
     Spectra::mz(sp_empty_pks)
   )
 
-  # Left vs right neighbor selection and exact dalton boundary in harmonize_mzs
+  # Left vs right neighbor selection and exact binary dalton boundary
   df_h <- data.frame(msLevel = c(2L, 2L, 2L), SKELETON = c("A", "B", "C"))
   df_h$mz <- list(
-    c(50.0, 99.996, 1000.000, 2000.000),
-    c(50.0, 100.004, 1000.020, 2000.030),
+    c(50.0, 99.875, 1000.000, 2000.000),
+    c(50.0, 100.125, 1000.500, 2000.750),
     numeric(0)
   )
   df_h$intensity <- list(
@@ -349,19 +374,19 @@ testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
     c(10, 20, 30, 40),
     numeric(0)
   )
-  sp_h <- harmonize_mzs(df_to_spectra(df_h), dalton = 0.01, ppm = 30)
+  sp_h <- harmonize_mzs(df_to_spectra(df_h), dalton = 0.25, ppm = 500)
   mzs_h <- as.list(Spectra::mz(sp_h))
-  # 99.996 and 100.004 average to 100.0 (diff 0.004 <= 0.01)
-  # 1000.000 and 1000.020 average to 1000.010 (diff 0.01 == 0.01, within!)
-  # 2000.000 and 2000.030 average to 2000.015 (diff 0.015 > 0.01, not within!)
+  # 99.875 and 100.125 average to 100.0 (diff 0.125 <= 0.25)
+  # 1000.000 and 1000.500 average to 1000.250 (diff 0.25 == 0.25 boundary!)
+  # 2000.000 and 2000.750 average to 2000.375 (diff 0.375 > 0.25, outside!)
   testthat::expect_equal(
     mzs_h[[1L]],
-    c(50.0, 100.0, 1000.01, 2000.000),
+    c(50.0, 100.0, 1000.25, 2000.000),
     tolerance = 1e-10
   )
   testthat::expect_equal(
     mzs_h[[2L]],
-    c(50.0, 100.0, 1000.01, 2000.030),
+    c(50.0, 100.0, 1000.25, 2000.750),
     tolerance = 1e-10
   )
   testthat::expect_identical(mzs_h[[3L]], numeric(0))
@@ -378,9 +403,9 @@ testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
     mat_0col
   )
 
-  # fix_binned_mzs: fast path (all unique rounded names)
+  # fix_binned_mzs: fast path + exact binary tolerance boundary
   df_orig <- data.frame(msLevel = 2L, SKELETON = "A")
-  df_orig$mz <- list(c(100.002, 200.004))
+  df_orig$mz <- list(c(100.5, 200.125))
   df_orig$intensity <- list(c(50, 100))
   sp_orig <- df_to_spectra(df_orig)
 
@@ -393,11 +418,11 @@ testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
   fixed_unique <- fix_binned_mzs(
     binned_unique,
     original_mzs = sp_orig,
-    dalton = 0.01,
+    dalton = 0.5,
     ppm = 0,
     decimals = 3L
   )
-  testthat::expect_identical(colnames(fixed_unique), c("100.002", "200.004"))
+  testthat::expect_identical(colnames(fixed_unique), c("100.5", "200.125"))
   testthat::expect_identical(as.vector(fixed_unique), c(10, 20, 30, 40))
 
   # fix_binned_mzs: column-merging path when two columns round to the same value
@@ -498,9 +523,16 @@ testthat::test_that("query matching helpers work across all branches", {
   )
   testthat::expect_identical(hits, c(TRUE, TRUE, FALSE, FALSE))
 
-  # NL-only query where spec 4 is empty and spec 1 has precursor == nl
+  # NL-only query where spec 4 is empty and spec 1 has precursor == nl (0.0)
+  # Even with a peak at 0.0, target_mz == 0 must be rejected (> 0, not >= 0)
+  all_mz_zero <- list(
+    c(0.0, 100.0, 150.0),
+    c(100.0, 200.0),
+    c(250.0),
+    numeric(0)
+  )
   hits_nl_only <- perform_query(
-    all_mz,
+    all_mz_zero,
     prec_mz,
     frags = numeric(0),
     nls = 200.0,
@@ -578,8 +610,8 @@ testthat::test_that("query matching helpers work across all branches", {
     SKELETON = c("S1", "S2", NA_character_),
     PRECURSOR_MZ = c(Inf, 250.0, 300.0)
   )
-  df_inf$mz <- list(c(100.0, 150.0), c(100.0, 200.0), c(250.0))
-  df_inf$intensity <- list(c(50.0, 100.0), c(50.0, 100.0), c(100.0))
+  df_inf$mz <- list(c(100.0, 150.0), c(0.0, 100.0, 200.0), c(250.0))
+  df_inf$intensity <- list(c(50.0, 100.0), c(10.0, 50.0, 100.0), c(100.0))
   sp_inf <- df_to_spectra(df_inf)
   sp_inf@backend@spectraData$precursorMz <- df_inf$PRECURSOR_MZ
 
@@ -599,7 +631,8 @@ testthat::test_that("query matching helpers work across all branches", {
       Q1 = "50_nl",
       c("50_nl", "300_nl"),
       Invalid = "bad_ion",
-      OnlyNA = "250_frag"
+      OnlyNA = "250_frag",
+      BoundaryNL = "250_nl"
     ),
     spectra = sp_inf,
     dalton = 0.01,
@@ -612,6 +645,8 @@ testthat::test_that("query matching helpers work across all branches", {
   testthat::expect_identical(res_inf[[2L]]$value, "S2")
   testthat::expect_identical(nrow(res_inf[[3L]]), 0L)
   testthat::expect_identical(nrow(res_inf[[4L]]), 0L)
+  # BoundaryNL: 250_nl == precursor_mz (250) on S2 must not match 0.0 peak
+  testthat::expect_identical(nrow(res_inf[[5L]]), 0L)
 })
 
 testthat::test_that("spectra_to_queries validates inputs and synthetic cases", {
@@ -668,33 +703,63 @@ testthat::test_that("spectra_to_queries validates inputs and synthetic cases", {
     class = "stq_input_error"
   )
 
+  # Valid boundary values in validate_stq_inputs must succeed without error
+  testthat::expect_true(validate_stq_inputs(
+    spectra = NULL,
+    export = NULL,
+    dalton = 0,
+    decimals = 0L,
+    intensity_min = 0,
+    ions_max = 1L,
+    n_skel_min = 1L,
+    n_spec_min = 1L,
+    ppm = 0,
+    mcc_min = -1,
+    precision_min = 0,
+    recall_min = 0,
+    zero_val = 0
+  ))
+  testthat::expect_true(validate_stq_inputs(
+    spectra = "grouped",
+    export = "out.tsv",
+    dalton = 0.01,
+    decimals = 4L,
+    intensity_min = 100,
+    ions_max = 2L,
+    n_skel_min = 2L,
+    n_spec_min = 2L,
+    ppm = 30,
+    mcc_min = 1,
+    precision_min = 1,
+    recall_min = 1,
+    zero_val = 0
+  ))
+
   # Startup message coverage
   testthat::expect_message(
-    SpectraToQueries:::.onAttach(NULL, "SpectraToQueries"),
+    .onAttach(NULL, "SpectraToQueries"),
     "Welcome to SpectraToQueries"
   )
 
-  # Synthetic 6-spectrum dataset with sorted unique TITLEs:
-  # 3 in SkelA (all have 100_frag, 2 have 120_frag; precursor 300)
-  # 3 in SkelB (all have 150_frag, 2 have 160_frag; precursor 300)
-  # Combined query (100_frag and 120_frag and 180_nl) has TP 2, FP 0, FN 1, TN 3
-  # giving exact MCC of 6 divided by sqrt(72), which is 1 / sqrt(2) (0.7071)
+  # Synthetic 6-spectrum dataset with distinct PRECURSOR_MZ and TITLEs:
+  # SkelA: 100_frag (3/3 -> diagnostic), 120_frag (2/3) -> MCC = 0.7071
+  # SkelB: 150_frag (TP=2, FP=1, FN=1, TN=2) -> MCC = (4-1)/9 = 0.3333
   synth_df <- data.frame(
     msLevel = rep(2L, 6L),
     rtime = seq_len(6L) * 1.0,
     acquisitionNum = seq_len(6L),
     TITLE = paste0("Spec_", seq_len(6L)),
-    PRECURSOR_MZ = rep(300.0, 6L),
+    PRECURSOR_MZ = c(300.0, 400.0, 500.0, 600.0, 700.0, 800.0),
     SKELETON = c("SkelA", "SkelA", "SkelA", "SkelB", "SkelB", "SkelB"),
     stringsAsFactors = FALSE
   )
   synth_df$mz <- list(
     c(100.0, 120.0),
     c(100.0, 120.0),
-    c(100.0, 130.0),
+    c(100.0, 150.0),
     c(150.0, 160.0),
-    c(150.0, 160.0),
-    c(150.0, 170.0)
+    c(150.0, 170.0),
+    c(180.0, 190.0)
   )
   synth_df$intensity <- rep(list(c(100.0, 80.0)), 6L)
 
@@ -705,11 +770,10 @@ testthat::test_that("spectra_to_queries validates inputs and synthetic cases", {
     n_skel_min = 2L,
     n_spec_min = 2L
   )
-  expected_mcc <- round(1 / sqrt(2), 4L)
   testthat::expect_identical(nrow(res_sp), 2L)
   testthat::expect_equal(
     res_sp$mcc,
-    c(expected_mcc, expected_mcc),
+    c(round(1 / sqrt(2), 4L), round(1 / 3, 4L)),
     tolerance = 1e-12
   )
 
