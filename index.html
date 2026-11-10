@@ -90,6 +90,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./vignettes/spectra-to-queries.html" rel="next">
 <link href="./man/figures/logo.svg" rel="icon" type="image/svg+xml">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -133,7 +134,7 @@ div.csl-indent {
 
 </head>
 
-<body class="nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
+<body class="nav-sidebar floating nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -179,10 +180,169 @@ div.csl-indent {
             <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Home</a></li></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Section">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Home</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">Articles</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./vignettes/spectra-to-queries.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Translating MS/MS Spectra into Diagnostic Queries and MassQL</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">Reference</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/combine_ions_minimal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">combine_ions_minimal</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/contains_all_mz_tol.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">contains_all_mz_tol</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/contains_all_mz.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">contains_all_mz</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/create_dir.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">create_dir</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/create_matrix.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">create_matrix</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/filter_matrix.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">filter_matrix</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/fix_binned_mzs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">fix_binned_mzs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/generate_combinations_progress.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">generate_combinations_progress</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/generate_combinations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">generate_combinations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/harmonize_mzs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">harmonize_mzs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/mia_spectra_df.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">mia_spectra_df</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/mia_spectra_grouped_df.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">mia_spectra_grouped_df</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/normalize_peaks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">normalize_peaks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/perform_list_of_queries_progress.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">perform_list_of_queries_progress</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/perform_list_of_queries.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">perform_list_of_queries</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/perform_query.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">perform_query</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_query_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_query_data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/spectra_to_queries.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">spectra_to_queries</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/to_massql.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">to_massql</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
@@ -196,6 +356,7 @@ div.csl-indent {
   <li><a href="#use" id="toc-use" class="nav-link" data-scroll-target="#use">Use</a>
   <ul class="collapse">
   <li><a href="#viewing-all-parameters" id="toc-viewing-all-parameters" class="nav-link" data-scroll-target="#viewing-all-parameters">Viewing all parameters</a></li>
+  <li><a href="#output-and-massql-translation" id="toc-output-and-massql-translation" class="nav-link" data-scroll-target="#output-and-massql-translation">Output and MassQL translation</a></li>
   <li><a href="#example-data" id="toc-example-data" class="nav-link" data-scroll-target="#example-data">Example data</a></li>
   </ul></li>
   <li><a href="#main-citations" id="toc-main-citations" class="nav-link" data-scroll-target="#main-citations">Main Citations</a></li>
@@ -264,6 +425,22 @@ div.csl-indent {
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">zero_val =</span> <span class="fl">0.0</span></span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
+<section id="output-and-massql-translation" class="level3">
+<h3 class="anchored" data-anchor-id="output-and-massql-translation">Output and MassQL translation</h3>
+<p><code>spectra_to_queries()</code> returns (and exports as TSV) a table with one most parsimonious diagnostic query per skeleton class:</p>
+<ul>
+<li><code>skeleton</code>: chemical class identifier.</li>
+<li><code>mcc</code>: Matthews Correlation Coefficient of the query on the spectral library.</li>
+<li><code>combined_ions</code>: minimal conjunctive/disjunctive combination of fragments (<code>_frag</code>) and neutral losses (<code>_nl</code>).</li>
+<li><code>massql</code>: directly executable <a href="https://mwang87.github.io/MassQueryLanguage_Documentation/">MassQL</a> query (<code>QUERY scaninfo(MS2DATA) WHERE ...</code>).</li>
+</ul>
+<p>Custom ion expressions can also be converted to MassQL directly:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>SpectraToQueries<span class="sc">::</span><span class="fu">to_massql</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"108.0804_frag &amp; 241.095_nl"</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">dalton =</span> <span class="fl">0.01</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">ppm =</span> <span class="fl">30.0</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
 <section id="example-data" class="level3">
 <h3 class="anchored" data-anchor-id="example-data">Example data</h3>
 <p>The package includes two example datasets from MIADB:</p>
@@ -273,8 +450,8 @@ div.csl-indent {
 </ul>
 <p>These are stored as portable <code>data.frame</code> objects (with <code>mz</code> and <code>intensity</code> as list columns) and automatically converted to <code>Spectra</code> objects when loaded.</p>
 <p>To access them directly:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">data</span>(mia_spectra_df, <span class="at">package =</span> <span class="st">"SpectraToQueries"</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">data</span>(mia_spectra_grouped_df, <span class="at">package =</span> <span class="st">"SpectraToQueries"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">data</span>(mia_spectra_df, <span class="at">package =</span> <span class="st">"SpectraToQueries"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">data</span>(mia_spectra_grouped_df, <span class="at">package =</span> <span class="st">"SpectraToQueries"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 <section id="main-citations" class="level2">
@@ -314,7 +491,7 @@ div.csl-indent {
 </tr>
 <tr class="even">
 <td style="text-align: left;">grateful</td>
-<td style="text-align: left;">0.3.0</td>
+<td style="text-align: left;">0.3.1</td>
 <td style="text-align: left;">Rodriguez-Sanchez and Jackson (2025)</td>
 </tr>
 <tr class="odd">
@@ -354,7 +531,7 @@ Rainer, Johannes, Andrea Vicini, Liesa Salzer, et al.&nbsp;2022. “A Modular an
 Rodriguez-Sanchez, Francisco, and Connor P. Jackson. 2025. <em><span class="nocase">grateful</span>: Facilitate Citation of R Packages</em>. <a href="https://pakillo.github.io/grateful/" class="uri">https://pakillo.github.io/grateful/</a>.
 </div>
 <div id="ref-SpectraToQueries2025a" class="csl-entry" role="listitem">
-Rutz, Adriano, and Sarah Szwarc. 2025. <em>SpectraToQueries: SpectraToQueries Provides the Infrastructure to Translate Spectra to Queries</em>.
+Rutz, Adriano, and Sarah Szwarc. 2025. <em>SpectraToQueries: Spectra to Queries</em>.
 </div>
 <div id="ref-SpectraToQueries2025b" class="csl-entry" role="listitem">
 <span class="nocase">Szwarc, Sarah, Adriano Rutz, Kyungha Lee, et al.</span> 2025. “Translating Community-Wide Spectral Library into Actionable Chemical Knowledge: A Proof of Concept with Monoterpene Indole Alkaloids.” <em>J. Cheminform.</em> 17. <a href="https://doi.org/10.1186/s13321-025-01009-0" class="uri">https://doi.org/10.1186/s13321-025-01009-0</a>.
@@ -842,6 +1019,15 @@ Rutz, Adriano, and Sarah Szwarc. 2025. <em>SpectraToQueries: SpectraToQueries Pr
   <script type="application/javascript">
   window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
   </script>
+<nav class="page-navigation" aria-label="Page">
+  <div class="nav-page nav-page-previous">
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./vignettes/spectra-to-queries.html" class="pagination-link" aria-label="Translating MS/MS Spectra into Diagnostic Queries and MassQL">
+        <span class="nav-page-text">Translating MS/MS Spectra into Diagnostic Queries and MassQL</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">

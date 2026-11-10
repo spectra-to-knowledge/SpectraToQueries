@@ -26,6 +26,13 @@ website:
       - icon: github
         href: $ALTDOC_PACKAGE_URL_GITHUB
         aria-label: $ALTDOC_PACKAGE_NAME GitHub
+  sidebar:
+    collapse-level: 1
+    contents:
+      - text: Home
+        file: index.md
+      - section: $ALTDOC_VIGNETTE_BLOCK
+      - section: $ALTDOC_MAN_BLOCK
   page-footer: |
     <div style="display: flex; justify-content: center;">
     <a href="https://www.simpleanalytics.com?utm_source=spectra-to-knowledge.github.io&utm_content=badge" referrerpolicy="origin" target="_blank" rel="noopener noreferrer">

@@ -79,7 +79,7 @@ ul.task-list li input[type="checkbox"] {
 
 </head>
 
-<body class="nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
+<body class="nav-sidebar floating nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -125,10 +125,169 @@ ul.task-list li input[type="checkbox"] {
             <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav" aria-label="Toolbar">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="Breadcrumbs"><ol class="breadcrumb"></ol></nav>
+        <a class="flex-grow-1" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto" aria-label="Section">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Home</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-controls="quarto-sidebar-section-1" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-1-label">Articles</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-1" aria-labelledby="quarto-sidebar-section-1-label" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./vignettes/spectra-to-queries.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Translating MS/MS Spectra into Diagnostic Queries and MassQL</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <button type="button" class="sidebar-item-text sidebar-item-toggle sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-controls="quarto-sidebar-section-2" aria-expanded="false">
+ <span class="menu-text" id="quarto-sidebar-section-2-label">Reference</span><i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/combine_ions_minimal.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">combine_ions_minimal</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/contains_all_mz_tol.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">contains_all_mz_tol</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/contains_all_mz.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">contains_all_mz</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/create_dir.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">create_dir</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/create_matrix.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">create_matrix</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/filter_matrix.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">filter_matrix</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/fix_binned_mzs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">fix_binned_mzs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/generate_combinations_progress.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">generate_combinations_progress</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/generate_combinations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">generate_combinations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/harmonize_mzs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">harmonize_mzs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/mia_spectra_df.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">mia_spectra_df</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/mia_spectra_grouped_df.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">mia_spectra_grouped_df</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/normalize_peaks.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">normalize_peaks</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/perform_list_of_queries_progress.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">perform_list_of_queries_progress</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/perform_list_of_queries.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">perform_list_of_queries</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/perform_query.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">perform_query</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/prepare_query_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">prepare_query_data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/spectra_to_queries.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">spectra_to_queries</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./man/to_massql.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">to_massql</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
@@ -138,6 +297,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#spectratoqueries" id="toc-spectratoqueries" class="nav-link active" data-scroll-target="#spectratoqueries">SpectraToQueries</a></li>
   <li><a href="#spectratoqueries-0.0.0.9002" id="toc-spectratoqueries-0.0.0.9002" class="nav-link" data-scroll-target="#spectratoqueries-0.0.0.9002">SpectraToQueries 0.0.0.9002</a>
   <ul class="collapse">
+  <li><a href="#algorithms-massql-support" id="toc-algorithms-massql-support" class="nav-link" data-scroll-target="#algorithms-massql-support">Algorithms &amp; MassQL Support</a></li>
   <li><a href="#performance-optimization" id="toc-performance-optimization" class="nav-link" data-scroll-target="#performance-optimization">Performance &amp; Optimization</a></li>
   <li><a href="#dependencies" id="toc-dependencies" class="nav-link" data-scroll-target="#dependencies">Dependencies</a></li>
   <li><a href="#data-documentation-metadata" id="toc-data-documentation-metadata" class="nav-link" data-scroll-target="#data-documentation-metadata">Data, Documentation &amp; Metadata</a></li>
@@ -158,6 +318,19 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="spectratoqueries-0.0.0.9002" class="level1">
 <h1>SpectraToQueries 0.0.0.9002</h1>
+<section id="algorithms-massql-support" class="level2">
+<h2 class="anchored" data-anchor-id="algorithms-massql-support">Algorithms &amp; MassQL Support</h2>
+<ul>
+<li>Added <code>to_massql()</code> and a <code>massql</code> column in <code>spectra_to_queries()</code> output to translate diagnostic fragment (<code>_frag</code>) and neutral-loss (<code>_nl</code>) expressions into directly executable MassQL queries (<code>QUERY scaninfo(MS2DATA) WHERE ...</code>).</li>
+<li>Improved peak alignment and candidate query discovery:
+<ul>
+<li>Intensity-weighted consensus centroiding in <code>harmonize_mzs()</code> and <code>fix_binned_mzs()</code> within <code>dalton + mz * ppm / 1e6</code>.</li>
+<li>Enforced physical neutral-loss bounds (<code>nl &gt; 0</code> and <code>precursor_mz - nl &gt; 0</code>) during preprocessing and query evaluation.</li>
+<li>Replaced top-N single-ion ranking with greedy hitting-set pruning on 100%-recall ions and forward conjunctive MCC selection penalized by negative-class correlation (mRMR).</li>
+<li>Added Branch-and-Bound pruning of ion combinations using the zero-FP MCC upper bound, Boolean superset absorption in <code>combine_ions_minimal()</code>, and selection of the single most parsimonious query per skeleton.</li>
+</ul></li>
+</ul>
+</section>
 <section id="performance-optimization" class="level2">
 <h2 class="anchored" data-anchor-id="performance-optimization">Performance &amp; Optimization</h2>
 <ul>
