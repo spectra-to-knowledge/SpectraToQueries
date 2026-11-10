@@ -13,5 +13,7 @@ combine_ions_minimal(ion_lists)
 Single character string representing nested AND/OR expression
 }
 \description{
-Combine ions into minimal AND/OR expression with sorting
+Simplifies a list of conjunctive ion clauses into a minimal
+Boolean expression by canonical sorting (\verb{_frag} then \verb{_nl}), Boolean
+absorption (\code{A | (A & B) = A}), and common-factor extraction.
 }

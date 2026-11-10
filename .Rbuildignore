@@ -63,6 +63,7 @@
 ^renv\.lock$
 ^tests/testthat/_snaps$
 ^tests/testthat/_snaps/
+^vignettes$
 ^vignettes/\.quarto$
 ^vignettes/articles$
 ^vignettes/articles/*_files$

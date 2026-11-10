@@ -46,6 +46,15 @@ testthat::test_that("combine_ions_minimal simplifies and sorts expressions", {
     )),
     "100_frag"
   )
+  # Multi-ion superset absorbed by smaller subset when other clauses remain
+  testthat::expect_identical(
+    combine_ions_minimal(list(
+      c("100_frag", "200_frag"),
+      c("100_frag", "300_frag"),
+      c("100_frag", "200_frag", "300_frag")
+    )),
+    "100_frag & 200_frag | 300_frag"
+  )
 
   # Duplicate ions within a query and order-variant remaining sets
   testthat::expect_identical(
@@ -62,6 +71,71 @@ testthat::test_that("combine_ions_minimal simplifies and sorts expressions", {
       c("400_frag", "300_frag")
     )),
     "(100_frag & 200_frag) | (300_frag & 400_frag)"
+  )
+
+  # to_massql translations across all branches
+  testthat::expect_identical(to_massql(character(0)), character(0))
+  testthat::expect_identical(
+    to_massql(c("", NA_character_, "bad_ion")),
+    c("", "", "")
+  )
+  testthat::expect_identical(
+    to_massql("100_frag & 50_nl", dalton = 0.01, ppm = 30, intensity_min = 5),
+    paste0(
+      "QUERY scaninfo(MS2DATA) WHERE ",
+      "MS2PROD=100:TOLERANCEMZ=0.01:TOLERANCEPPM=30:INTENSITYPERCENT=5 AND ",
+      "MS2NL=50:TOLERANCEMZ=0.01:TOLERANCEPPM=30:INTENSITYPERCENT=5"
+    )
+  )
+  testthat::expect_identical(
+    to_massql(list(c("200_frag", "100_frag")), dalton = 0.02, ppm = 10),
+    paste0(
+      "QUERY scaninfo(MS2DATA) WHERE ",
+      "MS2PROD=100:TOLERANCEMZ=0.02:TOLERANCEPPM=10 AND ",
+      "MS2PROD=200:TOLERANCEMZ=0.02:TOLERANCEPPM=10"
+    )
+  )
+  testthat::expect_identical(
+    to_massql("100_frag & 200_frag | 300_frag", dalton = 0.01, ppm = 30),
+    paste0(
+      "QUERY scaninfo(MS2DATA) WHERE ",
+      "MS2PROD=100:TOLERANCEMZ=0.01:TOLERANCEPPM=30 AND ",
+      "MS2PROD=(200 OR 300):TOLERANCEMZ=0.01:TOLERANCEPPM=30"
+    )
+  )
+  testthat::expect_identical(
+    to_massql("100_frag & 50_nl | 60_nl", dalton = 0.01, ppm = 30),
+    paste0(
+      "QUERY scaninfo(MS2DATA) WHERE ",
+      "MS2PROD=100:TOLERANCEMZ=0.01:TOLERANCEPPM=30 AND ",
+      "MS2NL=(50 OR 60):TOLERANCEMZ=0.01:TOLERANCEPPM=30"
+    )
+  )
+  testthat::expect_identical(
+    to_massql(
+      "100_frag & (200_frag & 50_nl) | 300_frag",
+      dalton = 0.01,
+      ppm = 30
+    ),
+    paste0(
+      "QUERY scaninfo(MS2DATA) WHERE ",
+      "MS2PROD=100:TOLERANCEMZ=0.01:TOLERANCEPPM=30 AND ",
+      "MS2PROD=200:TOLERANCEMZ=0.01:TOLERANCEPPM=30 AND ",
+      "MS2NL=50:TOLERANCEMZ=0.01:TOLERANCEPPM=30 ; ",
+      "QUERY scaninfo(MS2DATA) WHERE ",
+      "MS2PROD=100:TOLERANCEMZ=0.01:TOLERANCEPPM=30 AND ",
+      "MS2PROD=300:TOLERANCEMZ=0.01:TOLERANCEPPM=30"
+    )
+  )
+  testthat::expect_identical(
+    to_massql("(100_frag & 200_frag) | 50_nl", dalton = 0.01, ppm = 30),
+    paste0(
+      "QUERY scaninfo(MS2DATA) WHERE ",
+      "MS2PROD=100:TOLERANCEMZ=0.01:TOLERANCEPPM=30 AND ",
+      "MS2PROD=200:TOLERANCEMZ=0.01:TOLERANCEPPM=30 ; ",
+      "QUERY scaninfo(MS2DATA) WHERE ",
+      "MS2NL=50:TOLERANCEMZ=0.01:TOLERANCEPPM=30"
+    )
   )
 })
 
@@ -362,7 +436,7 @@ testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
     Spectra::mz(sp_empty_pks)
   )
 
-  # Left vs right neighbor selection and exact binary dalton boundary
+  # Left vs right neighbor selection and exact binary dalton + ppm boundary
   df_h <- data.frame(msLevel = c(2L, 2L, 2L), SKELETON = c("A", "B", "C"))
   df_h$mz <- list(
     c(50.0, 99.875, 1000.000, 2000.000),
@@ -376,17 +450,18 @@ testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
   )
   sp_h <- harmonize_mzs(df_to_spectra(df_h), dalton = 0.25, ppm = 500)
   mzs_h <- as.list(Spectra::mz(sp_h))
-  # 99.875 and 100.125 average to 100.0 (diff 0.125 <= 0.25)
-  # 1000.000 and 1000.500 average to 1000.250 (diff 0.25 == 0.25 boundary!)
-  # 2000.000 and 2000.750 average to 2000.375 (diff 0.375 > 0.25, outside!)
+  # With dalton = 0.25, ppm = 500:
+  # - 99.875 and 100.125 average to 100.0 (diff 0.125 <= 0.30)
+  # - 1000.000 and 1000.500 average to 1000.250 (diff 0.25 <= 0.750125)
+  # - 2000.000 and 2000.750 average to 2000.375 (diff 0.375 <= 1.2501875)
   testthat::expect_equal(
     mzs_h[[1L]],
-    c(50.0, 100.0, 1000.25, 2000.000),
+    c(50.0, 100.0, 1000.25, 2000.375),
     tolerance = 1e-10
   )
   testthat::expect_equal(
     mzs_h[[2L]],
-    c(50.0, 100.0, 1000.25, 2000.750),
+    c(50.0, 100.0, 1000.25, 2000.375),
     tolerance = 1e-10
   )
   testthat::expect_identical(mzs_h[[3L]], numeric(0))
@@ -640,9 +715,8 @@ testthat::test_that("query matching helpers work across all branches", {
     show_progress = FALSE
   )
   testthat::expect_identical(res_inf[[1L]]$value, "S2")
-  # Multi-NL query: 300_nl > precursor_mz (250) ignored while 50_nl matches S2
-  testthat::expect_identical(res_inf[[2L]]$target, "query_2")
-  testthat::expect_identical(res_inf[[2L]]$value, "S2")
+  # Multi-NL query: 300_nl > precursor_mz (250) is impossible -> 0 matches
+  testthat::expect_identical(nrow(res_inf[[2L]]), 0L)
   testthat::expect_identical(nrow(res_inf[[3L]]), 0L)
   testthat::expect_identical(nrow(res_inf[[4L]]), 0L)
   # BoundaryNL: 250_nl == precursor_mz (250) on S2 must not match 0.0 peak
@@ -742,7 +816,7 @@ testthat::test_that("spectra_to_queries validates inputs and synthetic cases", {
   )
 
   # Synthetic 6-spectrum dataset with distinct PRECURSOR_MZ and TITLEs:
-  # SkelA: 100_frag (3/3 -> diagnostic), 120_frag (2/3) -> MCC = 0.7071
+  # SkelA: 100_frag (3/3, FP=0 -> MCC = 1.0)
   # SkelB: 150_frag (TP=2, FP=1, FN=1, TN=2) -> MCC = (4-1)/9 = 0.3333
   synth_df <- data.frame(
     msLevel = rep(2L, 6L),
@@ -773,7 +847,7 @@ testthat::test_that("spectra_to_queries validates inputs and synthetic cases", {
   testthat::expect_identical(nrow(res_sp), 2L)
   testthat::expect_equal(
     res_sp$mcc,
-    c(round(1 / sqrt(2), 4L), round(1 / 3, 4L)),
+    c(1.0, round(1 / 3, 4L)),
     tolerance = 1e-12
   )
 
@@ -853,6 +927,7 @@ testthat::test_that("pipeline functions handle empty and filtered-out inputs", {
       skeleton = character(0),
       mcc = numeric(0),
       combined_ions = character(0),
+      massql = character(0),
       stringsAsFactors = FALSE
     )
   )
@@ -868,6 +943,7 @@ testthat::test_that("pipeline functions handle empty and filtered-out inputs", {
       skeleton = character(0),
       mcc = numeric(0),
       combined_ions = character(0),
+      massql = character(0),
       stringsAsFactors = FALSE
     )
   )
@@ -925,7 +1001,7 @@ testthat::test_that("extracted pipeline helpers handle boundaries and ties", {
     cand$ions_list_diagnostic,
     list(G.1 = "100_frag", G2 = "100_frag")
   )
-  # ions_max = 1L slices non-diagnostic ions per group to 1 ion
+  # ions_max = 1L slices candidate ions per group to 1 ion
   testthat::expect_identical(lengths(cand$ions_list), c(G.1 = 1L, G2 = 1L))
 
   # Strict precision_min / recall_min filtering (> 0.5 drops 0.5)
@@ -957,7 +1033,26 @@ testthat::test_that("extracted pipeline helpers handle boundaries and ties", {
   )
   testthat::expect_identical(merged_combs$G3, list("400_frag"))
 
-  # summarize_best_queries: tie-combining and denom == 0 (empty hit list)
+  # prune_combinations_bnb: empty candidate list, zero-denom MCC, no FP drop
+  df_bnb <- data.frame(
+    msLevel = c(2L, 2L, 2L),
+    SKELETON = c("G1", "G1", "G2"),
+    PRECURSOR_MZ = c(300.0, 300.0, 300.0)
+  )
+  df_bnb$mz <- list(c(100.0, 200.0), c(100.0, 200.0), c(100.0, 200.0))
+  df_bnb$intensity <- list(c(50.0, 100.0), c(50.0, 100.0), c(50.0, 100.0))
+  bnb_res <- prune_combinations_bnb(
+    ions_list = list(Empty = character(0), G1 = c("100_frag", "200_frag")),
+    spectra = df_to_spectra(df_bnb),
+    max_ions = 2L,
+    dalton = 0.01,
+    ppm = 30,
+    decimals = 4L
+  )
+  testthat::expect_identical(bnb_res$Empty, list())
+  testthat::expect_identical(bnb_res$G1, list("100_frag", "200_frag"))
+
+  # summarize_best_queries: selects single minimal query per skeleton + massql
   q_res <- stats::setNames(
     list(
       data.frame(
@@ -992,7 +1087,11 @@ testthat::test_that("extracted pipeline helpers handle boundaries and ties", {
   testthat::expect_equal(summary_df$mcc, c(1.0, 0.0))
   testthat::expect_identical(
     summary_df$combined_ions,
-    c("100_frag & 200_frag | 300_frag", "400_frag")
+    c("100_frag & 200_frag", "400_frag")
+  )
+  testthat::expect_identical(
+    summary_df$massql,
+    to_massql(c("100_frag & 200_frag", "400_frag"))
   )
 })
 
@@ -1007,7 +1106,7 @@ testthat::test_that("spectra_to_queries reproduces raw and grouped results", {
   testthat::expect_identical(nrow(res_raw), 21L)
   testthat::expect_identical(
     colnames(res_raw),
-    c("skeleton", "mcc", "combined_ions")
+    c("skeleton", "mcc", "combined_ions", "massql")
   )
   testthat::expect_identical(res_raw$skeleton[1L], "Lapidilectine")
   testthat::expect_equal(res_raw$mcc[1L], 1.0)

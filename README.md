@@ -85,6 +85,29 @@ SpectraToQueries::spectra_to_queries(
 )
 ```
 
+### Output and MassQL translation
+
+`spectra_to_queries()` returns (and exports as TSV) a table with one most
+parsimonious diagnostic query per skeleton class:
+
+- `skeleton`: chemical class identifier.
+- `mcc`: Matthews Correlation Coefficient of the query on the spectral library.
+- `combined_ions`: minimal conjunctive/disjunctive combination of fragments
+  (`_frag`) and neutral losses (`_nl`).
+- `massql`: directly executable
+  [MassQL](https://mwang87.github.io/MassQueryLanguage_Documentation/) query
+  (`QUERY scaninfo(MS2DATA) WHERE ...`).
+
+Custom ion expressions can also be converted to MassQL directly:
+
+```r
+SpectraToQueries::to_massql(
+  "108.0804_frag & 241.095_nl",
+  dalton = 0.01,
+  ppm = 30.0
+)
+```
+
 ### Example data
 
 The package includes two example datasets from MIADB:
@@ -116,7 +139,7 @@ a proof of concept with monoterpene indole alkaloids:
   | base             | 4.6.2      | R Core Team (2026)                                                       |
   | BiocManager      | 1.30.27    | Morgan and Ramos (2025)                                                  |
   | BiocVersion      | 3.23.1     | Morgan (2025)                                                            |
-  | grateful         | 0.3.0      | Rodriguez-Sanchez and Jackson (2025)                                     |
+  | grateful         | 0.3.1      | Rodriguez-Sanchez and Jackson (2025)                                     |
   | MsBackendMgf     | 1.20.1     | Gatto et al. (2026)                                                      |
   | Spectra          | 1.22.2     | Rainer et al. (2022)                                                     |
   | SpectraToQueries | 0.0.0.9002 | Rutz and Szwarc (2025); <span class="nocase">Szwarc et al.</span> (2025) |
@@ -172,8 +195,7 @@ Packages*. <https://pakillo.github.io/grateful/>.
 
 <div id="ref-SpectraToQueries2025a" class="csl-entry">
 
-Rutz, Adriano, and Sarah Szwarc. 2025. *SpectraToQueries:
-SpectraToQueries Provides the Infrastructure to Translate Spectra to
+Rutz, Adriano, and Sarah Szwarc. 2025. *SpectraToQueries: Spectra to
 Queries*.
 
 </div>

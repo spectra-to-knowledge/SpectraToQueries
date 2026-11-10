@@ -21,7 +21,9 @@ fix_binned_mzs(binned_m, original_mzs, dalton, ppm, decimals)
 Matrix with corrected m/z column names
 }
 \description{
-Fix binned mzs
+Replaces binned matrix column m/z names with intensity-weighted
+centroids of matching unbinned peaks within \code{dalton + mz * ppm / 1e6}, and
+merges columns that round to the same value.
 }
 \examples{
 NULL

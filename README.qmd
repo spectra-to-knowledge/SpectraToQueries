@@ -91,6 +91,29 @@ SpectraToQueries::spectra_to_queries(
 )
 ```
 
+### Output and MassQL translation
+
+`spectra_to_queries()` returns (and exports as TSV) a table with one most
+parsimonious diagnostic query per skeleton class:
+
+- `skeleton`: chemical class identifier.
+- `mcc`: Matthews Correlation Coefficient of the query on the spectral library.
+- `combined_ions`: minimal conjunctive/disjunctive combination of fragments
+  (`_frag`) and neutral losses (`_nl`).
+- `massql`: directly executable
+  [MassQL](https://mwang87.github.io/MassQueryLanguage_Documentation/) query
+  (`QUERY scaninfo(MS2DATA) WHERE ...`).
+
+Custom ion expressions can also be converted to MassQL directly:
+
+```r
+SpectraToQueries::to_massql(
+  "108.0804_frag & 241.095_nl",
+  dalton = 0.01,
+  ppm = 30.0
+)
+```
+
 ### Example data
 
 The package includes two example datasets from MIADB:

@@ -1,5 +1,8 @@
 #' @title Harmonize mzs
 #'
+#' @description Aligns peak m/z values across spectra to intensity-weighted
+#'   consensus centroids within a combined `dalton + mz * ppm / 1e6` window.
+#'
 #' @param spectra Spectra object
 #' @param dalton Tolerance in Dalton
 #' @param ppm Tolerance in parts per million
@@ -18,7 +21,8 @@ harmonize_mzs <- function(spectra, dalton, ppm) {
     Spectra::combinePeaksData(
       tolerance = dalton,
       ppm = ppm,
-      peaks = "union"
+      peaks = "union",
+      weighted = TRUE
     )
   averaged_intensities <- combined_peaks[, "mz"]
   averaged_intensities <- averaged_intensities[is.finite(averaged_intensities)]
@@ -43,9 +47,10 @@ harmonize_mzs <- function(spectra, dalton, ppm) {
       min_diff <- ifelse(use_right, d_right, d_left)
       best_idx <- ifelse(use_right, idx_right, idx_left_clamped)
 
-      within <- min_diff <= dalton
+      target_mzs <- averaged_intensities[best_idx]
+      within <- min_diff <= (dalton + target_mzs * (ppm / 1e6))
       if (any(within)) {
-        mzs[within] <- averaged_intensities[best_idx[within]]
+        mzs[within] <- target_mzs[within]
         pks[[i]][, 1L] <- mzs
       }
     }

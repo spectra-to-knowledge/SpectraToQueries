@@ -17,7 +17,8 @@ harmonize_mzs(spectra, dalton, ppm)
 Spectra with harmonized m/z values
 }
 \description{
-Harmonize mzs
+Aligns peak m/z values across spectra to intensity-weighted
+consensus centroids within a combined \code{dalton + mz * ppm / 1e6} window.
 }
 \examples{
 NULL

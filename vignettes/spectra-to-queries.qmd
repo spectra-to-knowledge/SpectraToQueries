@@ -1,0 +1,92 @@
+---
+title: "Translating MS/MS Spectra into Diagnostic Queries and MassQL"
+format: html
+---
+
+```{r}
+#| label: "setup"
+#| include: false
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Overview
+
+`SpectraToQueries` extracts skeleton-specific diagnostic fragment (`_frag`) and
+neutral-loss (`_nl`) ion queries from annotated MS/MS spectral libraries and
+translates them into
+[MassQL](https://mwang87.github.io/MassQueryLanguage_Documentation/) queries.
+
+For each chemical class (`SKELETON`) with at least `n_skel_min` spectra,
+`spectra_to_queries()` executes five steps:
+
+1. **Preprocessing and intensity-weighted m/z harmonization**: MS2 intensities
+   are normalized to 100%, peaks below `intensity_min` and non-positive neutral
+   losses are removed, and m/z values across spectra are aligned to
+   intensity-weighted consensus centroids within `dalton + mz * ppm / 1e6`.
+2. **Unbinned centroid evaluation**: Candidate fragment and neutral-loss
+   centroids are matched directly against the unbinned spectra, enforcing
+   physical feasibility (`precursor_mz - nl > 0`).
+3. **Candidate ion selection (hitting set + mRMR)**: Exact duplicate hit
+   profiles are collapsed. Ions with 100% recall on the target skeleton are
+   pruned via a greedy hitting-set cover of false-positive spectra, and
+   remaining slots up to `ions_max` are filled by forward conjunctive Matthews
+   Correlation Coefficient (MCC) gain penalized by correlation on negative
+   spectra.
+4. **Branch-and-Bound combination search**: When exploring multi-ion
+   conjunctions up to `ions_max`, branches whose zero-false-positive MCC upper
+   bound cannot reach the best MCC found so far for that skeleton are pruned.
+5. **Parsimonious query selection & MassQL export**: Among combinations tied for
+   the highest MCC on a skeleton, the combination using the fewest ions is
+   retained and formatted into both a minimal human-readable query
+   (`combined_ions`) and a directly executable MassQL statement (`massql`).
+
+## Generating queries
+
+Run `spectra_to_queries()` on a small subset of the bundled Monoterpene Indole
+Alkaloids Database (`mia_spectra_df`):
+
+```{r}
+#| label: "generate-queries"
+#| message: false
+
+library(SpectraToQueries)
+
+utils::data(mia_spectra_df, package = "SpectraToQueries")
+
+keep <- mia_spectra_df$SKELETON %in% c("corynanthean", "ibogan", "plumeran")
+queries <- spectra_to_queries(
+  spectra = mia_spectra_df[keep, ],
+  export = NULL,
+  ions_max = 4L
+)
+
+knitr::kable(queries, digits = 4)
+```
+
+On the full bundled dataset (`spectra_to_queries()`), pass `spectra = NULL` (raw
+skeletons) or `spectra = "grouped"` (grouped skeleton classes), or supply a path
+to an `.mgf` file containing a `SKELETON` metadata field.
+
+## Converting expressions to MassQL
+
+`to_massql()` converts any ion expression (or list of ion vectors) into a MassQL
+query with `TOLERANCEMZ`, `TOLERANCEPPM`, and optional `INTENSITYPERCENT`
+qualifiers:
+
+```{r}
+#| label: "to-massql"
+
+to_massql(
+  c(
+    "144.0807_frag & 171.0935_nl",
+    "168.0808_frag & (180.0809_frag | 241.095_nl)"
+  ),
+  dalton = 0.01,
+  ppm = 30.0,
+  intensity_min = 5.0
+)
+```

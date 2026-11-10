@@ -1,5 +1,9 @@
 #' @title Fix binned mzs
 #'
+#' @description Replaces binned matrix column m/z names with intensity-weighted
+#'   centroids of matching unbinned peaks within `dalton + mz * ppm / 1e6`, and
+#'   merges columns that round to the same value.
+#'
 #' @param binned_m Binned matrix
 #' @param original_mzs Original `Spectra` object with unbinned m/z values
 #' @param dalton Tolerance in Dalton
@@ -14,18 +18,21 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
     return(binned_m)
   }
 
-  all_mzs <- if (length(original_mzs) > 0L) {
+  if (length(original_mzs) > 0L) {
     combined_peaks <- original_mzs |>
       Spectra::peaksData() |>
       Spectra::combinePeaksData(
         tolerance = dalton,
         ppm = ppm,
-        peaks = "union"
+        peaks = "union",
+        weighted = TRUE
       )
-    mz_vals <- combined_peaks[, "mz"]
-    mz_vals[is.finite(mz_vals)]
+    keep_fin <- is.finite(combined_peaks[, "mz"])
+    all_mzs <- combined_peaks[keep_fin, "mz"]
+    all_ints <- combined_peaks[keep_fin, "intensity"]
   } else {
-    numeric(0)
+    all_mzs <- numeric(0)
+    all_ints <- numeric(0)
   }
 
   old_colnames <- as.numeric(colnames(binned_m))
@@ -44,7 +51,9 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
         idx <- lo:hi
         within <- abs(all_mzs[idx] - old_colnames[i]) <= tolerance_vec[idx]
         if (any(within)) {
-          new_colnames[i] <- mean(all_mzs[idx[within]])
+          hit_idx <- idx[within]
+          w <- pmax(0, all_ints[hit_idx]) + 1
+          new_colnames[i] <- sum(all_mzs[hit_idx] * w) / sum(w)
         }
       }
     }

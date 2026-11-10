@@ -2,6 +2,23 @@
 
 # SpectraToQueries 0.0.0.9002
 
+## Algorithms & MassQL Support
+
+- Added `to_massql()` and a `massql` column in `spectra_to_queries()` output to
+  translate diagnostic fragment (`_frag`) and neutral-loss (`_nl`) expressions
+  into directly executable MassQL queries (`QUERY scaninfo(MS2DATA) WHERE ...`).
+- Improved peak alignment and candidate query discovery:
+  - Intensity-weighted consensus centroiding in `harmonize_mzs()` and
+    `fix_binned_mzs()` within `dalton + mz * ppm / 1e6`.
+  - Enforced physical neutral-loss bounds (`nl > 0` and `precursor_mz - nl > 0`)
+    during preprocessing and query evaluation.
+  - Replaced top-N single-ion ranking with greedy hitting-set pruning on
+    100%-recall ions and forward conjunctive MCC selection penalized by
+    negative-class correlation (mRMR).
+  - Added Branch-and-Bound pruning of ion combinations using the zero-FP MCC
+    upper bound, Boolean superset absorption in `combine_ions_minimal()`, and
+    selection of the single most parsimonious query per skeleton.
+
 ## Performance & Optimization
 
 - **~30x end-to-end speedup** in `spectra_to_queries()` with 100% identical

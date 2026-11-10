@@ -119,8 +119,7 @@ perform_query <- function(all_mz, precursor_mz, frags, nls, dalton, ppm) {
           next
         }
         target_mz <- precursor_mz[i] - nls
-        target_mz <- target_mz[is.finite(target_mz) & target_mz > 0]
-        keep[i] <- length(target_mz) > 0L &&
+        keep[i] <- all(target_mz > 0) &&
           contains_all_mz(spec, target_mz, dalton, ppm)
       }
       keep[!valid_mask] <- FALSE
@@ -240,17 +239,14 @@ precompute_ion_hits <- function(
 ) {
   n_spec <- length(all_mz)
   valid_idx <- which(valid_prec_and_spec)
-  frag_hits <- list()
-  nl_lax_hits <- list()
-  nl_strict_hits <- list()
-  nl_vals <- numeric(0)
+  hits <- list()
 
   for (u in unique_ions) {
     if (grepl("_frag", u, fixed = TRUE)) {
       val <- suppressWarnings(as.numeric(sub("_frag", "", u, fixed = TRUE)))
       if (is.finite(val)) {
         tol <- dalton + val * (ppm / 1e6)
-        frag_hits[[u]] <- vapply(
+        hits[[u]] <- vapply(
           all_mz,
           function(spec_mz) any(abs(spec_mz - val) <= tol),
           logical(1L)
@@ -259,39 +255,22 @@ precompute_ion_hits <- function(
     } else if (grepl("_nl", u, fixed = TRUE)) {
       val <- suppressWarnings(as.numeric(sub("_nl", "", u, fixed = TRUE)))
       if (is.finite(val)) {
-        nl_vals[[u]] <- val
-        lax_vec <- logical(n_spec)
-        strict_vec <- logical(n_spec)
+        vec <- logical(n_spec)
         for (idx in valid_idx) {
           tmz <- precursor_mz[idx] - val
-          if (tmz <= 0) {
-            lax_vec[idx] <- TRUE
-          } else {
+          if (tmz > 0) {
             tol <- dalton + tmz * (ppm / 1e6)
-            hit <- any(abs(all_mz[[idx]] - tmz) <= tol)
-            lax_vec[idx] <- hit
-            strict_vec[idx] <- hit
+            vec[idx] <- any(abs(all_mz[[idx]] - tmz) <= tol)
           }
         }
-        nl_lax_hits[[u]] <- lax_vec
-        nl_strict_hits[[u]] <- strict_vec
+        hits[[u]] <- vec
       }
     }
   }
 
-  # Order NL ions first (sorted by ascending NL value) and fragment ions after:
-  # min(idx_vec) is then always the minimum-NL ion if any NL ion is present,
-  # or a fragment ion if only fragments are present.
-  if (length(nl_vals) > 0L) {
-    nl_ord <- names(sort(nl_vals))
-    nl_lax_hits <- nl_lax_hits[nl_ord]
-    nl_strict_hits <- nl_strict_hits[nl_ord]
-  }
-
   list(
-    names = c(names(nl_lax_hits), names(frag_hits)),
-    lax = c(nl_lax_hits, frag_hits),
-    strict = c(nl_strict_hits, frag_hits)
+    names = names(hits),
+    hits = hits
   )
 }
 
@@ -340,8 +319,7 @@ perform_list_of_queries_progress <- function(
     ppm = ppm
   )
   all_valid_names <- precomp$names
-  lax_lookup <- precomp$lax
-  strict_lookup <- precomp$strict
+  hits_lookup <- precomp$hits
 
   empty_df <- data.frame(
     target = character(0),
@@ -362,10 +340,12 @@ perform_list_of_queries_progress <- function(
     if (length(idx_vec) == 0L) {
       results[[i]] <- empty_df
     } else {
-      min_pos <- which.min(idx_vec)
-      keep <- strict_lookup[[idx_vec[min_pos]]]
-      for (code in idx_vec[-min_pos]) {
-        keep <- keep & lax_lookup[[code]]
+      keep <- hits_lookup[[idx_vec[1L]]]
+      for (code in idx_vec[-1L]) {
+        keep <- keep & hits_lookup[[code]]
+        if (!any(keep)) {
+          break
+        }
       }
 
       if (!any(keep)) {

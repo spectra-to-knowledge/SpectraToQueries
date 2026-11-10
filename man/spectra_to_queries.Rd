@@ -59,14 +59,31 @@ is \code{0.0}.}
 \item{zero_val}{Zero value threshold for intensity. Default is \code{0.0}.}
 }
 \value{
-Invisibly returns a \code{data.frame} with columns \code{skeleton}, \code{mcc}, and
-\code{combined_ions}, and writes the TSV table to \code{export} when \code{export} is
-non-\code{NULL}.
+Invisibly returns a \code{data.frame} with columns \code{skeleton}, \code{mcc},
+\code{combined_ions}, and \code{massql}, and writes the TSV table to \code{export} when
+\code{export} is non-\code{NULL}.
 }
 \description{
-This function converts tandem mass spectra into diagnostic
-fragment and neutral-loss ion queries ranked by Matthews Correlation
-Coefficient (MCC).
+Converts tandem mass spectra into diagnostic fragment (\verb{_frag})
+and neutral-loss (\verb{_nl}) ion queries ranked by Matthews Correlation
+Coefficient (MCC), together with ready-to-run MassQL queries.
+}
+\details{
+For each skeleton class with at least \code{n_skel_min} spectra, the pipeline:
+\enumerate{
+\item Normalizes MS2 intensities, removes sub-threshold and non-positive
+neutral-loss peaks, and aligns m/z values across spectra using
+intensity-weighted consensus centroids within \code{dalton + mz * ppm / 1e6}.
+\item Evaluates candidate fragment and neutral-loss centroids against the raw
+unbinned spectra (requiring \code{precursor_mz - nl > 0}).
+\item Selects up to \code{ions_max} candidate ions per skeleton using greedy
+hitting-set pruning on 100\%-recall ions followed by forward conjunctive
+MCC selection with negative-class correlation penalty (mRMR).
+\item Prunes the power set of ion combinations via Branch-and-Bound when the
+optimistic zero-FP upper bound cannot reach the current best MCC.
+\item Returns the single most parsimonious query achieving the maximum MCC per
+skeleton and translates it to MassQL via \code{\link[=to_massql]{to_massql()}}.
+}
 }
 \examples{
 \dontrun{
