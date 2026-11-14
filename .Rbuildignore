@@ -4,6 +4,7 @@
 ^AGENTS[.]md$
 ^CITATION\.cff$
 ^CLAUDE[.]md$
+^CONTRIBUTING\.md$
 ^GEMINI[.]md$
 ^LICENSE\.md$
 ^README\.Rmd$
@@ -21,6 +22,7 @@
 ^\.Rdata$
 ^\.Rhistory$
 ^\.Rproj\.user$
+^\.agent-work$
 ^\.agents$
 ^\.claude$
 ^\.claudeignore$
@@ -62,10 +64,5 @@
 ^renv$
 ^renv\.lock$
 ^tests/testthat/_snaps$
-^tests/testthat/_snaps/
 ^vignettes$
-^vignettes/\.quarto$
-^vignettes/articles$
-^vignettes/articles/*_files$
-^vignettes/articles/\.quarto$
 _\.new\.png$

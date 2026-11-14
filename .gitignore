@@ -57,3 +57,5 @@ _quarto/*
 README_files/
 README.html
 .licenses/
+.agent-work/
+renv/
