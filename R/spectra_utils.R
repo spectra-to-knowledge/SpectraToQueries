@@ -36,6 +36,10 @@ check_num <- function(x, msg, lower = -Inf, upper = Inf) {
 spectra_to_df <- function(spectra) {
   meta_df <- Spectra::spectraData(spectra) |>
     as.data.frame()
+  if ("dataOrigin" %in% names(meta_df) && is.character(meta_df$dataOrigin)) {
+    non_na <- !is.na(meta_df$dataOrigin)
+    meta_df$dataOrigin[non_na] <- basename(meta_df$dataOrigin[non_na])
+  }
   peaks_data <- Spectra::peaksData(spectra)
 
   meta_df$mz <- lapply(peaks_data, \(x) x[, "mz"])

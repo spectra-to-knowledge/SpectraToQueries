@@ -93,3 +93,15 @@ testthat::test_that("only public Rd help pages are shipped", {
   }
   testthat::expect_identical(actual_rd, expected_rd)
 })
+
+testthat::test_that("bundled datasets have no directory paths in dataOrigin", {
+  for (ds_name in c("mia_spectra_df", "mia_spectra_grouped_df")) {
+    env <- new.env(parent = emptyenv())
+    utils::data(list = ds_name, package = "SpectraToQueries", envir = env)
+    df <- env[[ds_name]]
+    if ("dataOrigin" %in% names(df)) {
+      origins <- df$dataOrigin[!is.na(df$dataOrigin)]
+      testthat::expect_false(any(grepl("[/\\\\]", origins)))
+    }
+  }
+})

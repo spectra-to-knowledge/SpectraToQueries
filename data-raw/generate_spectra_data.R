@@ -1,13 +1,14 @@
-library(Spectra)
-library(MsBackendMgf)
+# Run from the package root directory: Rscript data-raw/generate_spectra_data.R
 
-# Paths (assumes script is run from the package tree)
-pkg_root <- normalizePath(file.path("data-raw", ".."), mustWork = TRUE)
+pkg_root <- normalizePath(".", mustWork = TRUE)
 source(file.path(pkg_root, "R", "spectra_utils.R"))
 
 mgf_raw <- file.path(
   pkg_root,
-  "data/source/spectra/export_traitement_python_matchms-squelettes-tries.mgf"
+  "data",
+  "source",
+  "spectra",
+  "export_traitement_python_matchms-squelettes-tries.mgf"
 )
 mgf_grouped <- file.path(
   pkg_root,
@@ -17,43 +18,28 @@ mgf_grouped <- file.path(
   "export_traitement_python_matchms-squelettes-tries-grouped.mgf"
 )
 
-cat("========================================\n")
-cat("Generating spectra data from MGF files\n")
-cat("========================================\n\n")
-
-# 1. Load raw spectra from MGF file
-cat("Step 1: Loading raw spectra from MGF...\n")
+message("Loading raw spectra from MGF...")
 spectra_obj <- mgf_raw |>
   MsBackendMgf::readMgf() |>
   Spectra::Spectra()
-cat("  ✓ Loaded", length(spectra_obj), "raw spectra\n\n")
+message("Loaded ", length(spectra_obj), " raw spectra.")
 
-# 2. Convert raw Spectra to portable data.frame
-cat("Step 2: Converting spectra to portable data.frame...\n")
-mia_spectra_df <- spectra_obj |>
-  spectra_to_df()
-cat("  ✓ Created data.frame with", nrow(mia_spectra_df), "rows\n")
-cat(
-  "  ✓ Columns:",
-  paste(utils::head(colnames(mia_spectra_df), 5), collapse = ", "),
-  "...\n\n"
-)
+mia_spectra_df <- spectra_to_df(spectra_obj)
+message("Created mia_spectra_df with ", nrow(mia_spectra_df), " rows.")
 
-# 3. Load grouped spectra from MGF file
-cat("Step 3: Loading grouped spectra from MGF...\n")
+message("Loading grouped spectra from MGF...")
 spectra_grouped_obj <- mgf_grouped |>
   MsBackendMgf::readMgf() |>
   Spectra::Spectra()
-cat("  ✓ Loaded", length(spectra_grouped_obj), "grouped spectra\n\n")
+message("Loaded ", length(spectra_grouped_obj), " grouped spectra.")
 
-# 4. Convert grouped Spectra to portable data.frame
-cat("Step 4: Converting grouped spectra to portable data.frame...\n")
-mia_spectra_grouped_df <- spectra_grouped_obj |>
-  spectra_to_df()
-cat("  ✓ Created data.frame with", nrow(mia_spectra_grouped_df), "rows\n\n")
+mia_spectra_grouped_df <- spectra_to_df(spectra_grouped_obj)
+message(
+  "Created mia_spectra_grouped_df with ",
+  nrow(mia_spectra_grouped_df),
+  " rows."
+)
 
-# 5. Save as RDA files in data/ directory
-cat("Step 5: Saving as RDA files...\n")
 save(
   mia_spectra_df,
   file = file.path(pkg_root, "data", "mia_spectra_df.rda"),
@@ -64,18 +50,4 @@ save(
   file = file.path(pkg_root, "data", "mia_spectra_grouped_df.rda"),
   compress = "bzip2"
 )
-cat("  ✓ Saved data/mia_spectra_df.rda\n")
-cat("  ✓ Saved data/mia_spectra_grouped_df.rda\n\n")
-
-cat("========================================\n")
-cat("  ✓ Data generation complete!\n")
-cat("========================================\n")
-cat("\nGenerated files:\n")
-cat("  - data/mia_spectra_df.rda (raw spectra as portable data.frame)\n")
-cat(
-  "  - data/mia_spectra_grouped_df.rda",
-  "(grouped spectra as portable data.frame)\n"
-)
-cat("\nThese can be loaded via:\n")
-cat("  utils::data(mia_spectra_df, package = 'SpectraToQueries')\n")
-cat("  utils::data(mia_spectra_grouped_df, package = 'SpectraToQueries')\n")
+message("Saved sanitized datasets to data/.")
