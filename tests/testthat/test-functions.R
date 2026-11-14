@@ -1206,3 +1206,33 @@ testthat::test_that("pipeline handles numeric skeletons and backends", {
   )
   testthat::expect_identical(mat_dup_mz["A", "100"], 35.0)
 })
+
+testthat::test_that("spectra_to_queries works when TITLE is absent", {
+  df_no_title <- data.frame(
+    msLevel = c(2L, 2L, 2L, 2L),
+    SKELETON = c("SkelA", "SkelA", "SkelB", "SkelB"),
+    precursorMz = c(300.0, 300.0, 300.0, 300.0),
+    stringsAsFactors = FALSE
+  )
+  df_no_title$mz <- list(
+    c(100.0, 150.0),
+    c(100.0, 160.0),
+    c(200.0, 250.0),
+    c(200.0, 260.0)
+  )
+  df_no_title$intensity <- list(
+    c(80, 100),
+    c(70, 100),
+    c(90, 100),
+    c(85, 100)
+  )
+  res <- suppressMessages(spectra_to_queries(
+    spectra = df_no_title,
+    export = NULL,
+    n_skel_min = 2L,
+    n_spec_min = 2L
+  ))
+  testthat::expect_identical(res$skeleton, c("SkelA", "SkelB"))
+  testthat::expect_equal(res$mcc, c(1.0, 1.0), tolerance = 1e-12)
+  testthat::expect_identical(res$combined_ions, c("100_frag", "200_frag"))
+})

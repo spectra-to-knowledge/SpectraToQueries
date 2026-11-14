@@ -173,8 +173,14 @@ load_input_spectra <- function(spectra) {
 #' @noRd
 preprocess_spectra <- function(spectra_obj, dalton, ppm, intensity_min) {
   combine_by_title <- function(x) {
+    if (!("TITLE" %in% Spectra::spectraVariables(x))) {
+      return(x)
+    }
     titles <- x$TITLE
-    if (!is.null(titles) && (anyDuplicated(titles) || is.unsorted(titles))) {
+    if (
+      !is.null(titles) &&
+        isTRUE(anyDuplicated(titles) > 0L || is.unsorted(titles, na.rm = TRUE))
+    ) {
       Spectra::combineSpectra(x, f = titles)
     } else {
       x
