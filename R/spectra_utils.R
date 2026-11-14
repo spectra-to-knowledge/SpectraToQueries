@@ -24,7 +24,7 @@ check_num <- function(x, msg, lower = -Inf, upper = Inf) {
 #' Converts a [Spectra::Spectra] object to a portable `data.frame` format where
 #' metadata columns are preserved and peaks (`mz`/`intensity`) are added as list
 #' columns. This format is ideal for export to portable formats and can be
-#' converted back to a [Spectra::Spectra] object via [df_to_spectra()].
+#' converted back to a [Spectra::Spectra] object via `df_to_spectra()`.
 #'
 #' @param spectra A [Spectra::Spectra] object
 #'
@@ -48,7 +48,7 @@ spectra_to_df <- function(spectra) {
 #' Convert data.frame back to Spectra object
 #'
 #' Reconstructs a [Spectra::Spectra] object from a portable `data.frame` format
-#' created by [spectra_to_df()]. The `data.frame` must have `mz` and `intensity`
+#' created by `spectra_to_df()`. The `data.frame` must have `mz` and `intensity`
 #' columns (as lists) along with metadata columns.
 #'
 #' @param df A `data.frame` with metadata columns plus `mz` and `intensity`

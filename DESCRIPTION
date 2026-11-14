@@ -40,11 +40,9 @@ Collate:
     'data.R'
     'filter_matrix.R'
     'fix_binned_mzs.R'
-    'generate_combinations.R'
     'harmonize_mzs.R'
     'normalize_peaks.R'
     'perform_list_of_queries.R'
-    'progress_utils.R'
     'spectra_to_queries.R'
     'spectra_utils.R'
 Config/roxygen2/markdown: TRUE

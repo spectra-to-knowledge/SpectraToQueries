@@ -8,7 +8,7 @@ to_massql(query, dalton = 0.01, ppm = 30, intensity_min = 0)
 }
 \arguments{
 \item{query}{Character vector of query expressions, or a \code{list} of character
-vectors of ions.}
+vectors of ions or expression strings.}
 
 \item{dalton}{Tolerance in Dalton (\code{TOLERANCEMZ}). Default is \code{0.01}.}
 
@@ -23,8 +23,17 @@ Character vector of MassQL query strings.
 }
 \description{
 Translates one or more ion query expressions (such as
-\code{"108.0804_frag & 241.095_nl"} or a list of ion vectors) into directly
-executable MassQL queries (\verb{QUERY scaninfo(MS2DATA) WHERE ...}).
+\code{"108.0804_frag & 241.095_nl"}, \code{"100_frag & (200_frag | 300_frag)"}, or a
+list of ion vectors/expressions) into MassQL queries
+(\verb{QUERY scaninfo(MS2DATA) WHERE ...}).
+}
+\details{
+MassQL ignores \code{TOLERANCEMZ} when \code{TOLERANCEPPM} is present on the
+same condition. When \code{dalton > 0}, \code{to_massql()} emits a single effective
+\code{TOLERANCEMZ} modifier (\code{round(dalton + max(mz) * ppm / 1e6, 6)} for
+\code{MS2PROD}, and static \code{dalton} for \code{MS2NL}). When \code{dalton == 0} and
+\code{ppm > 0}, it emits \code{TOLERANCEPPM}. Disjunctive normal form clauses that
+cannot share a single \code{OR} group are joined with \code{" ; "}.
 }
 \examples{
 to_massql("108.0804_frag & 241.095_nl", dalton = 0.01, ppm = 30)

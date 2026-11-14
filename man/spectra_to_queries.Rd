@@ -86,14 +86,22 @@ skeleton and translates it to MassQL via \code{\link[=to_massql]{to_massql()}}.
 }
 }
 \examples{
-\dontrun{
-  # Run with default example spectra (mia_spectra_df)
-  spectra_to_queries(export = tempfile(fileext = ".tsv"))
-
-  # Run with grouped example spectra (mia_spectra_grouped_df)
-  spectra_to_queries(
-    spectra = "grouped",
-    export = tempfile(fileext = ".tsv")
-  )
-}
+df <- data.frame(
+  msLevel = c(2L, 2L, 2L, 2L),
+  SKELETON = c("SkelA", "SkelA", "SkelB", "SkelB"),
+  precursorMz = c(300.0, 300.0, 300.0, 300.0)
+)
+df$mz <- list(
+  c(100.0, 150.0),
+  c(100.0, 160.0),
+  c(200.0, 250.0),
+  c(200.0, 260.0)
+)
+df$intensity <- list(c(80, 100), c(70, 100), c(90, 100), c(85, 100))
+spectra_to_queries(
+  spectra = df,
+  export = NULL,
+  n_skel_min = 2L,
+  n_spec_min = 2L
+)
 }

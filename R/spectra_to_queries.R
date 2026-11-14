@@ -1,3 +1,47 @@
+#' @title Compute Matthews Correlation Coefficient (vectorized)
+#' @keywords internal
+#' @noRd
+calc_mcc_vec <- function(tp, fp, n_pos, total_spectra) {
+  tp <- as.numeric(tp)
+  fp <- as.numeric(fp)
+  n_pos <- as.numeric(n_pos)
+  total_spectra <- as.numeric(total_spectra)
+  fn_ <- n_pos - tp
+  tn <- total_spectra - tp - fp - fn_
+  denom <- sqrt((tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_))
+  ifelse(denom > 0, (tp * tn - fp * fn_) / denom, 0.0)
+}
+
+#' @title Return empty query table
+#' @keywords internal
+#' @noRd
+empty_query_table <- function() {
+  data.frame(
+    skeleton = character(0),
+    mcc = numeric(0),
+    combined_ions = character(0),
+    massql = character(0),
+    stringsAsFactors = FALSE
+  )
+}
+
+#' @title Write query table to TSV when export path is given
+#' @keywords internal
+#' @noRd
+write_query_table <- function(queries, export) {
+  if (!is.null(export)) {
+    create_dir(dirname(export))
+    utils::write.table(
+      queries,
+      file = export,
+      sep = "\t",
+      row.names = FALSE,
+      quote = FALSE
+    )
+  }
+  invisible(queries)
+}
+
 #' @title Validate inputs for `spectra_to_queries`
 #' @keywords internal
 #' @noRd
@@ -172,8 +216,7 @@ bin_and_fix_spectra <- function(
   dalton,
   ppm,
   decimals,
-  n_spec_min,
-  reset_first = FALSE
+  n_spec_min
 ) {
   if (sum(lengths(spectra_obj)) == 0L) {
     message("Fixing mzs (", label, ")")
@@ -185,8 +228,7 @@ bin_and_fix_spectra <- function(
     ))
   }
 
-  to_mat <- if (reset_first) Spectra::reset(spectra_obj) else spectra_obj
-  mat <- create_matrix(to_mat, name = to_mat$SKELETON)
+  mat <- create_matrix(spectra_obj, name = spectra_obj$SKELETON)
   message("Fixing mzs (", label, ")")
   fix_binned_mzs(
     mat,
@@ -214,7 +256,7 @@ select_mrmr_ions <- function(
     return(cand_ions)
   }
 
-  is_frag <- grepl("_frag", cand_ions, fixed = TRUE)
+  is_frag <- endsWith(cand_ions, "_frag")
   ord <- order(cand_mcc, cand_recall, is_frag, decreasing = TRUE)
   cand_ions <- cand_ions[ord]
   cand_mcc <- cand_mcc[ord]
@@ -242,14 +284,13 @@ select_mrmr_ions <- function(
   phi_mat[!is.finite(phi_mat)] <- 0.0
 
   n_pos <- as.numeric(sum(is_group))
-  n_neg <- as.numeric(sum(neg_mask))
   calc_mcc <- function(vec) {
-    tp <- as.numeric(sum(vec[is_group]))
-    fp <- as.numeric(sum(vec[neg_mask]))
-    fn_ <- n_pos - tp
-    tn <- n_neg - fp
-    denom <- sqrt((tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_))
-    if (denom > 0) (tp * tn - fp * fn_) / denom else 0.0
+    calc_mcc_vec(
+      tp = sum(vec[is_group]),
+      fp = sum(vec[neg_mask]),
+      n_pos = n_pos,
+      total_spectra = nrow(sub_mat)
+    )
   }
 
   selected <- 1L
@@ -393,13 +434,11 @@ extract_candidate_ions <- function(
   # Matthews Correlation Coefficient (MCC) for a single ion and group pair
   tp <- as.numeric(ions_df$count_per_ion_per_group)
   fp <- as.numeric(ions_df$count_per_ion) - tp
-  fn_ <- as.numeric(ions_df$group_count) - tp
-  tn <- total_spectra - tp - fp - fn_
-  denom_sq <- (tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_)
-  ions_df$mcc <- ifelse(
-    denom_sq > 0,
-    (tp * tn - fp * fn_) / sqrt(denom_sq),
-    0.0
+  ions_df$mcc <- calc_mcc_vec(
+    tp = tp,
+    fp = fp,
+    n_pos = ions_df$group_count,
+    total_spectra = total_spectra
   )
 
   ions_df <- ions_df[
@@ -408,10 +447,7 @@ extract_candidate_ions <- function(
     drop = FALSE
   ]
   if (nrow(ions_df) == 0L) {
-    return(list(
-      ions_list = list(),
-      ions_list_diagnostic = list()
-    ))
+    return(list())
   }
 
   groups <- sort(unique(ions_df$group), method = "radix")
@@ -427,42 +463,7 @@ extract_candidate_ions <- function(
     )
   })
   names(ions_list) <- groups
-
-  diag_df <- ions_df[ions_df$recall == 1, c("group", "ion"), drop = FALSE]
-  d_groups <- sort(unique(diag_df$group), method = "radix")
-  ions_list_diagnostic <- stats::setNames(
-    lapply(d_groups, function(g) unique(diag_df$ion[diag_df$group == g])),
-    d_groups
-  )
-
-  list(
-    ions_list = ions_list,
-    ions_list_diagnostic = ions_list_diagnostic
-  )
-}
-
-#' @title Merge diagnostic ions into candidate combinations
-#' @keywords internal
-#' @noRd
-merge_diagnostic_ions <- function(combinations, ions_list_diagnostic) {
-  has_diagnostic <- match(
-    names(combinations),
-    names(ions_list_diagnostic),
-    nomatch = 0L
-  ) >
-    0L
-
-  if (any(has_diagnostic)) {
-    for (name in names(combinations)[has_diagnostic]) {
-      diagnostic_ions <- ions_list_diagnostic[[name]]
-      if (length(diagnostic_ions) > 0L) {
-        combinations[[name]] <- lapply(combinations[[name]], function(sublist) {
-          unique(c(unlist(sublist), diagnostic_ions))
-        })
-      }
-    }
-  }
-  combinations
+  ions_list
 }
 
 #' @title Prune redundant superset combinations via exact Branch-and-Bound
@@ -470,76 +471,64 @@ merge_diagnostic_ions <- function(combinations, ions_list_diagnostic) {
 #' @noRd
 prune_combinations_bnb <- function(
   ions_list,
-  spectra,
+  skeleton,
+  hits_lookup,
   max_ions,
-  dalton,
-  ppm,
-  decimals,
-  intensity_min = 0.0
+  decimals
 ) {
-  query_data <- prepare_query_data(spectra, intensity_min = intensity_min)
-  all_mz <- query_data$mz
-  precursor_mz <- query_data$precursor_mz
-  skeleton <- query_data$skeleton
-  total_spectra <- as.numeric(length(all_mz))
-
-  unique_ions <- unique(unlist(ions_list, use.names = FALSE))
-  unique_ions <- unique_ions[!is.na(unique_ions) & nzchar(unique_ions)]
-  valid_prec_and_spec <- is.finite(precursor_mz) & (lengths(all_mz) > 0L)
-
-  precomp <- precompute_ion_hits(
-    unique_ions = unique_ions,
-    all_mz = all_mz,
-    precursor_mz = precursor_mz,
-    valid_prec_and_spec = valid_prec_and_spec,
-    dalton = dalton,
-    ppm = ppm
-  )
-  hits_lookup <- precomp$hits
-
+  total_spectra <- as.numeric(sum(!is.na(skeleton)))
+  valid_names <- names(hits_lookup)
   skel_names <- names(ions_list)
-  out <- stats::setNames(vector("list", length(skel_names)), skel_names)
+  empty_eval <- list(
+    skeleton = character(0),
+    ions = list(),
+    tp = numeric(0),
+    fp = numeric(0)
+  )
+  if (length(skel_names) == 0L || total_spectra == 0) {
+    return(empty_eval)
+  }
+
+  all_skel <- character(0)
+  all_ions <- list()
+  all_tp <- numeric(0)
+  all_fp <- numeric(0)
 
   for (s in skel_names) {
-    cands <- intersect(ions_list[[s]], names(hits_lookup))
+    cands <- intersect(ions_list[[s]], valid_names)
     m <- length(cands)
     if (m == 0L) {
-      out[[s]] <- list()
       next
     }
 
     is_pos <- !is.na(skeleton) & (skeleton == s)
     is_neg <- !is.na(skeleton) & (skeleton != s)
     n_pos <- as.numeric(sum(is_pos))
-    n_neg <- total_spectra - n_pos
 
     pos_hits <- lapply(cands, function(u) hits_lookup[[u]][is_pos])
     neg_hits <- lapply(cands, function(u) hits_lookup[[u]][is_neg])
 
-    eval_mcc <- function(tp, fp) {
-      fn_ <- n_pos - tp
-      tn <- n_neg - fp
-      denom <- sqrt((tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_))
-      if (denom > 0) (tp * tn - fp * fn_) / denom else 0.0
-    }
-
-    # Level 1: all single-ion queries
     kept_combs <- as.list(cands)
-    active <- lapply(seq_len(m), function(j) {
+    kept_tp <- numeric(m)
+    kept_fp <- numeric(m)
+    active <- vector("list", m)
+    for (j in seq_len(m)) {
       ph <- pos_hits[[j]]
       nh <- neg_hits[[j]]
       tp <- as.numeric(sum(ph))
       fp <- as.numeric(sum(nh))
-      list(
+      kept_tp[j] <- tp
+      kept_fp[j] <- fp
+      active[[j]] <- list(
         idx = j,
         last = j,
         ph = ph,
         nh = nh,
         tp = tp,
         fp = fp,
-        mcc = round(eval_mcc(tp, fp), decimals)
+        mcc = round(calc_mcc_vec(tp, fp, n_pos, total_spectra), decimals)
       )
-    })
+    }
 
     best_mcc <- max(vapply(active, `[[`, numeric(1L), "mcc"))
     max_k <- min(m, as.integer(max_ions))
@@ -552,7 +541,11 @@ prune_combinations_bnb <- function(
             node$last < m &&
               node$tp > 0 &&
               node$fp > 0 &&
-              round(eval_mcc(node$tp, 0.0), decimals) > best_mcc
+              round(
+                calc_mcc_vec(node$tp, 0.0, n_pos, total_spectra),
+                decimals
+              ) >
+                best_mcc
           },
           active
         )
@@ -570,9 +563,15 @@ prune_combinations_bnb <- function(
               ph_new <- node$ph & pos_hits[[j]]
               tp_new <- as.numeric(sum(ph_new))
               if (tp_new > 0) {
-                mcc_new <- round(eval_mcc(tp_new, fp_new), decimals)
+                mcc_new <- round(
+                  calc_mcc_vec(tp_new, fp_new, n_pos, total_spectra),
+                  decimals
+                )
                 idx_new <- c(node$idx, j)
-                kept_combs[[length(kept_combs) + 1L]] <- cands[idx_new]
+                kept_idx <- length(kept_combs) + 1L
+                kept_combs[[kept_idx]] <- cands[idx_new]
+                kept_tp[kept_idx] <- tp_new
+                kept_fp[kept_idx] <- fp_new
                 next_active[[length(next_active) + 1L]] <- list(
                   idx = idx_new,
                   last = j,
@@ -597,18 +596,25 @@ prune_combinations_bnb <- function(
       }
     }
 
-    out[[s]] <- kept_combs
+    all_skel <- c(all_skel, rep(s, length(kept_combs)))
+    all_ions <- c(all_ions, kept_combs)
+    all_tp <- c(all_tp, kept_tp)
+    all_fp <- c(all_fp, kept_fp)
   }
 
-  out
+  list(
+    skeleton = all_skel,
+    ions = all_ions,
+    tp = all_tp,
+    fp = all_fp
+  )
 }
 
 #' @title Evaluate query MCC and summarize minimal best queries per skeleton
 #' @keywords internal
 #' @noRd
 summarize_best_queries <- function(
-  queries_results,
-  all_combinations,
+  candidates,
   skeleton_counts,
   total_spectra,
   decimals,
@@ -616,36 +622,30 @@ summarize_best_queries <- function(
   ppm = 30.0,
   intensity_min = 0.0
 ) {
-  stats_mat <- vapply(
-    seq_along(queries_results),
-    function(result) {
-      target_name <- names(queries_results)[result]
-      vals <- queries_results[[result]]$value
-      tp <- as.numeric(sum(vals == target_name))
-      fp <- as.numeric(length(vals)) - tp
-      group_total <- as.numeric(skeleton_counts[[target_name]])
-      fn_ <- group_total - tp
-      tn <- total_spectra - tp - fp - fn_
+  if (length(candidates$ions) == 0L) {
+    return(empty_query_table())
+  }
 
-      denom <- sqrt((tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_))
-      mcc_raw <- if (denom > 0) (tp * tn - fp * fn_) / denom else 0.0
-      prec <- if (tp + fp > 0) tp / (tp + fp) else 0.0
-      c(round(mcc_raw, decimals), mcc_raw, prec)
-    },
-    numeric(3L)
-  )
+  skel_vec <- candidates$skeleton
+  ions_vec <- candidates$ions
+  tp <- as.numeric(candidates$tp)
+  fp <- as.numeric(candidates$fp)
+  n_pos <- as.numeric(skeleton_counts[skel_vec])
 
-  results_stats <- stats_mat[1L, ]
-  valid_mcc <- !is.nan(results_stats)
-  skel_vec <- names(all_combinations)[valid_mcc]
-  mcc_vec <- results_stats[valid_mcc]
-  mcc_raw_vec <- stats_mat[2L, valid_mcc]
-  prec_vec <- stats_mat[3L, valid_mcc]
-  ions_vec <- all_combinations[valid_mcc]
+  mcc_raw_vec <- calc_mcc_vec(tp, fp, n_pos, total_spectra)
+  mcc_vec <- round(mcc_raw_vec, decimals)
+  prec_vec <- ifelse(tp + fp > 0, tp / (tp + fp), 0.0)
+
+  valid_mcc <- !is.nan(mcc_vec)
+  skel_vec <- skel_vec[valid_mcc]
+  mcc_vec <- mcc_vec[valid_mcc]
+  mcc_raw_vec <- mcc_raw_vec[valid_mcc]
+  prec_vec <- prec_vec[valid_mcc]
+  ions_vec <- ions_vec[valid_mcc]
   n_ions_vec <- lengths(ions_vec)
   n_frags_vec <- vapply(
     ions_vec,
-    function(x) sum(grepl("_frag", x, fixed = TRUE)),
+    function(x) sum(endsWith(x, "_frag")),
     integer(1L)
   )
 
@@ -755,16 +755,24 @@ summarize_best_queries <- function(
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'   # Run with default example spectra (mia_spectra_df)
-#'   spectra_to_queries(export = tempfile(fileext = ".tsv"))
-#'
-#'   # Run with grouped example spectra (mia_spectra_grouped_df)
-#'   spectra_to_queries(
-#'     spectra = "grouped",
-#'     export = tempfile(fileext = ".tsv")
-#'   )
-#' }
+#' df <- data.frame(
+#'   msLevel = c(2L, 2L, 2L, 2L),
+#'   SKELETON = c("SkelA", "SkelA", "SkelB", "SkelB"),
+#'   precursorMz = c(300.0, 300.0, 300.0, 300.0)
+#' )
+#' df$mz <- list(
+#'   c(100.0, 150.0),
+#'   c(100.0, 160.0),
+#'   c(200.0, 250.0),
+#'   c(200.0, 260.0)
+#' )
+#' df$intensity <- list(c(80, 100), c(70, 100), c(90, 100), c(85, 100))
+#' spectra_to_queries(
+#'   spectra = df,
+#'   export = NULL,
+#'   n_skel_min = 2L,
+#'   n_spec_min = 2L
+#' )
 spectra_to_queries <- function(
   spectra = NULL,
   export = "data/interim/queries.tsv",
@@ -807,24 +815,7 @@ spectra_to_queries <- function(
 
   total_spectra <- as.numeric(length(mia_spectra))
   if (total_spectra == 0) {
-    empty_queries <- data.frame(
-      skeleton = character(0),
-      mcc = numeric(0),
-      combined_ions = character(0),
-      massql = character(0),
-      stringsAsFactors = FALSE
-    )
-    if (!is.null(export)) {
-      create_dir(dirname(export))
-      utils::write.table(
-        empty_queries,
-        file = export,
-        sep = "\t",
-        row.names = FALSE,
-        quote = FALSE
-      )
-    }
-    return(invisible(empty_queries))
+    return(write_query_table(empty_query_table(), export))
   }
 
   skel_norm <- gsub("+", ".", skel_raw, fixed = TRUE)
@@ -881,9 +872,8 @@ spectra_to_queries <- function(
 
   mia_spectra_w_nl <- harmonize_mzs(mia_spectra_nl, dalton = dalton, ppm = ppm)
 
-  message("Bin spectra to get a matrix.")
-  message("The window is ", dalton, " Dalton")
-  message("Create fragments and neutral losses matrices.")
+  message("Align consensus m/z values into feature matrix.")
+  message("Create fragments and neutral-loss feature matrix.")
   message("Remove features not appearing in at least ", n_spec_min, " spectra.")
 
   spectra_mat <- bin_and_fix_spectra(
@@ -892,8 +882,7 @@ spectra_to_queries <- function(
     dalton = dalton,
     ppm = ppm,
     decimals = decimals,
-    n_spec_min = n_spec_min,
-    reset_first = FALSE
+    n_spec_min = n_spec_min
   )
   spectra_nl_mat <- bin_and_fix_spectra(
     mia_spectra_w_nl,
@@ -901,8 +890,7 @@ spectra_to_queries <- function(
     dalton = dalton,
     ppm = ppm,
     decimals = decimals,
-    n_spec_min = n_spec_min,
-    reset_first = FALSE
+    n_spec_min = n_spec_min
   )
 
   message("Create a matrix containing fragments and neutral losses.")
@@ -952,7 +940,7 @@ spectra_to_queries <- function(
   }
 
   message("Count the number of members per skeleton and pivot the matrix.")
-  candidates <- extract_candidate_ions(
+  ions_list <- extract_candidate_ions(
     merged_mat = merged_mat,
     total_spectra = total_spectra,
     n_skel_min = n_skel_min,
@@ -964,67 +952,25 @@ spectra_to_queries <- function(
   )
   rm(merged_mat)
 
-  ions_list <- candidates$ions_list
   if (length(ions_list) == 0L) {
-    final_queries <- data.frame(
-      skeleton = character(0),
-      mcc = numeric(0),
-      combined_ions = character(0),
-      massql = character(0),
-      stringsAsFactors = FALSE
-    )
-    if (!is.null(export)) {
-      create_dir(dirname(export))
-      utils::write.table(
-        final_queries,
-        file = export,
-        sep = "\t",
-        row.names = FALSE,
-        quote = FALSE
-      )
-    }
-    return(invisible(final_queries))
+    return(write_query_table(empty_query_table(), export))
   }
 
-  message("Generate all combinations of queries.")
-  combinations <- prune_combinations_bnb(
+  message("Evaluate candidate combinations via Branch-and-Bound.")
+  candidates <- prune_combinations_bnb(
     ions_list = ions_list,
-    spectra = mia_spectra,
+    skeleton = qd$skeleton,
+    hits_lookup = pre$hits,
     max_ions = ions_max,
-    dalton = dalton,
-    ppm = ppm,
-    decimals = decimals,
-    intensity_min = intensity_min
+    decimals = decimals
   )
-  rm(candidates, ions_list)
+  rm(ions_list, pre)
 
-  all_combinations <- unlist(combinations, recursive = FALSE)
-  names(all_combinations) <- rep(names(combinations), lengths(combinations))
-  rm(combinations)
-
-  message("Test the queries. (This is the longest step)")
-  queries_results <- all_combinations |>
-    perform_list_of_queries_progress(
-      spectra = mia_spectra,
-      dalton = dalton,
-      ppm = ppm,
-      show_progress = TRUE,
-      intensity_min = intensity_min
-    )
-  names(queries_results) <- names(all_combinations)
-
-  message("Evaluate the performance of each query using MCC.")
-  normalized_skeleton <- gsub(
-    pattern = "+",
-    replacement = ".",
-    x = mia_spectra$SKELETON,
-    fixed = TRUE
-  )
-  skeleton_counts <- table(normalized_skeleton)
+  message("Rank best queries by MCC.")
+  skeleton_counts <- table(qd$skeleton)
 
   final_queries <- summarize_best_queries(
-    queries_results = queries_results,
-    all_combinations = all_combinations,
+    candidates = candidates,
     skeleton_counts = skeleton_counts,
     total_spectra = total_spectra,
     decimals = decimals,
@@ -1034,16 +980,5 @@ spectra_to_queries <- function(
   )
 
   message("Export the best queries for further use.")
-  if (!is.null(export)) {
-    create_dir(dirname(export))
-    utils::write.table(
-      final_queries,
-      file = export,
-      sep = "\t",
-      row.names = FALSE,
-      quote = FALSE
-    )
-  }
-
-  invisible(final_queries)
+  write_query_table(final_queries, export)
 }

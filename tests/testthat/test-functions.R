@@ -279,75 +279,6 @@ testthat::test_that("filter_matrix and normalize_peaks handle boundaries", {
   testthat::expect_identical(norm_fn(neg_pks), neg_pks)
 })
 
-testthat::test_that("generate_combinations and show_progress work", {
-  combs <- generate_combinations(c("a", "b", "c"), max_ions = 2L)
-  testthat::expect_identical(
-    combs,
-    list("a", "b", "c", c("a", "b"), c("a", "c"), c("b", "c"))
-  )
-  testthat::expect_identical(
-    generate_combinations(c("a", "b"), max_ions = 5L),
-    list("a", "b", c("a", "b"))
-  )
-  testthat::expect_identical(
-    generate_combinations(c("a", "b"), max_ions = 1L),
-    list("a", "b")
-  )
-  testthat::expect_identical(generate_combinations(character(0), 2L), list())
-  testthat::expect_identical(generate_combinations(c("a", "b"), 0L), list())
-  testthat::expect_identical(generate_combinations(c("a", "b"), -2L), list())
-
-  ions_list <- list(s1 = c("a", "b"), s2 = c("c"))
-  # Reordered indices verify `indices[idx]` lookup rather than positional `idx`
-  res <- testthat::expect_no_message(
-    generate_combinations_progress(
-      c("s2", "s1"),
-      ions_list = ions_list,
-      max_ions = 2L,
-      show_progress = FALSE
-    )
-  )
-  testthat::expect_identical(
-    res,
-    list(list("c"), list("a", "b", c("a", "b")))
-  )
-
-  testthat::expect_message(
-    generate_combinations_progress(
-      "s2",
-      ions_list = ions_list,
-      max_ions = 1L,
-      show_progress = TRUE
-    ),
-    "Progress: 1/1 \\(100%\\) - Done!"
-  )
-
-  testthat::expect_no_message(
-    vis0 <- withVisible(show_progress(0L, 0L))
-  )
-  testthat::expect_false(vis0$visible)
-  testthat::expect_null(vis0$value)
-  testthat::expect_no_message(show_progress(1L, -5L))
-  testthat::expect_no_message(show_progress(9L, 100L))
-  testthat::expect_message(
-    show_progress(10L, 100L),
-    "Progress: 10/100 \\(10%\\)"
-  )
-  testthat::expect_no_message(show_progress(10L, 100L + 1L))
-  testthat::expect_no_message(show_progress(10L, 9L))
-  testthat::expect_no_message(show_progress(9.5, 9))
-  testthat::expect_message(
-    show_progress(9L, 10L),
-    "Progress: 9/10 \\(90%\\)"
-  )
-  testthat::expect_message(
-    vis_done <- withVisible(show_progress(10L, 10L)),
-    "Progress: 10/10 \\(100%\\) - Done!"
-  )
-  testthat::expect_false(vis_done$visible)
-  testthat::expect_null(vis_done$value)
-})
-
 testthat::test_that("spectra conversion and matrix helpers round-trip", {
   utils::data(
     "mia_spectra_df",
@@ -604,196 +535,76 @@ testthat::test_that("query matching helpers work across all branches", {
   df_qd <- data.frame(
     msLevel = c(2L, 2L),
     SKELETON = c("SkelA+SkelB", "SkelC"),
-    PRECURSOR_MZ = c(200.0, 300.0)
+    precursorMz = c(200.0, 300.0)
   )
-  df_qd$mz <- list(c(100.0, 150.0), c(100.0, 250.0))
+  df_qd$mz <- list(c(100.0, 150.0), c(Inf, 250.0))
   df_qd$intensity <- list(c(50.0, 100.0), c(50.0, 100.0))
   sp_qd <- df_to_spectra(df_qd)
-  sp_qd@backend@spectraData$precursorMz <- df_qd$PRECURSOR_MZ
-  sp_qd@backend@peaksData[[2L]][1L, 1L] <- Inf
   prep <- prepare_query_data(sp_qd)
   testthat::expect_identical(prep$mz, list(c(100.0, 150.0), 250.0))
   testthat::expect_identical(prep$precursor_mz, c(200.0, 300.0))
   testthat::expect_identical(prep$skeleton, c("SkelA.SkelB", "SkelC"))
 
-  # contains_all_mz_tol & contains_all_mz exact binary boundary and non-finite
-  testthat::expect_true(contains_all_mz_tol(c(100.0, Inf), 100.5, tol = 0.5))
-  testthat::expect_false(contains_all_mz_tol(c(100.0, Inf), 100.6, tol = 0.5))
-  testthat::expect_false(contains_all_mz_tol(numeric(0), 100.0, tol = 0.5))
-  testthat::expect_false(
-    contains_all_mz_tol(100.0, numeric(0), tol = numeric(0))
+  # prepare_query_data with intensity_min filtering and edge cases
+  df_int <- data.frame(
+    msLevel = c(2L, 2L, 2L, 2L),
+    SKELETON = c("A", "B", "C", "D"),
+    precursorMz = c(300.0, 300.0, 300.0, 300.0)
   )
-
-  # At target_mz = 1000, dalton = 0.01, ppm = 20 -> tol = 0.03
-  testthat::expect_true(
-    contains_all_mz(1000.025, 1000.0, dalton = 0.01, ppm = 20)
-  )
-  testthat::expect_false(
-    contains_all_mz(1000.025, 1000.0, dalton = 0.01, ppm = 10)
-  )
-  testthat::expect_false(
-    contains_all_mz(100.0, c(NA_real_, Inf), dalton = 0.01, ppm = 10)
-  )
-  testthat::expect_false(contains_all_mz(
+  df_int$mz <- list(
     numeric(0),
-    100.0,
-    dalton = 0.01,
-    ppm = 10
-  ))
-
-  # perform_query edge cases: 0 spectra, S4 NumericList, empty spec in NL loop
-  testthat::expect_identical(
-    perform_query(list(), numeric(0), 100, numeric(0), 0.01, 10),
-    logical(0)
-  )
-  testthat::expect_identical(
-    perform_query(
-      Spectra::mz(sp_qd),
-      c(200.0, 300.0),
-      150.0,
-      numeric(0),
-      0.01,
-      10
-    ),
-    c(TRUE, FALSE)
-  )
-
-  all_mz <- list(c(100.0, 150.0), c(100.0, 200.0), c(250.0), numeric(0))
-  prec_mz <- c(200.0, 250.0, 300.0, 250.0)
-  # NL of 50 Da + 100_frag matches spectrum 1 (200-50=150) and 2 (250-50=200)
-  hits <- perform_query(
-    all_mz,
-    prec_mz,
-    frags = 100.0,
-    nls = 50.0,
-    dalton = 0.01,
-    ppm = 10
-  )
-  testthat::expect_identical(hits, c(TRUE, TRUE, FALSE, FALSE))
-
-  # NL-only query where spec 4 is empty and spec 1 has precursor == nl (0.0)
-  # Even with a peak at 0.0, target_mz == 0 must be rejected (> 0, not >= 0)
-  all_mz_zero <- list(
-    c(0.0, 100.0, 150.0),
+    c(100.0, Inf),
     c(100.0, 200.0),
-    c(250.0),
-    numeric(0)
+    c(100.0, 200.0)
   )
-  hits_nl_only <- perform_query(
-    all_mz_zero,
-    prec_mz,
-    frags = numeric(0),
-    nls = 200.0,
-    dalton = 0.01,
-    ppm = 10
+  df_int$intensity <- list(
+    numeric(0),
+    c(NaN, 100.0),
+    c(0.0, 0.0),
+    c(10.0, 100.0)
   )
-  testthat::expect_identical(hits_nl_only, c(FALSE, FALSE, FALSE, FALSE))
+  prep_int <- prepare_query_data(df_to_spectra(df_int), intensity_min = 50)
+  testthat::expect_identical(
+    prep_int$mz,
+    list(numeric(0), numeric(0), numeric(0), 200.0)
+  )
 
-  qd <- list(
-    mz = all_mz,
+  # precompute_ion_hits: non-finite precursor, NL bounds, and malformed tokens
+  all_mz <- list(c(100.0, 150.0), c(0.0, 100.0, 200.0), c(250.0), numeric(0))
+  prec_mz <- c(Inf, 250.0, 300.0, 250.0)
+  valid_ps <- is.finite(prec_mz) & (lengths(all_mz) > 0L)
+  pre <- precompute_ion_hits(
+    unique_ions = c(
+      "100_frag",
+      "50_nl",
+      "300_nl",
+      "250_nl",
+      "bad_ion",
+      "Inf_frag",
+      "100_fragment"
+    ),
+    all_mz = all_mz,
     precursor_mz = prec_mz,
-    skeleton = c("S1", "S2", "S1", NA_character_)
-  )
-  ions_list <- list(
-    S1 = c("100_frag", "50_nl"),
-    S2 = c("999_frag"),
-    c("50_nl"),
-    Empty = character(0),
-    Invalid = c("bad_frag", "bad_nl"),
-    OnlyNA = c("250_frag")
-  )
-  r1 <- perform_list_of_queries(1L, ions_list, qd, dalton = 0.01, ppm = 10)
-  testthat::expect_identical(r1$target, c("S1", "S1"))
-  testthat::expect_identical(r1$value, c("S1", "S2"))
-  r2 <- perform_list_of_queries(2L, ions_list, qd, dalton = 0.01, ppm = 10)
-  testthat::expect_identical(nrow(r2), 0L)
-  # Unnamed entry defaults to "query_3" and matches specs 1, 2, 3 via 50_nl
-  r3 <- perform_list_of_queries(3L, ions_list, qd, dalton = 0.01, ppm = 10)
-  testthat::expect_identical(r3$target, c("query_3", "query_3", "query_3"))
-  testthat::expect_identical(r3$value, c("S1", "S2", "S1"))
-  # Empty and invalid ion entries return 0-row data.frame
-  testthat::expect_identical(
-    nrow(perform_list_of_queries(4L, ions_list, qd, dalton = 0.01, ppm = 10)),
-    0L
-  )
-  testthat::expect_identical(
-    nrow(perform_list_of_queries(5L, ions_list, qd, dalton = 0.01, ppm = 10)),
-    0L
-  )
-  # Entry matching only a spectrum whose skeleton is NA returns 0-row data.frame
-  qd_na <- qd
-  qd_na$skeleton <- rep(NA_character_, 4L)
-  testthat::expect_identical(
-    nrow(perform_list_of_queries(
-      6L,
-      ions_list,
-      qd_na,
-      dalton = 0.01,
-      ppm = 10
-    )),
-    0L
-  )
-  # Error inside perform_query is caught and warns
-  testthat::expect_warning(
-    r_err <- perform_list_of_queries(
-      1L,
-      ions_list,
-      qd,
-      dalton = "invalid_dalton",
-      ppm = 10
-    ),
-    "Error in perform_query for S1"
-  )
-  testthat::expect_identical(nrow(r_err), 0L)
-
-  # Non-finite target_mz or precursor_mz must not produce false-positive matches
-  testthat::expect_false(contains_all_mz(
-    c(100.0, 200.0),
-    Inf,
+    valid_prec_and_spec = valid_ps,
     dalton = 0.01,
     ppm = 10
-  ))
-  df_inf <- data.frame(
-    msLevel = c(2L, 2L, 2L),
-    SKELETON = c("S1", "S2", NA_character_),
-    PRECURSOR_MZ = c(Inf, 250.0, 300.0)
   )
-  df_inf$mz <- list(c(100.0, 150.0), c(0.0, 100.0, 200.0), c(250.0))
-  df_inf$intensity <- list(c(50.0, 100.0), c(10.0, 50.0, 100.0), c(100.0))
-  sp_inf <- df_to_spectra(df_inf)
-  sp_inf@backend@spectraData$precursorMz <- df_inf$PRECURSOR_MZ
-
   testthat::expect_identical(
-    perform_list_of_queries_progress(
-      list(),
-      spectra = sp_inf,
-      dalton = 0.01,
-      ppm = 10,
-      show_progress = FALSE
-    ),
-    list()
+    pre$names,
+    c("100_frag", "50_nl", "300_nl", "250_nl")
   )
-
-  res_inf <- perform_list_of_queries_progress(
-    list(
-      Q1 = "50_nl",
-      c("50_nl", "300_nl"),
-      Invalid = "bad_ion",
-      OnlyNA = "250_frag",
-      BoundaryNL = "250_nl"
-    ),
-    spectra = sp_inf,
-    dalton = 0.01,
-    ppm = 10,
-    show_progress = FALSE
+  testthat::expect_identical(
+    pre$hits[["100_frag"]],
+    c(TRUE, TRUE, FALSE, FALSE)
   )
-  testthat::expect_identical(res_inf[[1L]]$value, "S2")
-  # Multi-NL query: 300_nl > precursor_mz (250) is impossible -> 0 matches
-  testthat::expect_identical(nrow(res_inf[[2L]]), 0L)
-  testthat::expect_identical(nrow(res_inf[[3L]]), 0L)
-  testthat::expect_identical(nrow(res_inf[[4L]]), 0L)
-  # BoundaryNL: 250_nl == precursor_mz (250) on S2 must not match 0.0 peak
-  testthat::expect_identical(nrow(res_inf[[5L]]), 0L)
+  # 50_nl on spec 2 (250-50=200) & spec 3 (300-50=250); Inf prec skipped
+  testthat::expect_identical(
+    pre$hits[["50_nl"]],
+    c(FALSE, TRUE, TRUE, FALSE)
+  )
+  # 300_nl > precursor_mz (250) and 250_nl == precursor_mz (0.0 peak) rejected
+  testthat::expect_identical(pre$hits[["300_nl"]], rep(FALSE, 4L))
+  testthat::expect_identical(pre$hits[["250_nl"]], rep(FALSE, 4L))
 })
 
 testthat::test_that("spectra_to_queries validates inputs and synthetic cases", {
@@ -1089,12 +900,8 @@ testthat::test_that("extracted pipeline helpers handle boundaries and ties", {
     recall_min = 0.5,
     mcc_min = 0.0
   ))
-  testthat::expect_identical(
-    cand$ions_list_diagnostic,
-    list(G.1 = "100_frag", G2 = "100_frag")
-  )
   # ions_max = 1L slices candidate ions per group to 1 ion
-  testthat::expect_identical(lengths(cand$ions_list), c(G.1 = 1L, G2 = 1L))
+  testthat::expect_identical(lengths(cand), c(G.1 = 1L, G2 = 1L))
 
   # Strict precision_min / recall_min filtering (> 0.5 drops 0.5)
   cand_filtered <- suppressMessages(extract_candidate_ions(
@@ -1107,70 +914,55 @@ testthat::test_that("extracted pipeline helpers handle boundaries and ties", {
     recall_min = 0.5,
     mcc_min = 0.0
   ))
-  testthat::expect_identical(cand_filtered$ions_list, list())
-  testthat::expect_identical(cand_filtered$ions_list_diagnostic, list())
+  testthat::expect_identical(cand_filtered, list())
 
-  # merge_diagnostic_ions
-  combs_in <- list(
-    G.1 = list("200_frag", "300_frag"),
-    G3 = list("400_frag")
-  )
-  merged_combs <- merge_diagnostic_ions(
-    combs_in,
-    list(G.1 = "100_frag", G2 = character(0))
-  )
-  testthat::expect_identical(
-    merged_combs$G.1,
-    list(c("200_frag", "100_frag"), c("300_frag", "100_frag"))
-  )
-  testthat::expect_identical(merged_combs$G3, list("400_frag"))
-
-  # prune_combinations_bnb: empty candidate list, zero-denom MCC, no FP drop
-  df_bnb <- data.frame(
-    msLevel = c(2L, 2L, 2L),
-    SKELETON = c("G1", "G1", "G2"),
-    PRECURSOR_MZ = c(300.0, 300.0, 300.0)
-  )
-  df_bnb$mz <- list(c(100.0, 200.0), c(100.0, 200.0), c(100.0, 200.0))
-  df_bnb$intensity <- list(c(50.0, 100.0), c(50.0, 100.0), c(50.0, 100.0))
-  bnb_res <- prune_combinations_bnb(
-    ions_list = list(Empty = character(0), G1 = c("100_frag", "200_frag")),
-    spectra = df_to_spectra(df_bnb),
+  # prune_combinations_bnb: empty list, zero spectra, and no FP drop
+  bnb_empty <- prune_combinations_bnb(
+    ions_list = list(),
+    skeleton = c("G1", "G2"),
+    hits_lookup = list("100_frag" = c(TRUE, FALSE)),
     max_ions = 2L,
-    dalton = 0.01,
-    ppm = 30,
     decimals = 4L
   )
-  testthat::expect_identical(bnb_res$Empty, list())
-  testthat::expect_identical(bnb_res$G1, list("100_frag", "200_frag"))
+  testthat::expect_identical(bnb_empty$ions, list())
 
-  # summarize_best_queries: selects single minimal query per skeleton + massql
-  q_res <- stats::setNames(
-    list(
-      data.frame(
-        target = c("SkelA", "SkelA"),
-        value = c("SkelA", "SkelA")
-      ),
-      data.frame(
-        target = c("SkelA", "SkelA"),
-        value = c("SkelA", "SkelA")
-      ),
-      data.frame(target = character(0), value = character(0))
+  bnb_res <- prune_combinations_bnb(
+    ions_list = list(Empty = character(0), G1 = c("100_frag", "200_frag")),
+    skeleton = c("G1", "G1", "G2"),
+    hits_lookup = list(
+      "100_frag" = c(TRUE, TRUE, TRUE),
+      "200_frag" = c(TRUE, TRUE, TRUE)
     ),
-    c("SkelA", "SkelA", "SkelB")
+    max_ions = 2L,
+    decimals = 4L
   )
-  all_combs <- stats::setNames(
-    list(
+  testthat::expect_identical(bnb_res$skeleton, c("G1", "G1"))
+  testthat::expect_identical(bnb_res$ions, list("100_frag", "200_frag"))
+  testthat::expect_equal(bnb_res$tp, c(2, 2))
+  testthat::expect_equal(bnb_res$fp, c(1, 1))
+
+  # summarize_best_queries: empty input + minimal best query selection + massql
+  empty_sum <- summarize_best_queries(
+    candidates = bnb_empty,
+    skeleton_counts = table(c("G1", "G2")),
+    total_spectra = 2,
+    decimals = 4L
+  )
+  testthat::expect_identical(nrow(empty_sum), 0L)
+
+  cands_in <- list(
+    skeleton = c("SkelA", "SkelA", "SkelB"),
+    ions = list(
       c("100_frag", "200_frag"),
       c("100_frag", "300_frag"),
-      c("400_frag")
+      "400_frag"
     ),
-    c("SkelA", "SkelA", "SkelB")
+    tp = c(2, 2, 0),
+    fp = c(0, 0, 0)
   )
   skel_counts <- table(c("SkelA", "SkelA", "SkelB", "SkelB"))
   summary_df <- summarize_best_queries(
-    queries_results = q_res,
-    all_combinations = all_combs,
+    candidates = cands_in,
     skeleton_counts = skel_counts,
     total_spectra = 4,
     decimals = 4L
@@ -1209,6 +1001,29 @@ testthat::test_that("spectra_to_queries reproduces raw and grouped results", {
   testthat::expect_identical(nrow(res_grp), 17L)
   testthat::expect_identical(res_grp$skeleton[1L], "Lapidilectine.Lunduran")
   testthat::expect_equal(res_grp$mcc[1L], 1.0)
+
+  tsv_raw_path <- testthat::test_path(
+    "..",
+    "..",
+    "data",
+    "interim",
+    "queries.tsv"
+  )
+  if (file.exists(tsv_raw_path)) {
+    tsv_raw <- utils::read.delim(tsv_raw_path, stringsAsFactors = FALSE)
+    testthat::expect_equal(res_raw, tsv_raw, tolerance = 1e-12)
+  }
+  tsv_grp_path <- testthat::test_path(
+    "..",
+    "..",
+    "data",
+    "interim",
+    "queries-grouped.tsv"
+  )
+  if (file.exists(tsv_grp_path)) {
+    tsv_grp <- utils::read.delim(tsv_grp_path, stringsAsFactors = FALSE)
+    testthat::expect_equal(res_grp, tsv_grp, tolerance = 1e-12)
+  }
 })
 
 testthat::test_that("pipeline handles numeric skeletons and backends", {

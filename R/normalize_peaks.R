@@ -4,6 +4,8 @@
 #'   intensity of 100
 #'
 #' @examples NULL
+#' @keywords internal
+#' @noRd
 normalize_peaks <- function() {
   function(x, ...) {
     if (nrow(x) > 0L) {

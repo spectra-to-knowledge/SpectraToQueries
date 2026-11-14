@@ -42,3 +42,54 @@ testthat::test_that("spectra_to_queries matches MIADB subset baseline", {
     )
   )
 })
+
+testthat::test_that("package functions do not access Spectra @backend@ slots", {
+  ns <- asNamespace("SpectraToQueries")
+  obj_names <- ls(ns, all.names = TRUE)
+  has_slot <- vapply(
+    obj_names,
+    function(nm) {
+      fn <- get(nm, envir = ns, inherits = FALSE)
+      if (!is.function(fn)) {
+        return(FALSE)
+      }
+      txt <- paste(deparse(body(fn)), collapse = "\n")
+      grepl("@backend@", txt, fixed = TRUE)
+    },
+    logical(1L)
+  )
+  testthat::expect_false(any(has_slot))
+
+  r_dir <- testthat::test_path("..", "..", "R")
+  if (dir.exists(r_dir)) {
+    r_files <- list.files(r_dir, pattern = "\\.R$", full.names = TRUE)
+    file_hits <- vapply(
+      r_files,
+      function(f) {
+        any(grepl("@backend@", readLines(f, warn = FALSE), fixed = TRUE))
+      },
+      logical(1L)
+    )
+    testthat::expect_false(any(file_hits))
+  }
+})
+
+testthat::test_that("only public Rd help pages are shipped", {
+  expected_rd <- sort(
+    c(
+      "SpectraToQueries-package.Rd",
+      "mia_spectra_df.Rd",
+      "mia_spectra_grouped_df.Rd",
+      "spectra_to_queries.Rd",
+      "to_massql.Rd"
+    ),
+    method = "radix"
+  )
+  man_dir <- testthat::test_path("..", "..", "man")
+  actual_rd <- if (dir.exists(man_dir)) {
+    sort(list.files(man_dir, pattern = "\\.Rd$"), method = "radix")
+  } else {
+    sort(names(tools::Rd_db("SpectraToQueries")), method = "radix")
+  }
+  testthat::expect_identical(actual_rd, expected_rd)
+})

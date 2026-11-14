@@ -6,6 +6,8 @@
 #' @return Filtered matrix with columns having at least `n` non-zero values
 #'
 #' @examples NULL
+#' @keywords internal
+#' @noRd
 filter_matrix <- function(matrix, n) {
   keep_cols <- colSums(matrix > 0) >= n
   matrix[, keep_cols, drop = FALSE]
