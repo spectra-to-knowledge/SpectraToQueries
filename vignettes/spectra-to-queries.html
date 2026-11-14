@@ -71,7 +71,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../man/combine_ions_minimal.html" rel="next">
+<link href="../man/mia_spectra_df.html" rel="next">
 <link href="../index.html" rel="prev">
 <link href="../man/figures/logo.svg" rel="icon" type="image/svg+xml">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
@@ -207,66 +207,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../man/combine_ions_minimal.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">combine_ions_minimal</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/contains_all_mz_tol.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">contains_all_mz_tol</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/contains_all_mz.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">contains_all_mz</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/create_dir.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">create_dir</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/create_matrix.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">create_matrix</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/filter_matrix.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">filter_matrix</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/fix_binned_mzs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">fix_binned_mzs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/generate_combinations_progress.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">generate_combinations_progress</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/generate_combinations.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">generate_combinations</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/harmonize_mzs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">harmonize_mzs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="../man/mia_spectra_df.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">mia_spectra_df</span></a>
   </div>
@@ -275,36 +215,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <div class="sidebar-item-container"> 
   <a href="../man/mia_spectra_grouped_df.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">mia_spectra_grouped_df</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/normalize_peaks.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">normalize_peaks</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/perform_list_of_queries_progress.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">perform_list_of_queries_progress</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/perform_list_of_queries.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">perform_list_of_queries</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/perform_query.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">perform_query</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../man/prepare_query_data.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_query_data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -379,16 +289,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">data</span>(mia_spectra_df, <span class="at">package =</span> <span class="st">"SpectraToQueries"</span>)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>keep <span class="ot">&lt;-</span> mia_spectra_df<span class="sc">$</span>SKELETON <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"corynanthean"</span>, <span class="st">"ibogan"</span>, <span class="st">"plumeran"</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>queries <span class="ot">&lt;-</span> <span class="fu">spectra_to_queries</span>(</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> mia_spectra_df[keep, ],</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">export =</span> <span class="cn">NULL</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">ions_max =</span> <span class="dv">4</span>L</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(queries, <span class="at">digits =</span> <span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>keep <span class="ot">&lt;-</span> mia_spectra_df<span class="sc">$</span>SKELETON <span class="sc">%in%</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">"Corynanthean"</span>, <span class="st">"Iboga"</span>, <span class="st">"Aspidosperma"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>queries <span class="ot">&lt;-</span> <span class="fu">spectra_to_queries</span>(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">spectra =</span> mia_spectra_df[keep, ],</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">export =</span> <span class="cn">NULL</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">ions_max =</span> <span class="dv">4</span>L</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(queries, <span class="at">digits =</span> <span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<table class="caption-top">
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 4%">
+<col style="width: 18%">
+<col style="width: 68%">
+</colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">skeleton</th>
@@ -398,6 +315,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </thead>
 <tbody>
+<tr class="odd">
+<td style="text-align: left;">Aspidosperma</td>
+<td style="text-align: right;">0.6947</td>
+<td style="text-align: left;">134.0951_frag &amp; 199.1217_nl</td>
+<td style="text-align: left;">QUERY scaninfo(MS2DATA) WHERE MS2PROD=134.0951:TOLERANCEMZ=0.014023 AND MS2NL=199.1217:TOLERANCEMZ=0.01</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Iboga</td>
+<td style="text-align: right;">0.6896</td>
+<td style="text-align: left;">121.091_frag &amp; 224.1054_frag</td>
+<td style="text-align: left;">QUERY scaninfo(MS2DATA) WHERE MS2PROD=121.091:TOLERANCEMZ=0.013633 AND MS2PROD=224.1054:TOLERANCEMZ=0.016723</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Corynanthean</td>
+<td style="text-align: right;">0.5021</td>
+<td style="text-align: left;">116.0562_frag &amp; 143.0735_nl</td>
+<td style="text-align: left;">QUERY scaninfo(MS2DATA) WHERE MS2PROD=116.0562:TOLERANCEMZ=0.013482 AND MS2NL=143.0735:TOLERANCEMZ=0.01</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -406,7 +341,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="converting-expressions-to-massql" class="level2">
 <h2 class="anchored" data-anchor-id="converting-expressions-to-massql">Converting expressions to MassQL</h2>
-<p><code>to_massql()</code> converts any ion expression (or list of ion vectors) into a MassQL query with <code>TOLERANCEMZ</code>, <code>TOLERANCEPPM</code>, and optional <code>INTENSITYPERCENT</code> qualifiers:</p>
+<p><code>to_massql()</code> converts any ion expression (or list of ion vectors) into a MassQL query. Because MassQL ignores <code>TOLERANCEMZ</code> when <code>TOLERANCEPPM</code> is present on the same condition, <code>to_massql()</code> emits a single effective tolerance modifier per condition: <code>:TOLERANCEMZ=</code> (<code>round(dalton + max(mz) * ppm / 1e6, 6)</code> on <code>MS2PROD</code>, and static <code>dalton</code> on <code>MS2NL</code>) when <code>dalton &gt; 0</code>, or <code>:TOLERANCEPPM=</code> when <code>dalton == 0</code> and <code>ppm &gt; 0</code>, plus optional <code>:INTENSITYPERCENT=</code> when <code>intensity_min &gt; 0</code>. Disjunctive (<code>|</code>) clauses are expanded to disjunctive normal form and joined with <code>;</code>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">to_massql</span>(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(</span>
@@ -417,8 +352,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">ppm =</span> <span class="fl">30.0</span>,</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">intensity_min =</span> <span class="fl">5.0</span></span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "QUERY scaninfo(MS2DATA) WHERE MS2PROD=144.0807:TOLERANCEMZ=0.01:TOLERANCEPPM=30:INTENSITYPERCENT=5 AND MS2NL=171.0935:TOLERANCEMZ=0.01:TOLERANCEPPM=30:INTENSITYPERCENT=5"                                                                                                                                                                             </span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2] "QUERY scaninfo(MS2DATA) WHERE MS2PROD=168.0808:TOLERANCEMZ=0.01:TOLERANCEPPM=30:INTENSITYPERCENT=5 AND MS2PROD=180.0809:TOLERANCEMZ=0.01:TOLERANCEPPM=30:INTENSITYPERCENT=5 ; QUERY scaninfo(MS2DATA) WHERE MS2PROD=168.0808:TOLERANCEMZ=0.01:TOLERANCEPPM=30:INTENSITYPERCENT=5 AND MS2NL=241.095:TOLERANCEMZ=0.01:TOLERANCEPPM=30:INTENSITYPERCENT=5"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "QUERY scaninfo(MS2DATA) WHERE MS2PROD=144.0807:TOLERANCEMZ=0.014322:INTENSITYPERCENT=5 AND MS2NL=171.0935:TOLERANCEMZ=0.01:INTENSITYPERCENT=5"                                                                                                                                                     </span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2] "QUERY scaninfo(MS2DATA) WHERE MS2PROD=168.0808:TOLERANCEMZ=0.015042:INTENSITYPERCENT=5 AND MS2PROD=180.0809:TOLERANCEMZ=0.015402:INTENSITYPERCENT=5 ; QUERY scaninfo(MS2DATA) WHERE MS2PROD=168.0808:TOLERANCEMZ=0.015042:INTENSITYPERCENT=5 AND MS2NL=241.095:TOLERANCEMZ=0.01:INTENSITYPERCENT=5"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 
 
@@ -908,8 +843,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../man/combine_ions_minimal.html" class="pagination-link" aria-label="combine_ions_minimal">
-        <span class="nav-page-text">combine_ions_minimal</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../man/mia_spectra_df.html" class="pagination-link" aria-label="mia_spectra_df">
+        <span class="nav-page-text">mia_spectra_df</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

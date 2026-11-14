@@ -170,66 +170,6 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" aria-labelledby="quarto-sidebar-section-2-label" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./man/combine_ions_minimal.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">combine_ions_minimal</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./man/contains_all_mz_tol.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">contains_all_mz_tol</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./man/contains_all_mz.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">contains_all_mz</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./man/create_dir.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">create_dir</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./man/create_matrix.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">create_matrix</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./man/filter_matrix.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">filter_matrix</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./man/fix_binned_mzs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">fix_binned_mzs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./man/generate_combinations_progress.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">generate_combinations_progress</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./man/generate_combinations.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">generate_combinations</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./man/harmonize_mzs.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">harmonize_mzs</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./man/mia_spectra_df.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">mia_spectra_df</span></a>
   </div>
@@ -238,36 +178,6 @@ ul.task-list li input[type="checkbox"] {
   <div class="sidebar-item-container"> 
   <a href="./man/mia_spectra_grouped_df.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">mia_spectra_grouped_df</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./man/normalize_peaks.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">normalize_peaks</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./man/perform_list_of_queries_progress.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">perform_list_of_queries_progress</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./man/perform_list_of_queries.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">perform_list_of_queries</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./man/perform_query.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">perform_query</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./man/prepare_query_data.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">prepare_query_data</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -298,6 +208,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#spectratoqueries-0.0.0.9002" id="toc-spectratoqueries-0.0.0.9002" class="nav-link" data-scroll-target="#spectratoqueries-0.0.0.9002">SpectraToQueries 0.0.0.9002</a>
   <ul class="collapse">
   <li><a href="#algorithms-massql-support" id="toc-algorithms-massql-support" class="nav-link" data-scroll-target="#algorithms-massql-support">Algorithms &amp; MassQL Support</a></li>
+  <li><a href="#bug-fixes-compatibility" id="toc-bug-fixes-compatibility" class="nav-link" data-scroll-target="#bug-fixes-compatibility">Bug Fixes &amp; Compatibility</a></li>
   <li><a href="#performance-optimization" id="toc-performance-optimization" class="nav-link" data-scroll-target="#performance-optimization">Performance &amp; Optimization</a></li>
   <li><a href="#dependencies" id="toc-dependencies" class="nav-link" data-scroll-target="#dependencies">Dependencies</a></li>
   <li><a href="#data-documentation-metadata" id="toc-data-documentation-metadata" class="nav-link" data-scroll-target="#data-documentation-metadata">Data, Documentation &amp; Metadata</a></li>
@@ -331,34 +242,37 @@ ul.task-list li input[type="checkbox"] {
 </ul></li>
 </ul>
 </section>
+<section id="bug-fixes-compatibility" class="level2">
+<h2 class="anchored" data-anchor-id="bug-fixes-compatibility">Bug Fixes &amp; Compatibility</h2>
+<ul>
+<li>Fixed <code>to_massql()</code> and <code>combine_ions_minimal()</code> Boolean precedence and MassQL qualifier handling: parenthesized multi-term <code>OR</code> groups, parsed disjunctive normal form clauses joined by <code>" ; "</code>, and emitted a single effective tolerance modifier (<code>:TOLERANCEMZ=</code> when <code>dalton &gt; 0</code>, or <code>:TOLERANCEPPM=</code> when <code>dalton == 0</code> and <code>ppm &gt; 0</code>).</li>
+<li>Enforced relative base-peak intensity filtering <code>[0, 100]</code> via <code>intensity_min</code> during <code>prepare_query_data()</code>.</li>
+<li>Replaced internal <code>@backend@</code> slot access with public <code>Spectra</code> methods so in-memory backends (<code>MsBackendMemory</code>, <code>MsBackendDataFrame</code>) work reliably, and added classed errors (<code>stq_input_error</code>, <code>stq_file_not_found_error</code>) plus lowercase <code>skeleton</code> metadata fallback.</li>
+<li>Fixed trailing-digit corruption on skeleton labels ending in digits by replacing <code>names(unlist(...))</code> with <code>rep(names(...), lengths(...))</code>, and warned if <code>+</code> to <code>.</code> normalization causes skeleton label collisions.</li>
+<li>Fixed <code>create_dir()</code> directory creation, duplicate m/z accumulation in <code>create_matrix()</code>, and non-finite intensity filtering in <code>fix_binned_mzs()</code>.</li>
+<li>Evaluated helper validations before calling S4 <code>Spectra</code> generics so classed conditions propagate directly without wrapping.</li>
+</ul>
+</section>
 <section id="performance-optimization" class="level2">
 <h2 class="anchored" data-anchor-id="performance-optimization">Performance &amp; Optimization</h2>
 <ul>
-<li><strong>~30x end-to-end speedup</strong> in <code>spectra_to_queries()</code> with 100% identical outputs:
-<ul>
-<li>Precomputed single-ion logical hit vectors in <code>perform_list_of_queries_progress()</code> and converted S4 <code>SimpleNumericList</code> m/z lists to plain R vectors once in <code>prepare_query_data()</code>.</li>
-<li>Replaced nested loop linear scans in <code>harmonize_mzs()</code> with vectorized <code>findInterval()</code> nearest-neighbor lookup.</li>
-<li>Switched <code>Spectra::bin()</code> to sparse mode (<code>zero.rm = TRUE</code>) with sparse-aware <code>create_matrix()</code> and column-major distance calculation in <code>fix_binned_mzs()</code>.</li>
-<li>Avoided redundant <code>Spectra::combineSpectra()</code> and duplicate lazy queue evaluation before <code>Spectra::applyProcessing()</code>.</li>
-</ul></li>
+<li>Simplified the pipeline to single-pass candidate evaluation in <code>prune_combinations_bnb()</code> and <code>summarize_best_queries()</code> using precomputed ion hit vectors (<code>precompute_ion_hits()</code>).</li>
+<li>Removed dead helper code (<code>generate_combinations*()</code>, <code>contains_all_mz*()</code>, <code>perform_query()</code>, <code>perform_list_of_queries*()</code>, <code>merge_diagnostic_ions()</code>, <code>show_progress()</code>, and unused <code>inst/scripts/spectra_to_queries.R</code>), keeping internal helpers hidden with <code>@noRd</code>.</li>
+<li>Replaced nested linear scans in <code>harmonize_mzs()</code> with vectorized <code>findInterval()</code> lookup and avoided redundant <code>Spectra</code> processing passes.</li>
 </ul>
 </section>
 <section id="dependencies" class="level2">
 <h2 class="anchored" data-anchor-id="dependencies">Dependencies</h2>
 <ul>
-<li>Removed <code>tidytable</code> from <code>Imports</code>, leaving only <code>MsBackendMgf</code>, <code>Spectra</code>, and Base R <code>utils</code>.</li>
-<li>Removed <code>fastmatch</code>, <code>stringi</code>, <code>BiocParallel</code>, <code>data.table</code>, <code>progress</code>, <code>purrr</code>, and <code>tibble</code>.</li>
+<li>Narrowed <code>Imports</code> to <code>MsBackendMgf</code>, <code>Spectra</code>, <code>stats</code>, and <code>utils</code> (removing <code>tidytable</code>, <code>fastmatch</code>, <code>stringi</code>, <code>BiocParallel</code>, <code>data.table</code>, <code>progress</code>, <code>purrr</code>, and <code>tibble</code>).</li>
 </ul>
 </section>
 <section id="data-documentation-metadata" class="level2">
 <h2 class="anchored" data-anchor-id="data-documentation-metadata">Data, Documentation &amp; Metadata</h2>
 <ul>
-<li><strong>Portable <code>data/</code> datasets</strong> regenerated from source MGF files:
-<ul>
-<li><code>mia_spectra_df</code>: 321 MS/MS spectra from MIADB across 81 chemical skeletons (24,255 total peaks, median 66 peaks per spectrum).</li>
-<li><code>mia_spectra_grouped_df</code>: 321 MS/MS spectra from MIADB across 53 grouped skeleton classes.</li>
-</ul></li>
-<li>Regenerated <code>data/interim/queries.tsv</code> and <code>data/interim/queries-grouped.tsv</code> using Matthews Correlation Coefficient (MCC) ranking.</li>
+<li>Regenerated <code>data/mia_spectra_df.rda</code> (321 MS/MS spectra across 81 skeletons; 24,255 peaks) and <code>data/mia_spectra_grouped_df.rda</code> (321 MS/MS spectra across 53 grouped classes) with <code>basename()</code> applied to <code>dataOrigin</code> so no local paths are embedded.</li>
+<li>Regenerated <code>data/interim/queries.tsv</code> and <code>data/interim/queries-grouped.tsv</code>.</li>
+<li>Added executable <code>@examples</code> for <code>spectra_to_queries()</code> and updated vignette, <code>README</code>, <code>CONTRIBUTING.md</code>, <code>TESTING.md</code>, and <code>CITATION.cff</code>.</li>
 <li>Added verified EDAM ontology terms (<code>X-EDAM-Topic</code>, <code>X-EDAM-Operation</code>, <code>X-EDAM-Data</code>, <code>X-EDAM-Format</code>, <code>X-schema.org-keywords</code>, <code>biocViews</code>) to <code>DESCRIPTION</code>.</li>
 </ul>
 </section>
