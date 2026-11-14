@@ -33,6 +33,10 @@ Every invariant below is tested in `tests/testthat/test-architecture.R` or
   `simpleError`.
 - Keep `MsBackendDataFrame` and `MsBackendMemory` tests passing alongside `.mgf`
   inputs.
+- Always check `"COL" %in% Spectra::spectraVariables(x)` before accessing
+  optional metadata columns with `x$COL` (such as `TITLE`, `PRECURSOR_MZ`, or
+  `skeleton`), because `Spectra` `$` throws an error on missing variables
+  instead of returning `NULL`.
 
 ## 4. Label Handling and Intensity Filtering
 
