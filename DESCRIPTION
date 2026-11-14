@@ -27,10 +27,13 @@ Depends:
 Imports:
     MsBackendMgf (>= 1.18.0),
     Spectra (>= 1.20.1),
+    stats,
     utils
 Suggests:
+    knitr,
     spelling,
-    testthat (>= 3.3.2)
+    testthat (>= 3.3.2),
+    tools
 ByteCompile: TRUE
 Collate:
     'SpectraToQueries-package.R'

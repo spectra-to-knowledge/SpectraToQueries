@@ -27,8 +27,23 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05
         with:
-          extra-packages: any::covr, any::xml2
+          extra-packages: any::covr, any::lintr, any::spelling, any::xml2
           needs: coverage
+
+      - name: Lint and spell check
+        run: |
+          pkgload::load_all(".", quiet = TRUE)
+          lints <- lintr::lint_package()
+          print(lints)
+          if (length(lints) > 0L) {
+            stop("Lint errors found.")
+          }
+          sp <- spelling::spell_check_package()
+          print(sp)
+          if (nrow(sp) > 0L) {
+            stop("Spelling errors found.")
+          }
+        shell: Rscript {0}
 
       - name: Test coverage
         run: |

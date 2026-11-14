@@ -18,8 +18,17 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install
+      - name: Install air
         uses: posit-dev/setup-air@fd20dd239848b9d807848a7ab92265cf197de694
 
-      - name: Check
+      - name: Check R formatting
         run: air format . --check
+
+      - name: Install jarl
+        uses: e-kotov/setup-jarl@eabf7e572f2991d165059007531b9bbe2987e39c # v0.1.1
+
+      - name: Check R static lints
+        run: jarl check .
+
+      - name: Run prek hooks
+        uses: j178/prek-action@44924fe9ef4a6f88253c4b6b1bf11c689d3ce53d # v3.1.0
