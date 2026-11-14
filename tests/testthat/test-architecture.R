@@ -108,65 +108,68 @@ testthat::test_that("bundled datasets have no directory paths in dataOrigin", {
 
 testthat::test_that("DESCRIPTION Collate and namespace imports stay in sync", {
   desc_path <- testthat::test_path("..", "..", "DESCRIPTION")
+  if (!file.exists(desc_path)) {
+    desc_path <- system.file("DESCRIPTION", package = "SpectraToQueries")
+  }
+  testthat::expect_true(nzchar(desc_path) && file.exists(desc_path))
+  dcf <- read.dcf(desc_path)
+
+  parse_pkg_field <- function(val) {
+    if (is.na(val) || !nzchar(trimws(val))) {
+      return(character())
+    }
+    parts <- trimws(unlist(strsplit(val, ",", fixed = TRUE)))
+    parts <- sub("\\s*\\(.*$", "", parts)
+    parts[nzchar(parts)]
+  }
+
+  extract_pkg_calls <- function(paths) {
+    found <- character()
+    for (p in paths) {
+      lines <- readLines(p, warn = FALSE)
+      lines <- lines[!grepl("^\\s*#", lines)]
+      m <- gregexpr("[A-Za-z][A-Za-z0-9.]*::", lines, perl = TRUE)
+      hits <- unlist(regmatches(lines, m))
+      found <- c(found, sub("::$", "", hits))
+    }
+    unique(found)
+  }
+
+  imports_pkgs <- parse_pkg_field(dcf[1L, "Imports"])
+  suggests_pkgs <- parse_pkg_field(dcf[1L, "Suggests"])
+
   r_dir <- testthat::test_path("..", "..", "R")
-  tests_dir <- testthat::test_path("..", "..", "tests", "testthat")
-
-  if (file.exists(desc_path) && dir.exists(r_dir)) {
-    dcf <- read.dcf(desc_path)
-
+  r_paths <- if (dir.exists(r_dir)) {
+    list.files(r_dir, pattern = "\\.R$", full.names = TRUE)
+  } else {
+    character()
+  }
+  if (length(r_paths) > 0L) {
     collate_files <- scan(
       text = dcf[1L, "Collate"],
       what = character(),
       quiet = TRUE
     )
-    actual_r_files <- sort(
-      list.files(r_dir, pattern = "\\.R$"),
-      method = "radix"
-    )
     testthat::expect_identical(
       sort(collate_files, method = "radix"),
-      actual_r_files
+      sort(basename(r_paths), method = "radix")
     )
-
-    parse_pkg_field <- function(val) {
-      if (is.na(val) || !nzchar(trimws(val))) {
-        return(character())
-      }
-      parts <- trimws(unlist(strsplit(val, ",", fixed = TRUE)))
-      parts <- sub("\\s*\\(.*$", "", parts)
-      parts[nzchar(parts)]
-    }
-
-    extract_pkg_calls <- function(paths) {
-      found <- character()
-      for (p in paths) {
-        lines <- readLines(p, warn = FALSE)
-        lines <- lines[!grepl("^\\s*#", lines)]
-        m <- gregexpr("[A-Za-z][A-Za-z0-9.]*::", lines, perl = TRUE)
-        hits <- unlist(regmatches(lines, m))
-        found <- c(found, sub("::$", "", hits))
-      }
-      unique(found)
-    }
-
-    imports_pkgs <- parse_pkg_field(dcf[1L, "Imports"])
-    suggests_pkgs <- parse_pkg_field(dcf[1L, "Suggests"])
-
-    r_paths <- list.files(r_dir, pattern = "\\.R$", full.names = TRUE)
     r_pkgs <- extract_pkg_calls(r_paths)
     testthat::expect_true(
       all(r_pkgs %in% c(imports_pkgs, "SpectraToQueries", "base"))
     )
-
-    if (dir.exists(tests_dir)) {
-      test_paths <- list.files(tests_dir, pattern = "\\.R$", full.names = TRUE)
-      test_pkgs <- extract_pkg_calls(test_paths)
-      testthat::expect_true(
-        all(
-          test_pkgs %in%
-            c(imports_pkgs, suggests_pkgs, "SpectraToQueries", "base")
-        )
-      )
-    }
   }
+
+  test_paths <- list.files(
+    testthat::test_path(),
+    pattern = "\\.R$",
+    full.names = TRUE
+  )
+  test_pkgs <- extract_pkg_calls(test_paths)
+  testthat::expect_true(
+    all(
+      test_pkgs %in%
+        c(imports_pkgs, suggests_pkgs, "SpectraToQueries", "base")
+    )
+  )
 })
