@@ -16,21 +16,8 @@ validate_stq_inputs <- function(
   recall_min,
   zero_val
 ) {
-  abort_input <- function(msg) {
-    stop(errorCondition(msg, class = "stq_input_error"))
-  }
   is_valid_str <- function(x) {
     is.character(x) && length(x) == 1L && !is.na(x) && nzchar(x)
-  }
-  check_num <- function(x, msg, lower = -Inf, upper = Inf) {
-    ok <- is.numeric(x) &&
-      length(x) == 1L &&
-      is.finite(x) &&
-      x >= lower &&
-      x <= upper
-    if (!ok) {
-      abort_input(msg)
-    }
   }
 
   valid_spectra <- is.null(spectra) ||

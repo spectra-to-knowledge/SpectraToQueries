@@ -19,13 +19,26 @@ testthat::test_that("combine_ions_minimal simplifies and sorts expressions", {
     "5_frag & 100_frag & 200_frag & 5_nl & 20_nl & 50_nl"
   )
 
+  # Strict suffix matching ignores malformed tokens without warnings
+  testthat::expect_no_warning(
+    testthat::expect_identical(
+      combine_ions_minimal(list(
+        "100_fragment",
+        "abc_frag",
+        "Inf_nl",
+        "100_frag"
+      )),
+      "100_frag"
+    )
+  )
+
   # Common ions factored out with OR branches (both single and multi-ion)
   testthat::expect_identical(
     combine_ions_minimal(list(
       c("100_frag", "200_frag"),
       c("100_frag", "50_nl", "60_nl")
     )),
-    "100_frag & 200_frag | (50_nl & 60_nl)"
+    "100_frag & (200_frag | (50_nl & 60_nl))"
   )
 
   # Disjoint sets (no common ions)
@@ -53,7 +66,7 @@ testthat::test_that("combine_ions_minimal simplifies and sorts expressions", {
       c("100_frag", "300_frag"),
       c("100_frag", "200_frag", "300_frag")
     )),
-    "100_frag & 200_frag | 300_frag"
+    "100_frag & (200_frag | 300_frag)"
   )
 
   # Duplicate ions within a query and order-variant remaining sets
@@ -62,7 +75,7 @@ testthat::test_that("combine_ions_minimal simplifies and sorts expressions", {
       c("100_frag", "100_frag", "200_frag"),
       c("100_frag", "300_frag")
     )),
-    "100_frag & 200_frag | 300_frag"
+    "100_frag & (200_frag | 300_frag)"
   )
   testthat::expect_identical(
     combine_ions_minimal(list(
@@ -73,70 +86,139 @@ testthat::test_that("combine_ions_minimal simplifies and sorts expressions", {
     "(100_frag & 200_frag) | (300_frag & 400_frag)"
   )
 
-  # to_massql translations across all branches
+  # to_massql translations, precedence, and tolerance qualifier rules
   testthat::expect_identical(to_massql(character(0)), character(0))
   testthat::expect_identical(
-    to_massql(c("", NA_character_, "bad_ion")),
-    c("", "", "")
+    to_massql(c("", NA_character_, "bad_ion", "100_fragment")),
+    c("", "", "", "")
   )
   testthat::expect_identical(
     to_massql("100_frag & 50_nl", dalton = 0.01, ppm = 30, intensity_min = 5),
     paste0(
       "QUERY scaninfo(MS2DATA) WHERE ",
-      "MS2PROD=100:TOLERANCEMZ=0.01:TOLERANCEPPM=30:INTENSITYPERCENT=5 AND ",
-      "MS2NL=50:TOLERANCEMZ=0.01:TOLERANCEPPM=30:INTENSITYPERCENT=5"
+      "MS2PROD=100:TOLERANCEMZ=0.013:INTENSITYPERCENT=5 AND ",
+      "MS2NL=50:TOLERANCEMZ=0.01:INTENSITYPERCENT=5"
     )
+  )
+  testthat::expect_identical(
+    to_massql("100_frag", dalton = 0.01, ppm = 0),
+    "QUERY scaninfo(MS2DATA) WHERE MS2PROD=100:TOLERANCEMZ=0.01"
+  )
+  testthat::expect_identical(
+    to_massql("100_frag & 50_nl", dalton = 0, ppm = 30),
+    paste0(
+      "QUERY scaninfo(MS2DATA) WHERE ",
+      "MS2PROD=100:TOLERANCEPPM=30 AND ",
+      "MS2NL=50:TOLERANCEPPM=30"
+    )
+  )
+  testthat::expect_identical(
+    to_massql("100_frag", dalton = 0, ppm = 0),
+    "QUERY scaninfo(MS2DATA) WHERE MS2PROD=100:TOLERANCEMZ=0"
   )
   testthat::expect_identical(
     to_massql(list(c("200_frag", "100_frag")), dalton = 0.02, ppm = 10),
     paste0(
       "QUERY scaninfo(MS2DATA) WHERE ",
-      "MS2PROD=100:TOLERANCEMZ=0.02:TOLERANCEPPM=10 AND ",
-      "MS2PROD=200:TOLERANCEMZ=0.02:TOLERANCEPPM=10"
+      "MS2PROD=100:TOLERANCEMZ=0.021 AND ",
+      "MS2PROD=200:TOLERANCEMZ=0.022"
+    )
+  )
+  testthat::expect_identical(
+    to_massql(list("100_frag & 50_nl"), dalton = 0.01, ppm = 30),
+    to_massql(list(c("100_frag", "50_nl")), dalton = 0.01, ppm = 30)
+  )
+  expected_or_prod <- paste0(
+    "QUERY scaninfo(MS2DATA) WHERE ",
+    "MS2PROD=100:TOLERANCEMZ=0.013 AND ",
+    "MS2PROD=(200 OR 300):TOLERANCEMZ=0.019"
+  )
+  testthat::expect_identical(
+    to_massql("100_frag & (200_frag | 300_frag)", dalton = 0.01, ppm = 30),
+    expected_or_prod
+  )
+  testthat::expect_identical(
+    to_massql("(200_frag | 300_frag) & 100_frag", dalton = 0.01, ppm = 30),
+    expected_or_prod
+  )
+  testthat::expect_identical(
+    to_massql("100_frag & (50_nl | 60_nl)", dalton = 0.01, ppm = 30),
+    paste0(
+      "QUERY scaninfo(MS2DATA) WHERE ",
+      "MS2PROD=100:TOLERANCEMZ=0.013 AND ",
+      "MS2NL=(50 OR 60):TOLERANCEMZ=0.01"
     )
   )
   testthat::expect_identical(
     to_massql("100_frag & 200_frag | 300_frag", dalton = 0.01, ppm = 30),
     paste0(
       "QUERY scaninfo(MS2DATA) WHERE ",
-      "MS2PROD=100:TOLERANCEMZ=0.01:TOLERANCEPPM=30 AND ",
-      "MS2PROD=(200 OR 300):TOLERANCEMZ=0.01:TOLERANCEPPM=30"
-    )
-  )
-  testthat::expect_identical(
-    to_massql("100_frag & 50_nl | 60_nl", dalton = 0.01, ppm = 30),
-    paste0(
+      "MS2PROD=100:TOLERANCEMZ=0.013 AND ",
+      "MS2PROD=200:TOLERANCEMZ=0.016 ; ",
       "QUERY scaninfo(MS2DATA) WHERE ",
-      "MS2PROD=100:TOLERANCEMZ=0.01:TOLERANCEPPM=30 AND ",
-      "MS2NL=(50 OR 60):TOLERANCEMZ=0.01:TOLERANCEPPM=30"
+      "MS2PROD=300:TOLERANCEMZ=0.019"
     )
   )
   testthat::expect_identical(
     to_massql(
-      "100_frag & (200_frag & 50_nl) | 300_frag",
+      "(100_frag | 200_frag) & (300_frag | 400_frag)",
+      dalton = 0.01,
+      ppm = 0
+    ),
+    paste(
+      "QUERY scaninfo(MS2DATA) WHERE",
+      c(
+        "MS2PROD=100:TOLERANCEMZ=0.01 AND MS2PROD=300:TOLERANCEMZ=0.01",
+        "MS2PROD=100:TOLERANCEMZ=0.01 AND MS2PROD=400:TOLERANCEMZ=0.01",
+        "MS2PROD=200:TOLERANCEMZ=0.01 AND MS2PROD=300:TOLERANCEMZ=0.01",
+        "MS2PROD=200:TOLERANCEMZ=0.01 AND MS2PROD=400:TOLERANCEMZ=0.01"
+      ),
+      collapse = " ; "
+    )
+  )
+  testthat::expect_identical(
+    to_massql(
+      "100_frag & ((200_frag & 50_nl) | 300_frag)",
       dalton = 0.01,
       ppm = 30
     ),
     paste0(
       "QUERY scaninfo(MS2DATA) WHERE ",
-      "MS2PROD=100:TOLERANCEMZ=0.01:TOLERANCEPPM=30 AND ",
-      "MS2PROD=200:TOLERANCEMZ=0.01:TOLERANCEPPM=30 AND ",
-      "MS2NL=50:TOLERANCEMZ=0.01:TOLERANCEPPM=30 ; ",
+      "MS2PROD=100:TOLERANCEMZ=0.013 AND ",
+      "MS2PROD=200:TOLERANCEMZ=0.016 AND ",
+      "MS2NL=50:TOLERANCEMZ=0.01 ; ",
       "QUERY scaninfo(MS2DATA) WHERE ",
-      "MS2PROD=100:TOLERANCEMZ=0.01:TOLERANCEPPM=30 AND ",
-      "MS2PROD=300:TOLERANCEMZ=0.01:TOLERANCEPPM=30"
+      "MS2PROD=100:TOLERANCEMZ=0.013 AND ",
+      "MS2PROD=300:TOLERANCEMZ=0.019"
     )
   )
   testthat::expect_identical(
     to_massql("(100_frag & 200_frag) | 50_nl", dalton = 0.01, ppm = 30),
     paste0(
       "QUERY scaninfo(MS2DATA) WHERE ",
-      "MS2PROD=100:TOLERANCEMZ=0.01:TOLERANCEPPM=30 AND ",
-      "MS2PROD=200:TOLERANCEMZ=0.01:TOLERANCEPPM=30 ; ",
+      "MS2PROD=100:TOLERANCEMZ=0.013 AND ",
+      "MS2PROD=200:TOLERANCEMZ=0.016 ; ",
       "QUERY scaninfo(MS2DATA) WHERE ",
-      "MS2NL=50:TOLERANCEMZ=0.01:TOLERANCEPPM=30"
+      "MS2NL=50:TOLERANCEMZ=0.01"
     )
   )
+  testthat::expect_error(
+    to_massql("100_frag", dalton = -0.01),
+    class = "stq_input_error"
+  )
+  testthat::expect_error(
+    to_massql("100_frag", ppm = -1),
+    class = "stq_input_error"
+  )
+  testthat::expect_error(
+    to_massql("100_frag", intensity_min = -1),
+    class = "stq_input_error"
+  )
+  testthat::expect_error(
+    to_massql("100_frag", intensity_min = 101),
+    class = "stq_input_error"
+  )
+  testthat::expect_error(to_massql("(100_frag"), class = "stq_input_error")
 })
 
 testthat::test_that("create_dir creates target directories", {

@@ -153,22 +153,22 @@ perform_query <- function(all_mz, precursor_mz, frags, nls, dalton, ppm) {
 #' @keywords internal
 #' @noRd
 parse_query_ions <- function(ions) {
-  is_frag <- grepl("_frag", ions, fixed = TRUE)
-  is_nl <- grepl("_nl", ions, fixed = TRUE)
+  ions <- trimws(as.character(ions))
+  ions <- ions[!is.na(ions) & nzchar(ions)]
+  is_frag <- endsWith(ions, "_frag")
+  is_nl <- endsWith(ions, "_nl")
 
   frags <- if (any(is_frag)) {
-    vals <- suppressWarnings(as.numeric(
-      sub("_frag", "", ions[is_frag], fixed = TRUE)
-    ))
+    raw_f <- substr(ions[is_frag], 1L, nchar(ions[is_frag]) - 5L)
+    vals <- suppressWarnings(as.numeric(raw_f))
     vals[is.finite(vals)]
   } else {
     numeric(0)
   }
 
   nls <- if (any(is_nl)) {
-    vals <- suppressWarnings(as.numeric(
-      sub("_nl", "", ions[is_nl], fixed = TRUE)
-    ))
+    raw_n <- substr(ions[is_nl], 1L, nchar(ions[is_nl]) - 3L)
+    vals <- suppressWarnings(as.numeric(raw_n))
     vals[is.finite(vals)]
   } else {
     numeric(0)
@@ -262,8 +262,8 @@ precompute_ion_hits <- function(
   hits <- list()
 
   for (u in unique_ions) {
-    if (grepl("_frag", u, fixed = TRUE)) {
-      val <- suppressWarnings(as.numeric(sub("_frag", "", u, fixed = TRUE)))
+    if (endsWith(u, "_frag")) {
+      val <- suppressWarnings(as.numeric(substr(u, 1L, nchar(u) - 5L)))
       if (is.finite(val)) {
         tol <- dalton + val * (ppm / 1e6)
         hits[[u]] <- vapply(
@@ -272,8 +272,8 @@ precompute_ion_hits <- function(
           logical(1L)
         )
       }
-    } else if (grepl("_nl", u, fixed = TRUE)) {
-      val <- suppressWarnings(as.numeric(sub("_nl", "", u, fixed = TRUE)))
+    } else if (endsWith(u, "_nl")) {
+      val <- suppressWarnings(as.numeric(substr(u, 1L, nchar(u) - 3L)))
       if (is.finite(val)) {
         vec <- logical(n_spec)
         for (idx in valid_idx) {

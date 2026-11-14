@@ -1,3 +1,24 @@
+#' @title Abort with stq_input_error condition
+#' @keywords internal
+#' @noRd
+abort_input <- function(msg) {
+  stop(errorCondition(msg, class = "stq_input_error"))
+}
+
+#' @title Validate a scalar finite numeric argument
+#' @keywords internal
+#' @noRd
+check_num <- function(x, msg, lower = -Inf, upper = Inf) {
+  ok <- is.numeric(x) &&
+    length(x) == 1L &&
+    is.finite(x) &&
+    x >= lower &&
+    x <= upper
+  if (!ok) {
+    abort_input(msg)
+  }
+}
+
 #' Convert Spectra object to portable data.frame
 #'
 #' Converts a [Spectra::Spectra] object to a portable `data.frame` format where
@@ -11,6 +32,7 @@
 #'   as list columns (one entry per spectrum)
 #'
 #' @keywords internal
+#' @noRd
 spectra_to_df <- function(spectra) {
   meta_df <- Spectra::spectraData(spectra) |>
     as.data.frame()
@@ -35,6 +57,7 @@ spectra_to_df <- function(spectra) {
 #' @return A [Spectra::Spectra] object
 #'
 #' @keywords internal
+#' @noRd
 df_to_spectra <- function(df) {
   Spectra::Spectra(df)
 }
