@@ -13,22 +13,26 @@ badge](https://spectra-to-knowledge.r-universe.dev/SpectraToQueries/badges/versi
 coverage](https://codecov.io/gh/spectra-to-knowledge/SpectraToQueries/graph/badge.svg)](https://app.codecov.io/gh/spectra-to-knowledge/SpectraToQueries)
 <!-- badges: end -->
 
-Repository to translate spectra to queries.
+`SpectraToQueries` discovers diagnostic MS/MS fragment (`_frag`) and
+neutral-loss (`_nl`) ion combinations from annotated tandem mass spectrometry
+libraries and translates them into
+[MassQL](https://mwang87.github.io/MassQueryLanguage_Documentation/) queries.
+Candidate queries for each chemical class are ranked by Matthews Correlation
+Coefficient (MCC), selecting the smallest ion combination tied at the highest
+score.
 
 ## Requirements
 
-Here is what you *minimally* need:
-
-- **A file containing MS/MS spectra with associated skeleton information** (or
-  any other relevant chemical classification) **provided as metadata**. This
-  structure information, stored in the metadata field "skeleton", allows the
-  generation of queries specific to a given skeleton by extracting repetitive
-  skeleton-specific fragmentation patterns. The MIADB file is provided as an
-  example.
+- **R (\>= 4.5.0)** with `MsBackendMgf` and `Spectra`.
+- **MS2 spectra with class metadata**: an `.mgf` file, a `Spectra` object, or a
+  compatible `data.frame` containing MS2 scans, `precursorMz` values, and a
+  `SKELETON` metadata column (lowercase `skeleton` is accepted as a fallback).
+  Skeleton classes with fewer than `n_skel_min` non-empty MS2 spectra are
+  skipped.
 
 ## Installation
 
-As the package is not (yet) available on CRAN, you will need to install with:
+`SpectraToQueries` is distributed via r-universe:
 
 ```r
 install.packages(
@@ -41,31 +45,32 @@ install.packages(
 )
 ```
 
-## Use
+## Usage
 
-To run the default example with raw spectra from the Monoterpene Indole
-Alkaloids Database (MIADB):
-
-```r
-SpectraToQueries::spectra_to_queries()
-```
-
-To run with grouped spectra (pre-combined by skeleton classification):
+Run on the bundled raw Monoterpene Indole Alkaloids Database (`mia_spectra_df`):
 
 ```r
-SpectraToQueries::spectra_to_queries(spectra = "grouped")
+SpectraToQueries::spectra_to_queries(export = NULL)
 ```
 
-To generate diagnostic ions queries from your own spectra:
+Run on the bundled grouped skeleton dataset (`mia_spectra_grouped_df`):
+
+```r
+SpectraToQueries::spectra_to_queries(spectra = "grouped", export = NULL)
+```
+
+Generate queries from your own `.mgf` library and save the TSV output:
 
 ```r
 SpectraToQueries::spectra_to_queries(
-  spectra = "yourAwesomeSpectra.mgf",
-  export = "path/yourEvenBetterResults.tsv"
+  spectra = "path/to/library.mgf",
+  export = "results/queries.tsv"
 )
 ```
 
-### Viewing all parameters
+Pass `export = NULL` to return the `data.frame` without writing a file to disk.
+
+### Parameters
 
 ```r
 SpectraToQueries::spectra_to_queries(
@@ -85,48 +90,65 @@ SpectraToQueries::spectra_to_queries(
 )
 ```
 
-### Output and MassQL translation
+### Output, MassQL translation, and known behavior
 
-`spectra_to_queries()` returns (and exports as TSV) a table with one most
-parsimonious diagnostic query per skeleton class:
+`spectra_to_queries()` returns (and optionally exports as TSV) one row per
+qualifying skeleton class:
 
 - `skeleton`: chemical class identifier.
-- `mcc`: Matthews Correlation Coefficient of the query on the spectral library.
+- `mcc`: Matthews Correlation Coefficient on the input MS2 library.
 - `combined_ions`: minimal conjunctive/disjunctive combination of fragments
   (`_frag`) and neutral losses (`_nl`).
-- `massql`: directly executable
+- `massql`: executable
   [MassQL](https://mwang87.github.io/MassQueryLanguage_Documentation/) query
   (`QUERY scaninfo(MS2DATA) WHERE ...`).
 
-Custom ion expressions can also be converted to MassQL directly:
+You can also convert ion expressions or vectors directly with `to_massql()`:
 
 ```r
 SpectraToQueries::to_massql(
-  "108.0804_frag & 241.095_nl",
+  "108.0804_frag & (241.095_nl | 144.0807_frag)",
   dalton = 0.01,
   ppm = 30.0
 )
 ```
 
+Notes on query semantics:
+
+- MassQL ignores `TOLERANCEMZ` when `TOLERANCEPPM` is present on the same
+  condition. When `dalton > 0`, `to_massql()` emits a single `:TOLERANCEMZ=`
+  modifier (`round(dalton + max(mz) * ppm / 1e6, 6)` on `MS2PROD` and static
+  `dalton` on `MS2NL`). When `dalton == 0` and `ppm > 0`, it emits
+  `:TOLERANCEPPM=`.
+- Disjunctive clauses in `combined_ions` are expanded to disjunctive normal form
+  and separated by `" ; "` in `massql`.
+- Peak matching evaluates binary peak presence after relative base-peak
+  normalization (`0` to `100`) and `intensity_min` filtering; relative intensity
+  ratios between fragments are not encoded in the queries.
+- `+` characters in `SKELETON` labels are replaced with `.` for internal
+  grouping (a warning is emitted if distinct labels collide).
+
 ### Example data
 
-The package includes two example datasets from MIADB:
+The package ships two MIADB datasets as portable `data.frame` objects (with `mz`
+and `intensity` list columns):
 
-- `mia_spectra_df` --- Raw spectra (321 MS/MS spectra across 81 skeletons)
-- `mia_spectra_grouped_df` --- Grouped spectra (321 MS/MS spectra across 53
-  grouped skeleton classes)
-
-These are stored as portable `data.frame` objects (with `mz` and `intensity` as
-list columns) and automatically converted to `Spectra` objects when loaded.
-
-To access them directly:
+- `mia_spectra_df`: 321 MS/MS spectra across 81 skeletons (24,255 peaks total).
+- `mia_spectra_grouped_df`: 321 MS/MS spectra across 53 grouped skeleton
+  classes.
 
 ```r
 utils::data(mia_spectra_df, package = "SpectraToQueries")
 utils::data(mia_spectra_grouped_df, package = "SpectraToQueries")
 ```
 
-## Main Citations
+## Contributing
+
+Bug reports, tests, and pull requests are welcome. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for local setup and check commands, and
+[TESTING.md](TESTING.md) for testing conventions and error-handling contracts.
+
+## Main Citation
 
 Translating community-wide spectral library into actionable chemical knowledge:
 a proof of concept with monoterpene indole alkaloids:

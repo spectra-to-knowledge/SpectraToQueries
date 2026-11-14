@@ -1,94 +1,98 @@
 # Testing Guide for `SpectraToQueries`
 
-This document describes the testing conventions, error-handling contracts, and local commands for running tests, coverage, and mutation checks in `SpectraToQueries`.
+This document describes the test structure, error-handling contracts, and
+commands used to verify changes in `SpectraToQueries`.
+
+## Test Suite Layout
+
+Tests use `testthat` edition 3 and live under `tests/testthat/`:
+
+- `tests/testthat/test-architecture.R`: Structural and compatibility checks
+  covering namespace exports (`spectra_to_queries`, `to_massql`), MIADB subset
+  characterization results, absence of internal `@backend@` slot access, public
+  `.Rd` inventory in `man/`, clean `basename()` values in bundled `dataOrigin`
+  columns, and `DESCRIPTION` `Collate`/`Imports`/`Suggests` synchronization.
+- `tests/testthat/test-functions.R`: Unit, boundary, and end-to-end tests across
+  preprocessing (`normalize_peaks`, `harmonize_mzs`, `fix_binned_mzs`,
+  `create_matrix`, `filter_matrix`), candidate selection and Branch-and-Bound
+  search, Boolean minimization (`combine_ions_minimal`), MassQL translation
+  (`to_massql`), input validation, non-`MsBackendMgf` backends
+  (`MsBackendDataFrame`), and full `spectra_to_queries()` execution.
 
 ## Testing Conventions
 
-1. **Mutation-Resistant Assertions Over Coverage-Only Execution**
-   - Every test must assert an independently computed expected outcome (`expect_identical()` or `expect_equal(..., tolerance = ...)`).
-   - Check types, dimensions, row/column names, and ordering in addition to numeric values.
-   - Never compute expected values by re-running the function under test.
+1. **Assertion of Independently Expected Results**
+   - Assert expected values, types, column names, and ordering explicitly with
+     `testthat::expect_identical()` or
+     `testthat::expect_equal(..., tolerance = ...)`.
+   - Do not compute expected test values by calling the same function under
+     test.
 
-2. **Exact Boundary Testing**
-   - Every relational operator (`<`, `<=`, `>`, `>=`, `==`, `!=`) must be tested at `boundary - eps`, `boundary`, and `boundary + eps`.
-   - When testing floating-point tolerance boundaries (`dalton`, `ppm`), prefer exact binary floating-point values (e.g., `0.25`, `0.5`) so boundary equality (`diff == tol`) is exact in IEEE 754 arithmetic.
+2. **Tolerance Boundary Checks**
+   - Test numeric thresholds (`dalton`, `ppm`, `intensity_min`, `mcc_min`,
+     `precision_min`, `recall_min`) at both sides of the boundary and at exact
+     equality where applicable.
+   - Prefer exact binary floating-point values (such as `0.25` and `0.5`) when
+     testing floating-point boundaries around `dalton + mz * ppm / 1e6`.
 
 3. **Classed Error Conditions**
-   - Input validation errors use `cli::cli_abort(..., class = "stq_input_error")` via the internal `abort_bad_arg()` helper in `R/spectra_utils.R`.
-   - Missing file errors use `class = "stq_file_not_found_error"`.
-   - Always assert both the condition class and message pattern:
-     ```r
-     testthat::expect_error(
-       normalize_peaks(c(1, 2, 3)),
-       regexp = "`x` must be a 2-column numeric matrix",
-       class = "stq_input_error"
-     )
-     ```
+   - Input validation errors are raised via the internal `abort_input()` helper
+     in `R/spectra_utils.R` with condition class `"stq_input_error"`.
+   - Missing input file paths in `load_input_spectra()` raise class
+     `"stq_file_not_found_error"`.
+   - Assert both condition class and message text:
 
-4. **Filesystem Hygiene**
-   - Always write temporary files/directories under `tempdir()` (`tempfile()`) and register cleanup via `on.exit(unlink(...), add = TRUE)`.
+   ```r
+   testthat::expect_error(
+     SpectraToQueries::to_massql("100_frag", dalton = -1),
+     regexp = "`dalton` must be a single finite non-negative number",
+     class = "stq_input_error"
+   )
+   ```
 
-5. **Separate Bug-Fix Commits**
-   - When fixing a bug, commit a failing test (`test: ...`) before committing the fix (`fix: ...`).
+4. **Temporary Files and Cleanup**
+   - Write temporary `.mgf` or `.tsv` files under `tempdir()` using `tempfile()`
+     and clean them up with `on.exit(unlink(...), add = TRUE)`.
 
-## Running Tests & Quality Checks Locally
+5. **Regression Tests Before Fixes**
+   - Add a failing unit or boundary test reproducing the defect before applying
+     a code change, then verify the fix makes the test pass without breaking
+     characterization checks.
+
+## Running Tests, Coverage, and Static Checks Locally
 
 ```bash
-# Run the testthat suite
-Rscript -e "devtools::test()"
+# Run the full testthat suite against the local source tree
+Rscript --vanilla -e 'testthat::test_local(stop_on_failure = TRUE)'
 
-# Compute line and function coverage (target: >= 90% floor; currently 100%)
-Rscript -e "cov <- covr::package_coverage(); print(cov); covr::zero_coverage(cov)"
+# Compute line coverage (CI enforces >= 95%)
+Rscript --vanilla -e '
+cov <- covr::package_coverage(quiet = FALSE)
+print(cov)
+covr::zero_coverage(cov)
+pct <- covr::percent_coverage(cov)
+if (pct < 95) stop(sprintf("Coverage %.2f%% is below 95%%", pct))
+'
 
-# Run static analysis and formatting checks
-Rscript -e "lintr::lint_package()"
+# Lint and spell check (load workspace first so lintr resolves internal helpers)
+Rscript --vanilla -e '
+pkgload::load_all(".", quiet = TRUE)
+lints <- lintr::lint_package()
+print(lints)
+if (length(lints) > 0L) stop("Lint errors found.")
+sp <- spelling::spell_check_package()
+print(sp)
+if (nrow(sp) > 0L) stop("Spelling errors found.")
+'
+
+# Formatting, static analysis, and pre-commit hooks
 air format --check .
 jarl check .
+tombi lint .
+panache lint .
+prek run --all-files
 
-# Run full R CMD check
-Rscript -e "devtools::check()"
-```
-
-## Running Mutation Checks Locally
-
-To verify that tests catch small semantic regressions (operator flips, constant changes, branch removals), swap modified function bodies into both the package namespace and attached package environment and verify that `testthat::test_file()` fails:
-
-```r
-pkgload::load_all(".", quiet = TRUE)
-
-check_mutant <- function(fn_name, pattern, replacement) {
-  ns <- asNamespace("SpectraToQueries")
-  pkg_env <- as.environment("package:SpectraToQueries")
-  orig_fn <- get(fn_name, envir = ns)
-  on.exit({
-    unlockBinding(fn_name, ns)
-    assign(fn_name, orig_fn, envir = ns)
-    lockBinding(fn_name, ns)
-    if (exists(fn_name, envir = pkg_env, inherits = FALSE)) {
-      unlockBinding(fn_name, pkg_env)
-      assign(fn_name, orig_fn, envir = pkg_env)
-      lockBinding(fn_name, pkg_env)
-    }
-  }, add = TRUE)
-
-  src <- paste(deparse(orig_fn, width.cutoff = 500L), collapse = "\n")
-  mut_fn <- eval(parse(text = sub(pattern, replacement, src, fixed = TRUE)), envir = ns)
-
-  unlockBinding(fn_name, ns)
-  assign(fn_name, mut_fn, envir = ns)
-  lockBinding(fn_name, ns)
-  if (exists(fn_name, envir = pkg_env, inherits = FALSE)) {
-    unlockBinding(fn_name, pkg_env)
-    assign(fn_name, mut_fn, envir = pkg_env)
-    lockBinding(fn_name, pkg_env)
-  }
-
-  out <- as.data.frame(testthat::test_file(
-    "tests/testthat/test-functions.R",
-    reporter = "silent",
-    env = new.env(parent = ns),
-    load_package = "none"
-  ))
-  sum(out$failed) > 0L || any(out$error)
-}
+# Clean tarball build and R CMD check
+R CMD build .
+R CMD check --no-manual SpectraToQueries_*.tar.gz
 ```

@@ -57,7 +57,8 @@ library(SpectraToQueries)
 
 utils::data(mia_spectra_df, package = "SpectraToQueries")
 
-keep <- mia_spectra_df$SKELETON %in% c("corynanthean", "ibogan", "plumeran")
+keep <- mia_spectra_df$SKELETON %in%
+  c("Corynanthean", "Iboga", "Aspidosperma")
 queries <- spectra_to_queries(
   spectra = mia_spectra_df[keep, ],
   export = NULL,
@@ -74,8 +75,13 @@ to an `.mgf` file containing a `SKELETON` metadata field.
 ## Converting expressions to MassQL
 
 `to_massql()` converts any ion expression (or list of ion vectors) into a MassQL
-query with `TOLERANCEMZ`, `TOLERANCEPPM`, and optional `INTENSITYPERCENT`
-qualifiers:
+query. Because MassQL ignores `TOLERANCEMZ` when `TOLERANCEPPM` is present on
+the same condition, `to_massql()` emits a single effective tolerance modifier
+per condition: `:TOLERANCEMZ=` (`round(dalton + max(mz) * ppm / 1e6, 6)` on
+`MS2PROD`, and static `dalton` on `MS2NL`) when `dalton > 0`, or
+`:TOLERANCEPPM=` when `dalton == 0` and `ppm > 0`, plus optional
+`:INTENSITYPERCENT=` when `intensity_min > 0`. Disjunctive (`|`) clauses are
+expanded to disjunctive normal form and joined with `; `.
 
 ```{r}
 #| label: "to-massql"

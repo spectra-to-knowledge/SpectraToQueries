@@ -31,7 +31,7 @@ preferred-citation:
     orcid: https://orcid.org/0000-0001-6369-5522
   year: '2025'
   notes: R package, version 0.0.0.9002
-repository: https://bioconductor.org/
+repository: https://spectra-to-knowledge.r-universe.dev
 repository-code: https://github.com/spectra-to-knowledge/SpectraToQueries
 url: https://spectra-to-knowledge.github.io/SpectraToQueries/
 contact:
@@ -158,9 +158,8 @@ references:
   doi: 10.32614/R.manuals
   version: '>= 4.5.0'
 - type: software
-  title: MsBackendMgf
-  abstract: 'MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format
-    (mgf) Files'
+  title: 'MsBackendMgf: Mass Spectrometry Data Backend for Mascot Generic Format (mgf)
+    Files'
   notes: Imports
   url: https://github.com/RforMassSpectrometry/MsBackendMgf
   repository: https://bioconductor.org/
@@ -180,8 +179,7 @@ references:
   year: '2026'
   version: '>= 1.18.0'
 - type: software
-  title: Spectra
-  abstract: 'Spectra: Spectra Infrastructure for Mass Spectrometry Data'
+  title: 'Spectra: Spectra Infrastructure for Mass Spectrometry Data'
   notes: Imports
   url: https://github.com/RforMassSpectrometry/Spectra
   repository: https://bioc-release.r-universe.dev
@@ -205,8 +203,7 @@ references:
   year: '2026'
   version: '>= 1.20.1'
 - type: software
-  title: utils
-  abstract: 'R: A Language and Environment for Statistical Computing'
+  title: 'R: A Language and Environment for Statistical Computing'
   notes: Imports
   authors:
   - name: R Core Team
@@ -218,8 +215,19 @@ references:
   year: '2026'
   doi: 10.32614/R.manuals
 - type: software
-  title: spelling
-  abstract: 'spelling: Tools for Spell Checking in R'
+  title: 'knitr: A General-Purpose Package for Dynamic Report Generation in R'
+  notes: Suggests
+  url: https://yihui.org/knitr/
+  repository: https://CRAN.R-project.org/package=knitr
+  authors:
+  - family-names: Xie
+    given-names: Yihui
+    email: xie@yihui.name
+    orcid: https://orcid.org/0000-0003-0645-5666
+  year: '2026'
+  doi: 10.32614/CRAN.package.knitr
+- type: software
+  title: 'spelling: Tools for Spell Checking in R'
   notes: Suggests
   url: https://ropensci.r-universe.dev/spelling
   repository: https://CRAN.R-project.org/package=spelling
@@ -231,11 +239,10 @@ references:
   - family-names: Hester
     given-names: Jim
     email: james.hester@rstudio.com
-  year: '2026'
+  year: '2025'
   doi: 10.32614/CRAN.package.spelling
 - type: software
-  title: testthat
-  abstract: 'testthat: Unit Testing for R'
+  title: 'testthat: Unit Testing for R'
   notes: Suggests
   url: https://testthat.r-lib.org
   repository: https://CRAN.R-project.org/package=testthat
@@ -246,3 +253,15 @@ references:
   year: '2026'
   doi: 10.32614/CRAN.package.testthat
   version: '>= 3.3.2'
+- type: software
+  title: 'R: A Language and Environment for Statistical Computing'
+  notes: Suggests
+  authors:
+  - name: R Core Team
+    website: https://ror.org/02zz1nj61
+  institution:
+    name: R Foundation for Statistical Computing
+    website: https://ror.org/05qewa988
+    address: Vienna, Austria
+  year: '2026'
+  doi: 10.32614/R.manuals

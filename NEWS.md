@@ -19,37 +19,54 @@
     upper bound, Boolean superset absorption in `combine_ions_minimal()`, and
     selection of the single most parsimonious query per skeleton.
 
+## Bug Fixes & Compatibility
+
+- Fixed `to_massql()` and `combine_ions_minimal()` Boolean precedence and MassQL
+  qualifier handling: parenthesized multi-term `OR` groups, parsed disjunctive
+  normal form clauses joined by `" ; "`, and emitted a single effective
+  tolerance modifier (`:TOLERANCEMZ=` when `dalton > 0`, or `:TOLERANCEPPM=`
+  when `dalton == 0` and `ppm > 0`).
+- Enforced relative base-peak intensity filtering `[0, 100]` via `intensity_min`
+  during `prepare_query_data()`.
+- Replaced internal `@backend@` slot access with public `Spectra` methods so
+  in-memory backends (`MsBackendMemory`, `MsBackendDataFrame`) work reliably,
+  and added classed errors (`stq_input_error`, `stq_file_not_found_error`) plus
+  lowercase `skeleton` metadata fallback.
+- Fixed trailing-digit corruption on skeleton labels ending in digits by
+  replacing `names(unlist(...))` with `rep(names(...), lengths(...))`, and
+  warned if `+` to `.` normalization causes skeleton label collisions.
+- Fixed `create_dir()` directory creation, duplicate m/z accumulation in
+  `create_matrix()`, and non-finite intensity filtering in `fix_binned_mzs()`.
+- Evaluated helper validations before calling S4 `Spectra` generics so classed
+  conditions propagate directly without wrapping.
+
 ## Performance & Optimization
 
-- **~30x end-to-end speedup** in `spectra_to_queries()` with 100% identical
-  outputs:
-  - Precomputed single-ion logical hit vectors in
-    `perform_list_of_queries_progress()` and converted S4 `SimpleNumericList`
-    m/z lists to plain R vectors once in `prepare_query_data()`.
-  - Replaced nested loop linear scans in `harmonize_mzs()` with vectorized
-    `findInterval()` nearest-neighbor lookup.
-  - Switched `Spectra::bin()` to sparse mode (`zero.rm = TRUE`) with
-    sparse-aware `create_matrix()` and column-major distance calculation in
-    `fix_binned_mzs()`.
-  - Avoided redundant `Spectra::combineSpectra()` and duplicate lazy queue
-    evaluation before `Spectra::applyProcessing()`.
+- Simplified the pipeline to single-pass candidate evaluation in
+  `prune_combinations_bnb()` and `summarize_best_queries()` using precomputed
+  ion hit vectors (`precompute_ion_hits()`).
+- Removed dead helper code (`generate_combinations*()`, `contains_all_mz*()`,
+  `perform_query()`, `perform_list_of_queries*()`, `merge_diagnostic_ions()`,
+  `show_progress()`, and unused `inst/scripts/spectra_to_queries.R`), keeping
+  internal helpers hidden with `@noRd`.
+- Replaced nested linear scans in `harmonize_mzs()` with vectorized
+  `findInterval()` lookup and avoided redundant `Spectra` processing passes.
 
 ## Dependencies
 
-- Removed `tidytable` from `Imports`, leaving only `MsBackendMgf`, `Spectra`,
-  and Base R `utils`.
-- Removed `fastmatch`, `stringi`, `BiocParallel`, `data.table`, `progress`,
-  `purrr`, and `tibble`.
+- Narrowed `Imports` to `MsBackendMgf`, `Spectra`, `stats`, and `utils`
+  (removing `tidytable`, `fastmatch`, `stringi`, `BiocParallel`, `data.table`,
+  `progress`, `purrr`, and `tibble`).
 
 ## Data, Documentation & Metadata
 
-- **Portable `data/` datasets** regenerated from source MGF files:
-  - `mia_spectra_df`: 321 MS/MS spectra from MIADB across 81 chemical skeletons
-    (24,255 total peaks, median 66 peaks per spectrum).
-  - `mia_spectra_grouped_df`: 321 MS/MS spectra from MIADB across 53 grouped
-    skeleton classes.
-- Regenerated `data/interim/queries.tsv` and `data/interim/queries-grouped.tsv`
-  using Matthews Correlation Coefficient (MCC) ranking.
+- Regenerated `data/mia_spectra_df.rda` (321 MS/MS spectra across 81 skeletons;
+  24,255 peaks) and `data/mia_spectra_grouped_df.rda` (321 MS/MS spectra across
+  53 grouped classes) with `basename()` applied to `dataOrigin` so no local
+  paths are embedded.
+- Regenerated `data/interim/queries.tsv` and `data/interim/queries-grouped.tsv`.
+- Added executable `@examples` for `spectra_to_queries()` and updated vignette,
+  `README`, `CONTRIBUTING.md`, `TESTING.md`, and `CITATION.cff`.
 - Added verified EDAM ontology terms (`X-EDAM-Topic`, `X-EDAM-Operation`,
   `X-EDAM-Data`, `X-EDAM-Format`, `X-schema.org-keywords`, `biocViews`) to
   `DESCRIPTION`.
