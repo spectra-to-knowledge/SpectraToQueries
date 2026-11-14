@@ -3,11 +3,31 @@
 #' @description Extracts mz, precursor m/z, and skeleton labels once as plain R
 #'   vectors/lists so `perform_query()` never has to touch S4 objects again.
 #' @examples NULL
-prepare_query_data <- function(spectra) {
-  raw_mz <- as.list(Spectra::mz(spectra))
-  clean_mz <- lapply(raw_mz, function(x) {
-    if (all(is.finite(x))) x else x[is.finite(x)]
-  })
+prepare_query_data <- function(spectra, intensity_min = 0.0) {
+  if (is.finite(intensity_min) && intensity_min > 0) {
+    pks <- Spectra::peaksData(spectra)
+    clean_mz <- lapply(pks, function(x) {
+      if (nrow(x) == 0L) {
+        return(numeric(0))
+      }
+      mz_v <- x[, 1L]
+      int_v <- x[, 2L]
+      fin <- is.finite(mz_v) & is.finite(int_v)
+      if (!any(fin)) {
+        return(numeric(0))
+      }
+      max_int <- max(int_v[fin])
+      if (max_int <= 0) {
+        return(numeric(0))
+      }
+      mz_v[fin & ((100 * int_v / max_int) >= intensity_min)]
+    })
+  } else {
+    raw_mz <- as.list(Spectra::mz(spectra))
+    clean_mz <- lapply(raw_mz, function(x) {
+      if (all(is.finite(x))) x else x[is.finite(x)]
+    })
+  }
   list(
     mz = clean_mz,
     precursor_mz = as.numeric(Spectra::precursorMz(spectra)),
@@ -292,7 +312,8 @@ perform_list_of_queries_progress <- function(
   spectra,
   dalton,
   ppm,
-  show_progress = TRUE
+  show_progress = TRUE,
+  intensity_min = 0.0
 ) {
   n <- length(ions_list)
   results <- vector("list", n)
@@ -300,7 +321,7 @@ perform_list_of_queries_progress <- function(
     return(results)
   }
 
-  query_data <- prepare_query_data(spectra)
+  query_data <- prepare_query_data(spectra, intensity_min = intensity_min)
   all_mz <- query_data$mz
   precursor_mz <- query_data$precursor_mz
   skeleton <- query_data$skeleton

@@ -52,7 +52,18 @@ create_matrix <- function(spectra, zero_val = 0, name) {
   row_idx <- rep.int(seq_len(n_spectra), lens)
 
   spectra_mat <- matrix(0, nrow = n_spectra, ncol = length(u_mz))
-  spectra_mat[cbind(row_idx, col_idx)] <- all_int
+  has_dups <- any(vapply(
+    pks,
+    function(x) anyDuplicated(x[, 1L]) > 0L,
+    logical(1L)
+  ))
+  if (has_dups) {
+    lin_idx <- row_idx + (col_idx - 1L) * n_spectra
+    dup_sums <- rowsum(all_int, lin_idx, reorder = FALSE)
+    spectra_mat[as.integer(rownames(dup_sums))] <- dup_sums[, 1L]
+  } else {
+    spectra_mat[cbind(row_idx, col_idx)] <- all_int
+  }
 
   keep_cols <- colSums(spectra_mat) > zero_val
   if (!any(keep_cols)) {

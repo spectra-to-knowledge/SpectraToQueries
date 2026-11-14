@@ -4,7 +4,7 @@
 \alias{prepare_query_data}
 \title{Prepare spectra data for querying}
 \usage{
-prepare_query_data(spectra)
+prepare_query_data(spectra, intensity_min = 0)
 }
 \arguments{
 \item{spectra}{Spectra object}

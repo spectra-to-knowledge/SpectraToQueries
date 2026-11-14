@@ -27,7 +27,8 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
         peaks = "union",
         weighted = TRUE
       )
-    keep_fin <- is.finite(combined_peaks[, "mz"])
+    keep_fin <- is.finite(combined_peaks[, "mz"]) &
+      is.finite(combined_peaks[, "intensity"])
     all_mzs <- combined_peaks[keep_fin, "mz"]
     all_ints <- combined_peaks[keep_fin, "intensity"]
   } else {

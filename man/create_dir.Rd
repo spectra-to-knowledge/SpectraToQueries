@@ -7,16 +7,15 @@
 https://github.com/taxonomicallyinformedannotation/tima/blob/main/R/create_dir.R
 }
 \usage{
-create_dir(export)
+create_dir(path)
 }
 \arguments{
-\item{export}{Path to the directory or file whose parent directory is to be
-created}
+\item{path}{Path to the directory to create}
 }
 \value{
 Path to the directory (invisibly)
 }
 \description{
-This function creates a directory at the specified path
-if it does not already exist.
+Ensures the directory at \code{path} exists, creating it recursively
+if needed.
 }

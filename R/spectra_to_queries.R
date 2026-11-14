@@ -69,9 +69,13 @@ validate_stq_inputs <- function(
     upper = 1
   )
 
-  fin_msg <- "`intensity_min` and `zero_val` must be single finite numbers."
-  check_num(intensity_min, fin_msg)
-  check_num(zero_val, fin_msg)
+  check_num(
+    intensity_min,
+    "`intensity_min` must be a single finite number in [0, 100].",
+    lower = 0,
+    upper = 100
+  )
+  check_num(zero_val, "`zero_val` must be a single finite number.")
   invisible(TRUE)
 }
 
@@ -100,6 +104,12 @@ load_input_spectra <- function(spectra) {
     )
     mia_spectra <- df_to_spectra(data_env$mia_spectra_grouped_df)
   } else if (is.character(spectra)) {
+    if (!file.exists(spectra)) {
+      stop(errorCondition(
+        sprintf("Spectra file not found: '%s'.", spectra),
+        class = "stq_file_not_found_error"
+      ))
+    }
     message("Loading spectra from file.")
     mia_spectra <- spectra |>
       MsBackendMgf::readMgf() |>
@@ -110,9 +120,19 @@ load_input_spectra <- function(spectra) {
     mia_spectra <- spectra
   }
 
-  if (!is.null(mia_spectra@backend@spectraData$PRECURSOR_MZ)) {
-    mia_spectra@backend@spectraData$precursorMz <-
-      as.numeric(mia_spectra@backend@spectraData$PRECURSOR_MZ)
+  vars <- Spectra::spectraVariables(mia_spectra)
+  if (!("SKELETON" %in% vars)) {
+    if ("skeleton" %in% vars) {
+      mia_spectra$SKELETON <- mia_spectra$skeleton
+    } else {
+      stop(errorCondition(
+        "`spectra` must contain a `SKELETON` metadata variable.",
+        class = "stq_input_error"
+      ))
+    }
+  }
+  if ("PRECURSOR_MZ" %in% vars) {
+    mia_spectra$precursorMz <- as.numeric(mia_spectra$PRECURSOR_MZ)
   }
   mia_spectra
 }
@@ -467,9 +487,10 @@ prune_combinations_bnb <- function(
   max_ions,
   dalton,
   ppm,
-  decimals
+  decimals,
+  intensity_min = 0.0
 ) {
-  query_data <- prepare_query_data(spectra)
+  query_data <- prepare_query_data(spectra, intensity_min = intensity_min)
   all_mz <- query_data$mz
   precursor_mz <- query_data$precursor_mz
   skeleton <- query_data$skeleton
@@ -789,20 +810,55 @@ spectra_to_queries <- function(
   )
 
   mia_spectra <- load_input_spectra(spectra)
+  mia_spectra <- Spectra::filterMsLevel(mia_spectra, 2L)
+  skel_raw <- as.character(mia_spectra$SKELETON)
+  valid_skel <- !is.na(skel_raw) & nzchar(trimws(skel_raw))
+  if (!all(valid_skel)) {
+    mia_spectra <- mia_spectra[valid_skel]
+    skel_raw <- skel_raw[valid_skel]
+  }
+
   total_spectra <- as.numeric(length(mia_spectra))
+  if (total_spectra == 0) {
+    empty_queries <- data.frame(
+      skeleton = character(0),
+      mcc = numeric(0),
+      combined_ions = character(0),
+      massql = character(0),
+      stringsAsFactors = FALSE
+    )
+    if (!is.null(export)) {
+      create_dir(dirname(export))
+      utils::write.table(
+        empty_queries,
+        file = export,
+        sep = "\t",
+        row.names = FALSE,
+        quote = FALSE
+      )
+    }
+    return(invisible(empty_queries))
+  }
+
+  skel_norm <- gsub("+", ".", skel_raw, fixed = TRUE)
+  if (length(unique(skel_norm)) < length(unique(skel_raw))) {
+    warning(
+      "Distinct `SKELETON` labels collide after '+' to '.' normalization.",
+      call. = FALSE
+    )
+  }
 
   message(
     "Cut the fragments lower than ",
     intensity_min,
     " and rough preprocessing"
   )
-  mia_spectra_1 <- mia_spectra |>
-    Spectra::filterMsLevel(2L) |>
-    preprocess_spectra(
-      dalton = dalton,
-      ppm = ppm,
-      intensity_min = intensity_min
-    )
+  mia_spectra_1 <- preprocess_spectra(
+    mia_spectra,
+    dalton = dalton,
+    ppm = ppm,
+    intensity_min = intensity_min
+  )
 
   message(
     "Harmonize m/z values across spectra, given ",
@@ -881,7 +937,7 @@ spectra_to_queries <- function(
   zeros <- colSums(merged_mat) <= zero_val
   if (!all(zeros)) {
     cand_cols <- unique(c(frag_names, nl_names)[!zeros])
-    qd <- prepare_query_data(mia_spectra)
+    qd <- prepare_query_data(mia_spectra, intensity_min = intensity_min)
     pre <- precompute_ion_hits(
       unique_ions = cand_cols,
       all_mz = qd$mz,
@@ -931,7 +987,7 @@ spectra_to_queries <- function(
       stringsAsFactors = FALSE
     )
     if (!is.null(export)) {
-      create_dir(export)
+      create_dir(dirname(export))
       utils::write.table(
         final_queries,
         file = export,
@@ -950,12 +1006,13 @@ spectra_to_queries <- function(
     max_ions = ions_max,
     dalton = dalton,
     ppm = ppm,
-    decimals = decimals
+    decimals = decimals,
+    intensity_min = intensity_min
   )
   rm(candidates, ions_list)
 
   all_combinations <- unlist(combinations, recursive = FALSE)
-  names(all_combinations) <- gsub("\\d+$", "", names(all_combinations))
+  names(all_combinations) <- rep(names(combinations), lengths(combinations))
   rm(combinations)
 
   message("Test the queries. (This is the longest step)")
@@ -964,7 +1021,8 @@ spectra_to_queries <- function(
       spectra = mia_spectra,
       dalton = dalton,
       ppm = ppm,
-      show_progress = TRUE
+      show_progress = TRUE,
+      intensity_min = intensity_min
     )
   names(queries_results) <- names(all_combinations)
 
@@ -990,7 +1048,7 @@ spectra_to_queries <- function(
 
   message("Export the best queries for further use.")
   if (!is.null(export)) {
-    create_dir(export)
+    create_dir(dirname(export))
     utils::write.table(
       final_queries,
       file = export,

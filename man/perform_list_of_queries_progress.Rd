@@ -9,7 +9,8 @@ perform_list_of_queries_progress(
   spectra,
   dalton,
   ppm,
-  show_progress = TRUE
+  show_progress = TRUE,
+  intensity_min = 0
 )
 }
 \arguments{

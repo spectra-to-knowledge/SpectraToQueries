@@ -24,38 +24,44 @@ harmonize_mzs <- function(spectra, dalton, ppm) {
       peaks = "union",
       weighted = TRUE
     )
-  averaged_intensities <- combined_peaks[, "mz"]
-  averaged_intensities <- averaged_intensities[is.finite(averaged_intensities)]
-  n_avg <- length(averaged_intensities)
+  consensus_mzs <- combined_peaks[, "mz"]
+  consensus_mzs <- consensus_mzs[is.finite(consensus_mzs)]
+  n_avg <- length(consensus_mzs)
 
   if (n_avg == 0L) {
     return(spectra_new)
   }
 
-  pks <- spectra_new@backend@peaksData
-  for (i in seq_along(pks)) {
-    mzs <- pks[[i]][, 1L]
-    if (length(mzs) > 0L) {
-      idx_left <- findInterval(mzs, averaged_intensities)
+  align_mzs <- function(x, ...) {
+    if (nrow(x) > 0L) {
+      mzs <- x[, 1L]
+      idx_left <- findInterval(mzs, consensus_mzs)
       idx_left_clamped <- pmax(1L, idx_left)
       idx_right <- pmin(n_avg, idx_left + 1L)
 
-      d_left <- abs(mzs - averaged_intensities[idx_left_clamped])
-      d_right <- abs(mzs - averaged_intensities[idx_right])
+      d_left <- abs(mzs - consensus_mzs[idx_left_clamped])
+      d_right <- abs(mzs - consensus_mzs[idx_right])
 
       use_right <- d_right < d_left
       min_diff <- ifelse(use_right, d_right, d_left)
       best_idx <- ifelse(use_right, idx_right, idx_left_clamped)
 
-      target_mzs <- averaged_intensities[best_idx]
+      target_mzs <- consensus_mzs[best_idx]
       within <- min_diff <= (dalton + target_mzs * (ppm / 1e6))
       if (any(within)) {
         mzs[within] <- target_mzs[within]
-        pks[[i]][, 1L] <- mzs
+        x[, 1L] <- mzs
       }
     }
+    x
   }
-  spectra_new@backend@peaksData <- pks
 
-  spectra_new
+  sp_aligned <- Spectra::addProcessing(spectra_new, align_mzs)
+  tryCatch(
+    Spectra::applyProcessing(sp_aligned),
+    error = function(e) {
+      Spectra::setBackend(sp_aligned, Spectra::MsBackendMemory()) |>
+        Spectra::applyProcessing()
+    }
+  )
 }

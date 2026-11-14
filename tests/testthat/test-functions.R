@@ -139,25 +139,11 @@ testthat::test_that("combine_ions_minimal simplifies and sorts expressions", {
   )
 })
 
-testthat::test_that("create_dir creates parent or target directories", {
+testthat::test_that("create_dir creates target directories", {
   tmp_base <- file.path(tempdir(), paste0("stq_test_", Sys.getpid()))
   on.exit(unlink(tmp_base, recursive = TRUE), add = TRUE)
 
-  file_target <- file.path(tmp_base, "sub1", "queries.tsv")
-  testthat::expect_message(
-    vis_file <- withVisible(create_dir(file_target)),
-    "Directory .* created\\."
-  )
-  testthat::expect_false(vis_file$visible)
-  testthat::expect_identical(vis_file$value, dirname(file_target))
-  testthat::expect_true(dir.exists(dirname(file_target)))
-
-  # Second call on existing directory emits no message
-  testthat::expect_no_message(
-    testthat::expect_no_warning(create_dir(file_target))
-  )
-
-  dir_target <- file.path(tmp_base, "sub2")
+  dir_target <- file.path(tmp_base, "a.b", "sub")
   testthat::expect_message(
     vis_dir <- withVisible(create_dir(dir_target)),
     "Directory .* created\\."
@@ -165,6 +151,11 @@ testthat::test_that("create_dir creates parent or target directories", {
   testthat::expect_false(vis_dir$visible)
   testthat::expect_identical(vis_dir$value, dir_target)
   testthat::expect_true(dir.exists(dir_target))
+
+  # Second call on existing directory emits no message
+  testthat::expect_no_message(
+    testthat::expect_no_warning(create_dir(dir_target))
+  )
 })
 
 testthat::test_that("filter_matrix and normalize_peaks handle boundaries", {
@@ -776,6 +767,14 @@ testthat::test_that("spectra_to_queries validates inputs and synthetic cases", {
     spectra_to_queries(intensity_min = Inf),
     class = "stq_input_error"
   )
+  testthat::expect_error(
+    spectra_to_queries(intensity_min = -1),
+    class = "stq_input_error"
+  )
+  testthat::expect_error(
+    spectra_to_queries(intensity_min = 101),
+    class = "stq_input_error"
+  )
 
   # Valid boundary values in validate_stq_inputs must succeed without error
   testthat::expect_true(validate_stq_inputs(
@@ -932,10 +931,21 @@ testthat::test_that("pipeline functions handle empty and filtered-out inputs", {
     )
   )
 
+  df_zero_int <- data.frame(
+    msLevel = c(2L, 2L),
+    TITLE = c("Z1", "Z2"),
+    PRECURSOR_MZ = c(300.0, 400.0),
+    SKELETON = c("A", "A"),
+    stringsAsFactors = FALSE
+  )
+  df_zero_int$mz <- list(c(100.0, 120.0), c(100.0, 120.0))
+  df_zero_int$intensity <- list(c(0.0, 0.0), c(0.0, 0.0))
   res_no_peaks <- spectra_to_queries(
-    sub_df,
+    df_zero_int,
     export = NULL,
-    intensity_min = 101
+    intensity_min = 50,
+    n_skel_min = 2L,
+    n_spec_min = 2L
   )
   testthat::expect_identical(
     res_no_peaks,
@@ -1117,4 +1127,185 @@ testthat::test_that("spectra_to_queries reproduces raw and grouped results", {
   testthat::expect_identical(nrow(res_grp), 17L)
   testthat::expect_identical(res_grp$skeleton[1L], "Lapidilectine.Lunduran")
   testthat::expect_equal(res_grp$mcc[1L], 1.0)
+})
+
+testthat::test_that("pipeline handles numeric skeletons and backends", {
+  # 1. Skeletons ending in digits must not be stripped by unlist regex
+  df_num <- data.frame(
+    msLevel = rep(2L, 6L),
+    TITLE = paste0("T", 1:6),
+    PRECURSOR_MZ = rep(300.0, 6L),
+    SKELETON = c("Skel_1", "Skel_1", "Skel_1", "Skel_2", "Skel_2", "Skel_2"),
+    stringsAsFactors = FALSE
+  )
+  df_num$mz <- list(
+    c(100.0, 120.0),
+    c(100.0, 120.0),
+    c(100.0, 150.0),
+    c(200.0, 210.0),
+    c(200.0, 220.0),
+    c(200.0, 230.0)
+  )
+  df_num$intensity <- rep(list(c(100.0, 80.0)), 6L)
+
+  res_num <- suppressMessages(spectra_to_queries(
+    df_num,
+    export = NULL,
+    n_skel_min = 2L,
+    n_spec_min = 2L
+  ))
+  testthat::expect_identical(sort(res_num$skeleton), c("Skel_1", "Skel_2"))
+  testthat::expect_equal(res_num$mcc, c(1.0, 1.0), tolerance = 1e-12)
+
+  # 2. Lowercase skeleton accepted; missing SKELETON/skeleton throws error
+  df_low <- df_num
+  names(df_low)[names(df_low) == "SKELETON"] <- "skeleton"
+  res_low <- suppressMessages(spectra_to_queries(
+    df_low,
+    export = NULL,
+    n_skel_min = 2L,
+    n_spec_min = 2L
+  ))
+  testthat::expect_identical(res_low, res_num)
+
+  df_no_skel_col <- df_num[, setdiff(names(df_num), "SKELETON"), drop = FALSE]
+  testthat::expect_error(
+    spectra_to_queries(df_no_skel_col, export = NULL),
+    class = "stq_input_error"
+  )
+
+  # 3. Missing MGF path raises stq_file_not_found_error
+  testthat::expect_error(
+    spectra_to_queries(
+      spectra = file.path(tempdir(), "does_not_exist_12345.mgf"),
+      export = NULL
+    ),
+    class = "stq_file_not_found_error"
+  )
+
+  # 4. MsBackendDataFrame works in harmonize_mzs() and spectra_to_queries()
+  sp_df_backend <- Spectra::Spectra(
+    Spectra::backendInitialize(
+      Spectra::MsBackendDataFrame(),
+      data = df_num
+    )
+  )
+  sp_df_harm <- harmonize_mzs(sp_df_backend, dalton = 0.01, ppm = 30)
+  testthat::expect_s4_class(sp_df_harm, "Spectra")
+  res_df_backend <- suppressMessages(spectra_to_queries(
+    sp_df_backend,
+    export = NULL,
+    n_skel_min = 2L,
+    n_spec_min = 2L
+  ))
+  testthat::expect_identical(res_df_backend, res_num)
+
+  # 5. Extensionless export path with dotted parent directory writes file
+  tmp_dir <- file.path(tempdir(), paste0("stq_noext_", Sys.getpid()), "a.b")
+  on.exit(unlink(dirname(tmp_dir), recursive = TRUE), add = TRUE)
+  out_noext <- file.path(tmp_dir, "queries_out")
+  suppressMessages(spectra_to_queries(
+    df_num,
+    export = out_noext,
+    n_skel_min = 2L,
+    n_spec_min = 2L
+  ))
+  testthat::expect_true(file.exists(out_noext))
+  testthat::expect_false(dir.exists(out_noext))
+
+  # 6. intensity_min filters sub-threshold peaks during query evaluation
+  df_int <- data.frame(
+    msLevel = rep(2L, 4L),
+    TITLE = paste0("I", 1:4),
+    PRECURSOR_MZ = rep(300.0, 4L),
+    SKELETON = c("A", "A", "B", "B"),
+    stringsAsFactors = FALSE
+  )
+  df_int$mz <- list(
+    c(100.0, 150.0),
+    c(100.0, 160.0),
+    c(100.0, 200.0),
+    c(100.0, 200.0)
+  )
+  df_int$intensity <- list(
+    c(100.0, 50.0),
+    c(100.0, 50.0),
+    c(1.0, 100.0),
+    c(1.0, 100.0)
+  )
+  res_int <- suppressMessages(spectra_to_queries(
+    df_int,
+    export = NULL,
+    intensity_min = 50,
+    n_skel_min = 2L,
+    n_spec_min = 2L
+  ))
+  testthat::expect_identical(sort(res_int$skeleton), c("A", "B"))
+  testthat::expect_equal(res_int$mcc, c(1.0, 1.0), tolerance = 1e-12)
+
+  # 7. msLevel != 2 and NA/empty SKELETON excluded before total_spectra
+  df_mixed <- data.frame(
+    msLevel = c(1L, 2L, 2L, 2L, 2L, 2L, 2L),
+    TITLE = paste0("M", 1:7),
+    PRECURSOR_MZ = rep(300.0, 7L),
+    SKELETON = c("A", NA_character_, "", "A", "A", "B", "B"),
+    stringsAsFactors = FALSE
+  )
+  df_mixed$mz <- list(
+    c(100.0, 200.0),
+    c(100.0, 200.0),
+    c(100.0, 200.0),
+    c(100.0, 150.0),
+    c(100.0, 160.0),
+    c(200.0, 250.0),
+    c(200.0, 260.0)
+  )
+  df_mixed$intensity <- rep(list(c(100.0, 80.0)), 7L)
+  res_mixed <- suppressMessages(spectra_to_queries(
+    df_mixed,
+    export = NULL,
+    n_skel_min = 2L,
+    n_spec_min = 2L
+  ))
+  testthat::expect_equal(res_mixed$mcc, c(1.0, 1.0), tolerance = 1e-12)
+
+  # All spectra filtered out by msLevel/SKELETON returns empty result cleanly
+  df_all_bad <- df_mixed[1:3, ]
+  out_empty_ms1 <- file.path(tmp_dir, "empty_ms1.tsv")
+  res_all_bad <- suppressMessages(spectra_to_queries(
+    df_all_bad,
+    export = out_empty_ms1,
+    n_skel_min = 2L,
+    n_spec_min = 2L
+  ))
+  testthat::expect_identical(nrow(res_all_bad), 0L)
+  testthat::expect_true(file.exists(out_empty_ms1))
+
+  # Collision warning when '+' -> '.' maps distinct skeletons together
+  df_col <- df_num
+  df_col$SKELETON <- c("A+B", "A+B", "A+B", "A.B", "A.B", "A.B")
+  testthat::expect_warning(
+    suppressMessages(spectra_to_queries(
+      df_col,
+      export = NULL,
+      n_skel_min = 2L,
+      n_spec_min = 2L
+    )),
+    "collide"
+  )
+
+  # 8. create_matrix accumulates duplicate m/z intensities in sparse path
+  df_dup_mz <- data.frame(
+    msLevel = c(2L, 2L),
+    SKELETON = c("A", "B"),
+    stringsAsFactors = FALSE
+  )
+  df_dup_mz$mz <- list(c(100.0, 100.0, 200.0), c(100.0, 300.0))
+  df_dup_mz$intensity <- list(c(10.0, 25.0, 50.0), c(5.0, 10.0))
+  mat_dup_mz <- create_matrix(
+    df_to_spectra(df_dup_mz),
+    zero_val = 0,
+    name = c("A", "B")
+  )
+  testthat::expect_identical(mat_dup_mz["A", "100"], 35.0)
 })
