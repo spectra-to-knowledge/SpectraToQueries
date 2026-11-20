@@ -202,23 +202,19 @@ testthat::test_that("combine_ions_minimal simplifies and sorts expressions", {
       "MS2NL=50:TOLERANCEMZ=0.01"
     )
   )
-  testthat::expect_error(
-    to_massql("100_frag", dalton = -0.01),
-    class = "stq_input_error"
+  bad_massql_args <- list(
+    list("100_frag", dalton = -0.01),
+    list("100_frag", ppm = -1),
+    list("100_frag", intensity_min = -1),
+    list("100_frag", intensity_min = 101),
+    list("(100_frag")
   )
-  testthat::expect_error(
-    to_massql("100_frag", ppm = -1),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    to_massql("100_frag", intensity_min = -1),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    to_massql("100_frag", intensity_min = 101),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(to_massql("(100_frag"), class = "stq_input_error")
+  for (args in bad_massql_args) {
+    testthat::expect_error(
+      do.call(to_massql, args),
+      class = "stq_input_error"
+    )
+  }
 })
 
 testthat::test_that("create_dir creates target directories", {
@@ -327,9 +323,10 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
   testthat::expect_identical(dim(mat_0), c(0L, 0L))
 
   # Spectra with 0 peaks
-  df_no_pks <- data.frame(msLevel = c(2L, 2L), SKELETON = c("A", "B"))
-  df_no_pks$mz <- list(numeric(0), numeric(0))
-  df_no_pks$intensity <- list(numeric(0), numeric(0))
+  df_no_pks <- make_spectra_df(
+    c("A", "B"),
+    list(numeric(0), numeric(0))
+  )
   mat_no_pks <- create_matrix(
     df_to_spectra(df_no_pks),
     zero_val = 0,
@@ -339,9 +336,11 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
   testthat::expect_identical(rownames(mat_no_pks), c("A", "B"))
 
   # Mix of non-empty and empty spectra (all(lens == 0L) vs any(lens == 0L))
-  df_one_empty <- data.frame(msLevel = c(2L, 2L), SKELETON = c("A", "B"))
-  df_one_empty$mz <- list(c(100, 200), numeric(0))
-  df_one_empty$intensity <- list(c(10, 20), numeric(0))
+  df_one_empty <- make_spectra_df(
+    c("A", "B"),
+    list(c(100, 200), numeric(0)),
+    list(c(10, 20), numeric(0))
+  )
   mat_one_empty <- create_matrix(
     df_to_spectra(df_one_empty),
     zero_val = 0,
@@ -358,9 +357,11 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
   )
 
   # Fast path (shared sorted m/z grid) zero_val boundary
-  df_same <- data.frame(msLevel = c(2L, 2L), SKELETON = c("S1", "S2"))
-  df_same$mz <- list(c(100, 200), c(100, 200))
-  df_same$intensity <- list(c(4, 10), c(6, 20))
+  df_same <- make_spectra_df(
+    c("S1", "S2"),
+    list(c(100, 200), c(100, 200)),
+    list(c(4, 10), c(6, 20))
+  )
   sp_same <- df_to_spectra(df_same)
 
   # Column "100" has sum 10; with zero_val = 10 it must be dropped (> not >=)
@@ -380,12 +381,11 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
   testthat::expect_identical(rownames(mat_same_z50), c("S1", "S2"))
 
   # Middle-spectrum grid difference (sparse path) + zero_val boundaries
-  df_mid_diff <- data.frame(
-    msLevel = c(2L, 2L, 2L),
-    SKELETON = c("S1", "S2", "S3")
+  df_mid_diff <- make_spectra_df(
+    c("S1", "S2", "S3"),
+    list(c(100, 200), c(100, 300), c(100, 200)),
+    list(c(10, 20), c(30, 40), c(50, 60))
   )
-  df_mid_diff$mz <- list(c(100, 200), c(100, 300), c(100, 200))
-  df_mid_diff$intensity <- list(c(10, 20), c(30, 40), c(50, 60))
   sp_mid_diff <- df_to_spectra(df_mid_diff)
 
   mat_mid <- create_matrix(
@@ -431,9 +431,10 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
 
 testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
   # Spectra with 0 peaks across all spectra (n_avg == 0L)
-  df_empty_pks <- data.frame(msLevel = c(2L, 2L), SKELETON = c("A", "B"))
-  df_empty_pks$mz <- list(numeric(0), numeric(0))
-  df_empty_pks$intensity <- list(numeric(0), numeric(0))
+  df_empty_pks <- make_spectra_df(
+    c("A", "B"),
+    list(numeric(0), numeric(0))
+  )
   sp_empty_pks <- df_to_spectra(df_empty_pks)
   testthat::expect_identical(
     Spectra::mz(harmonize_mzs(sp_empty_pks, dalton = 0.01, ppm = 30)),
@@ -441,16 +442,14 @@ testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
   )
 
   # Left vs right neighbor selection and exact binary dalton + ppm boundary
-  df_h <- data.frame(msLevel = c(2L, 2L, 2L), SKELETON = c("A", "B", "C"))
-  df_h$mz <- list(
-    c(50.0, 99.875, 1000.000, 2000.000),
-    c(50.0, 100.125, 1000.500, 2000.750),
-    numeric(0)
-  )
-  df_h$intensity <- list(
-    c(10, 20, 30, 40),
-    c(10, 20, 30, 40),
-    numeric(0)
+  df_h <- make_spectra_df(
+    c("A", "B", "C"),
+    list(
+      c(50.0, 99.875, 1000.000, 2000.000),
+      c(50.0, 100.125, 1000.500, 2000.750),
+      numeric(0)
+    ),
+    list(c(10, 20, 30, 40), c(10, 20, 30, 40), numeric(0))
   )
   sp_h <- harmonize_mzs(df_to_spectra(df_h), dalton = 0.25, ppm = 500)
   mzs_h <- as.list(Spectra::mz(sp_h))
@@ -483,9 +482,11 @@ testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
   )
 
   # fix_binned_mzs: fast path + exact binary tolerance boundary
-  df_orig <- data.frame(msLevel = 2L, SKELETON = "A")
-  df_orig$mz <- list(c(100.5, 200.125))
-  df_orig$intensity <- list(c(50, 100))
+  df_orig <- make_spectra_df(
+    "A",
+    list(c(100.5, 200.125)),
+    list(c(50, 100))
+  )
   sp_orig <- df_to_spectra(df_orig)
 
   binned_unique <- matrix(
@@ -532,13 +533,12 @@ testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
 
 testthat::test_that("query matching helpers work across all branches", {
   # prepare_query_data with non-finite m/z values and "+" in SKELETON
-  df_qd <- data.frame(
-    msLevel = c(2L, 2L),
-    SKELETON = c("SkelA+SkelB", "SkelC"),
+  df_qd <- make_spectra_df(
+    c("SkelA+SkelB", "SkelC"),
+    list(c(100.0, 150.0), c(Inf, 250.0)),
+    list(c(50.0, 100.0), c(50.0, 100.0)),
     precursorMz = c(200.0, 300.0)
   )
-  df_qd$mz <- list(c(100.0, 150.0), c(Inf, 250.0))
-  df_qd$intensity <- list(c(50.0, 100.0), c(50.0, 100.0))
   sp_qd <- df_to_spectra(df_qd)
   prep <- prepare_query_data(sp_qd)
   testthat::expect_identical(prep$mz, list(c(100.0, 150.0), 250.0))
@@ -546,22 +546,11 @@ testthat::test_that("query matching helpers work across all branches", {
   testthat::expect_identical(prep$skeleton, c("SkelA.SkelB", "SkelC"))
 
   # prepare_query_data with intensity_min filtering and edge cases
-  df_int <- data.frame(
-    msLevel = c(2L, 2L, 2L, 2L),
-    SKELETON = c("A", "B", "C", "D"),
+  df_int <- make_spectra_df(
+    c("A", "B", "C", "D"),
+    list(numeric(0), c(100.0, Inf), c(100.0, 200.0), c(100.0, 200.0)),
+    list(numeric(0), c(NaN, 100.0), c(0.0, 0.0), c(10.0, 100.0)),
     precursorMz = c(300.0, 300.0, 300.0, 300.0)
-  )
-  df_int$mz <- list(
-    numeric(0),
-    c(100.0, Inf),
-    c(100.0, 200.0),
-    c(100.0, 200.0)
-  )
-  df_int$intensity <- list(
-    numeric(0),
-    c(NaN, 100.0),
-    c(0.0, 0.0),
-    c(10.0, 100.0)
   )
   prep_int <- prepare_query_data(df_to_spectra(df_int), intensity_min = 50)
   testthat::expect_identical(
@@ -608,66 +597,30 @@ testthat::test_that("query matching helpers work across all branches", {
 })
 
 testthat::test_that("spectra_to_queries validates inputs and synthetic cases", {
-  testthat::expect_error(
-    spectra_to_queries(spectra = 123),
-    class = "stq_input_error"
+  bad_stq_args <- list(
+    list(spectra = 123),
+    list(spectra = ""),
+    list(export = ""),
+    list(dalton = -0.01),
+    list(ppm = -1),
+    list(decimals = -1L),
+    list(ions_max = 0L),
+    list(n_skel_min = 0L),
+    list(n_spec_min = 0L),
+    list(precision_min = 1.5),
+    list(recall_min = -0.1),
+    list(mcc_min = 2.0),
+    list(intensity_min = Inf),
+    list(intensity_min = -1),
+    list(intensity_min = 101),
+    list(zero_val = NA_real_)
   )
-  testthat::expect_error(
-    spectra_to_queries(spectra = ""),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    spectra_to_queries(export = ""),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    spectra_to_queries(dalton = -0.01),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    spectra_to_queries(ppm = -1),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    spectra_to_queries(decimals = -1L),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    spectra_to_queries(ions_max = 0L),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    spectra_to_queries(n_skel_min = 0L),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    spectra_to_queries(n_spec_min = 0L),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    spectra_to_queries(precision_min = 1.5),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    spectra_to_queries(recall_min = -0.1),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    spectra_to_queries(mcc_min = 2.0),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    spectra_to_queries(intensity_min = Inf),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    spectra_to_queries(intensity_min = -1),
-    class = "stq_input_error"
-  )
-  testthat::expect_error(
-    spectra_to_queries(intensity_min = 101),
-    class = "stq_input_error"
-  )
+  for (args in bad_stq_args) {
+    testthat::expect_error(
+      do.call(spectra_to_queries, args),
+      class = "stq_input_error"
+    )
+  }
 
   # Valid boundary values in validate_stq_inputs must succeed without error
   testthat::expect_true(validate_stq_inputs(
@@ -710,24 +663,22 @@ testthat::test_that("spectra_to_queries validates inputs and synthetic cases", {
   # Synthetic 6-spectrum dataset with distinct PRECURSOR_MZ and TITLEs:
   # SkelA: 100_frag (3/3, FP=0 -> MCC = 1.0)
   # SkelB: 150_frag (TP=2, FP=1, FN=1, TN=2) -> MCC = (4-1)/9 = 0.3333
-  synth_df <- data.frame(
-    msLevel = rep(2L, 6L),
+  synth_df <- make_spectra_df(
+    c("SkelA", "SkelA", "SkelA", "SkelB", "SkelB", "SkelB"),
+    list(
+      c(100.0, 120.0),
+      c(100.0, 120.0),
+      c(100.0, 150.0),
+      c(150.0, 160.0),
+      c(150.0, 170.0),
+      c(180.0, 190.0)
+    ),
+    rep(list(c(100.0, 80.0)), 6L),
     rtime = seq_len(6L) * 1.0,
     acquisitionNum = seq_len(6L),
     TITLE = paste0("Spec_", seq_len(6L)),
-    PRECURSOR_MZ = c(300.0, 400.0, 500.0, 600.0, 700.0, 800.0),
-    SKELETON = c("SkelA", "SkelA", "SkelA", "SkelB", "SkelB", "SkelB"),
-    stringsAsFactors = FALSE
+    PRECURSOR_MZ = c(300.0, 400.0, 500.0, 600.0, 700.0, 800.0)
   )
-  synth_df$mz <- list(
-    c(100.0, 120.0),
-    c(100.0, 120.0),
-    c(100.0, 150.0),
-    c(150.0, 160.0),
-    c(150.0, 170.0),
-    c(180.0, 190.0)
-  )
-  synth_df$intensity <- rep(list(c(100.0, 80.0)), 6L)
 
   synth_sp <- df_to_spectra(synth_df)
   res_sp <- spectra_to_queries(
@@ -808,31 +759,27 @@ testthat::test_that("pipeline functions handle empty and filtered-out inputs", {
     envir = environment()
   )
   sub_df <- mia_spectra_df[1:10, ]
+  expected_empty <- data.frame(
+    skeleton = character(0),
+    mcc = numeric(0),
+    combined_ions = character(0),
+    massql = character(0),
+    stringsAsFactors = FALSE
+  )
   res_no_skel <- spectra_to_queries(
     sub_df,
     export = NULL,
     n_skel_min = 100L
   )
-  testthat::expect_identical(
-    res_no_skel,
-    data.frame(
-      skeleton = character(0),
-      mcc = numeric(0),
-      combined_ions = character(0),
-      massql = character(0),
-      stringsAsFactors = FALSE
-    )
-  )
+  testthat::expect_identical(res_no_skel, expected_empty)
 
-  df_zero_int <- data.frame(
-    msLevel = c(2L, 2L),
+  df_zero_int <- make_spectra_df(
+    c("A", "A"),
+    list(c(100.0, 120.0), c(100.0, 120.0)),
+    list(c(0.0, 0.0), c(0.0, 0.0)),
     TITLE = c("Z1", "Z2"),
-    PRECURSOR_MZ = c(300.0, 400.0),
-    SKELETON = c("A", "A"),
-    stringsAsFactors = FALSE
+    PRECURSOR_MZ = c(300.0, 400.0)
   )
-  df_zero_int$mz <- list(c(100.0, 120.0), c(100.0, 120.0))
-  df_zero_int$intensity <- list(c(0.0, 0.0), c(0.0, 0.0))
   res_no_peaks <- spectra_to_queries(
     df_zero_int,
     export = NULL,
@@ -840,16 +787,7 @@ testthat::test_that("pipeline functions handle empty and filtered-out inputs", {
     n_skel_min = 2L,
     n_spec_min = 2L
   )
-  testthat::expect_identical(
-    res_no_peaks,
-    data.frame(
-      skeleton = character(0),
-      mcc = numeric(0),
-      combined_ions = character(0),
-      massql = character(0),
-      stringsAsFactors = FALSE
-    )
-  )
+  testthat::expect_identical(res_no_peaks, expected_empty)
 })
 
 testthat::test_that("extracted pipeline helpers handle boundaries and ties", {
@@ -1028,22 +966,20 @@ testthat::test_that("spectra_to_queries reproduces raw and grouped results", {
 
 testthat::test_that("pipeline handles numeric skeletons and backends", {
   # 1. Skeletons ending in digits must not be stripped by unlist regex
-  df_num <- data.frame(
-    msLevel = rep(2L, 6L),
+  df_num <- make_spectra_df(
+    c("Skel_1", "Skel_1", "Skel_1", "Skel_2", "Skel_2", "Skel_2"),
+    list(
+      c(100.0, 120.0),
+      c(100.0, 120.0),
+      c(100.0, 150.0),
+      c(200.0, 210.0),
+      c(200.0, 220.0),
+      c(200.0, 230.0)
+    ),
+    rep(list(c(100.0, 80.0)), 6L),
     TITLE = paste0("T", 1:6),
-    PRECURSOR_MZ = rep(300.0, 6L),
-    SKELETON = c("Skel_1", "Skel_1", "Skel_1", "Skel_2", "Skel_2", "Skel_2"),
-    stringsAsFactors = FALSE
+    PRECURSOR_MZ = rep(300.0, 6L)
   )
-  df_num$mz <- list(
-    c(100.0, 120.0),
-    c(100.0, 120.0),
-    c(100.0, 150.0),
-    c(200.0, 210.0),
-    c(200.0, 220.0),
-    c(200.0, 230.0)
-  )
-  df_num$intensity <- rep(list(c(100.0, 80.0)), 6L)
 
   res_num <- suppressMessages(spectra_to_queries(
     df_num,
@@ -1111,24 +1047,17 @@ testthat::test_that("pipeline handles numeric skeletons and backends", {
   testthat::expect_false(dir.exists(out_noext))
 
   # 6. intensity_min filters sub-threshold peaks during query evaluation
-  df_int <- data.frame(
-    msLevel = rep(2L, 4L),
+  df_int <- make_spectra_df(
+    c("A", "A", "B", "B"),
+    list(
+      c(100.0, 150.0),
+      c(100.0, 160.0),
+      c(100.0, 200.0),
+      c(100.0, 200.0)
+    ),
+    list(c(100.0, 50.0), c(100.0, 50.0), c(1.0, 100.0), c(1.0, 100.0)),
     TITLE = paste0("I", 1:4),
-    PRECURSOR_MZ = rep(300.0, 4L),
-    SKELETON = c("A", "A", "B", "B"),
-    stringsAsFactors = FALSE
-  )
-  df_int$mz <- list(
-    c(100.0, 150.0),
-    c(100.0, 160.0),
-    c(100.0, 200.0),
-    c(100.0, 200.0)
-  )
-  df_int$intensity <- list(
-    c(100.0, 50.0),
-    c(100.0, 50.0),
-    c(1.0, 100.0),
-    c(1.0, 100.0)
+    PRECURSOR_MZ = rep(300.0, 4L)
   )
   res_int <- suppressMessages(spectra_to_queries(
     df_int,
@@ -1141,23 +1070,22 @@ testthat::test_that("pipeline handles numeric skeletons and backends", {
   testthat::expect_equal(res_int$mcc, c(1.0, 1.0), tolerance = 1e-12)
 
   # 7. msLevel != 2 and NA/empty SKELETON excluded before total_spectra
-  df_mixed <- data.frame(
-    msLevel = c(1L, 2L, 2L, 2L, 2L, 2L, 2L),
+  df_mixed <- make_spectra_df(
+    c("A", NA_character_, "", "A", "A", "B", "B"),
+    list(
+      c(100.0, 200.0),
+      c(100.0, 200.0),
+      c(100.0, 200.0),
+      c(100.0, 150.0),
+      c(100.0, 160.0),
+      c(200.0, 250.0),
+      c(200.0, 260.0)
+    ),
+    rep(list(c(100.0, 80.0)), 7L),
+    ms_level = c(1L, 2L, 2L, 2L, 2L, 2L, 2L),
     TITLE = paste0("M", 1:7),
-    PRECURSOR_MZ = rep(300.0, 7L),
-    SKELETON = c("A", NA_character_, "", "A", "A", "B", "B"),
-    stringsAsFactors = FALSE
+    PRECURSOR_MZ = rep(300.0, 7L)
   )
-  df_mixed$mz <- list(
-    c(100.0, 200.0),
-    c(100.0, 200.0),
-    c(100.0, 200.0),
-    c(100.0, 150.0),
-    c(100.0, 160.0),
-    c(200.0, 250.0),
-    c(200.0, 260.0)
-  )
-  df_mixed$intensity <- rep(list(c(100.0, 80.0)), 7L)
   res_mixed <- suppressMessages(spectra_to_queries(
     df_mixed,
     export = NULL,
@@ -1192,13 +1120,11 @@ testthat::test_that("pipeline handles numeric skeletons and backends", {
   )
 
   # 8. create_matrix accumulates duplicate m/z intensities in sparse path
-  df_dup_mz <- data.frame(
-    msLevel = c(2L, 2L),
-    SKELETON = c("A", "B"),
-    stringsAsFactors = FALSE
+  df_dup_mz <- make_spectra_df(
+    c("A", "B"),
+    list(c(100.0, 100.0, 200.0), c(100.0, 300.0)),
+    list(c(10.0, 25.0, 50.0), c(5.0, 10.0))
   )
-  df_dup_mz$mz <- list(c(100.0, 100.0, 200.0), c(100.0, 300.0))
-  df_dup_mz$intensity <- list(c(10.0, 25.0, 50.0), c(5.0, 10.0))
   mat_dup_mz <- create_matrix(
     df_to_spectra(df_dup_mz),
     zero_val = 0,
@@ -1208,23 +1134,16 @@ testthat::test_that("pipeline handles numeric skeletons and backends", {
 })
 
 testthat::test_that("spectra_to_queries works when TITLE is absent", {
-  df_no_title <- data.frame(
-    msLevel = c(2L, 2L, 2L, 2L),
-    SKELETON = c("SkelA", "SkelA", "SkelB", "SkelB"),
-    precursorMz = c(300.0, 300.0, 300.0, 300.0),
-    stringsAsFactors = FALSE
-  )
-  df_no_title$mz <- list(
-    c(100.0, 150.0),
-    c(100.0, 160.0),
-    c(200.0, 250.0),
-    c(200.0, 260.0)
-  )
-  df_no_title$intensity <- list(
-    c(80, 100),
-    c(70, 100),
-    c(90, 100),
-    c(85, 100)
+  df_no_title <- make_spectra_df(
+    c("SkelA", "SkelA", "SkelB", "SkelB"),
+    list(
+      c(100.0, 150.0),
+      c(100.0, 160.0),
+      c(200.0, 250.0),
+      c(200.0, 260.0)
+    ),
+    list(c(80, 100), c(70, 100), c(90, 100), c(85, 100)),
+    precursorMz = c(300.0, 300.0, 300.0, 300.0)
   )
   res <- suppressMessages(spectra_to_queries(
     spectra = df_no_title,
