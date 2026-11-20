@@ -1,5 +1,60 @@
 [
   {
+    "objectID": "vignettes/spectra-to-queries.html",
+    "href": "vignettes/spectra-to-queries.html",
+    "title": "Translating MS/MS Spectra into Diagnostic Queries and MassQL",
+    "section": "",
+    "text": "SpectraToQueries extracts skeleton-specific diagnostic fragment (_frag) and neutral-loss (_nl) ion queries from annotated MS/MS spectral libraries and translates them into MassQL queries.\nFor each chemical class (SKELETON) with at least n_skel_min spectra, spectra_to_queries() executes five steps:\n\nPreprocessing and intensity-weighted m/z harmonization: MS2 intensities are normalized to 100%, peaks below intensity_min and non-positive neutral losses are removed, and m/z values across spectra are aligned to intensity-weighted consensus centroids within dalton + mz * ppm / 1e6.\nUnbinned centroid evaluation: Candidate fragment and neutral-loss centroids are matched directly against the unbinned spectra, enforcing physical feasibility (precursor_mz - nl &gt; 0).\nCandidate ion selection (hitting set + mRMR): Exact duplicate hit profiles are collapsed. Ions with 100% recall on the target skeleton are pruned via a greedy hitting-set cover of false-positive spectra, and remaining slots up to ions_max are filled by forward conjunctive Matthews Correlation Coefficient (MCC) gain penalized by correlation on negative spectra.\nBranch-and-Bound combination search: When exploring multi-ion conjunctions up to ions_max, branches whose zero-false-positive MCC upper bound cannot reach the best MCC found so far for that skeleton are pruned.\nParsimonious query selection & MassQL export: Among combinations tied for the highest MCC on a skeleton, the combination using the fewest ions is retained and formatted into both a minimal human-readable query (combined_ions) and a directly executable MassQL statement (massql).",
+    "crumbs": [
+      "News",
+      "Articles",
+      "Translating MS/MS Spectra into Diagnostic Queries and MassQL"
+    ]
+  },
+  {
+    "objectID": "vignettes/spectra-to-queries.html#overview",
+    "href": "vignettes/spectra-to-queries.html#overview",
+    "title": "Translating MS/MS Spectra into Diagnostic Queries and MassQL",
+    "section": "",
+    "text": "SpectraToQueries extracts skeleton-specific diagnostic fragment (_frag) and neutral-loss (_nl) ion queries from annotated MS/MS spectral libraries and translates them into MassQL queries.\nFor each chemical class (SKELETON) with at least n_skel_min spectra, spectra_to_queries() executes five steps:\n\nPreprocessing and intensity-weighted m/z harmonization: MS2 intensities are normalized to 100%, peaks below intensity_min and non-positive neutral losses are removed, and m/z values across spectra are aligned to intensity-weighted consensus centroids within dalton + mz * ppm / 1e6.\nUnbinned centroid evaluation: Candidate fragment and neutral-loss centroids are matched directly against the unbinned spectra, enforcing physical feasibility (precursor_mz - nl &gt; 0).\nCandidate ion selection (hitting set + mRMR): Exact duplicate hit profiles are collapsed. Ions with 100% recall on the target skeleton are pruned via a greedy hitting-set cover of false-positive spectra, and remaining slots up to ions_max are filled by forward conjunctive Matthews Correlation Coefficient (MCC) gain penalized by correlation on negative spectra.\nBranch-and-Bound combination search: When exploring multi-ion conjunctions up to ions_max, branches whose zero-false-positive MCC upper bound cannot reach the best MCC found so far for that skeleton are pruned.\nParsimonious query selection & MassQL export: Among combinations tied for the highest MCC on a skeleton, the combination using the fewest ions is retained and formatted into both a minimal human-readable query (combined_ions) and a directly executable MassQL statement (massql).",
+    "crumbs": [
+      "News",
+      "Articles",
+      "Translating MS/MS Spectra into Diagnostic Queries and MassQL"
+    ]
+  },
+  {
+    "objectID": "vignettes/spectra-to-queries.html#generating-queries",
+    "href": "vignettes/spectra-to-queries.html#generating-queries",
+    "title": "Translating MS/MS Spectra into Diagnostic Queries and MassQL",
+    "section": "Generating queries",
+    "text": "Generating queries\nRun spectra_to_queries() on a small subset of the bundled Monoterpene Indole Alkaloids Database (mia_spectra_df):\n\nlibrary(SpectraToQueries)\n\nutils::data(mia_spectra_df, package = \"SpectraToQueries\")\n\nkeep &lt;- mia_spectra_df$SKELETON %in%\n  c(\"Corynanthean\", \"Iboga\", \"Aspidosperma\")\nqueries &lt;- spectra_to_queries(\n  spectra = mia_spectra_df[keep, ],\n  export = NULL,\n  ions_max = 4L\n)\n\nknitr::kable(queries, digits = 4)\n\n\n\n\n\n\n\n\n\n\nskeleton\nmcc\ncombined_ions\nmassql\n\n\n\n\nAspidosperma\n0.6947\n134.0951_frag & 199.1217_nl\nQUERY scaninfo(MS2DATA) WHERE MS2PROD=134.0951:TOLERANCEMZ=0.014023 AND MS2NL=199.1217:TOLERANCEMZ=0.01\n\n\nIboga\n0.6896\n121.091_frag & 224.1054_frag\nQUERY scaninfo(MS2DATA) WHERE MS2PROD=121.091:TOLERANCEMZ=0.013633 AND MS2PROD=224.1054:TOLERANCEMZ=0.016723\n\n\nCorynanthean\n0.5021\n116.0562_frag & 143.0735_nl\nQUERY scaninfo(MS2DATA) WHERE MS2PROD=116.0562:TOLERANCEMZ=0.013482 AND MS2NL=143.0735:TOLERANCEMZ=0.01\n\n\n\n\n\nOn the full bundled dataset (spectra_to_queries()), pass spectra = NULL (raw skeletons) or spectra = \"grouped\" (grouped skeleton classes), or supply a path to an .mgf file containing a SKELETON metadata field.",
+    "crumbs": [
+      "News",
+      "Articles",
+      "Translating MS/MS Spectra into Diagnostic Queries and MassQL"
+    ]
+  },
+  {
+    "objectID": "vignettes/spectra-to-queries.html#converting-expressions-to-massql",
+    "href": "vignettes/spectra-to-queries.html#converting-expressions-to-massql",
+    "title": "Translating MS/MS Spectra into Diagnostic Queries and MassQL",
+    "section": "Converting expressions to MassQL",
+    "text": "Converting expressions to MassQL\nto_massql() converts any ion expression (or list of ion vectors) into a MassQL query. Because MassQL ignores TOLERANCEMZ when TOLERANCEPPM is present on the same condition, to_massql() emits a single effective tolerance modifier per condition: :TOLERANCEMZ= (round(dalton + max(mz) * ppm / 1e6, 6) on MS2PROD, and static dalton on MS2NL) when dalton &gt; 0, or :TOLERANCEPPM= when dalton == 0 and ppm &gt; 0, plus optional :INTENSITYPERCENT= when intensity_min &gt; 0. Disjunctive (|) clauses are expanded to disjunctive normal form and joined with ;.\n\nto_massql(\n  c(\n    \"144.0807_frag & 171.0935_nl\",\n    \"168.0808_frag & (180.0809_frag | 241.095_nl)\"\n  ),\n  dalton = 0.01,\n  ppm = 30.0,\n  intensity_min = 5.0\n)\n#&gt; [1] \"QUERY scaninfo(MS2DATA) WHERE MS2PROD=144.0807:TOLERANCEMZ=0.014322:INTENSITYPERCENT=5 AND MS2NL=171.0935:TOLERANCEMZ=0.01:INTENSITYPERCENT=5\"                                                                                                                                                     \n#&gt; [2] \"QUERY scaninfo(MS2DATA) WHERE MS2PROD=168.0808:TOLERANCEMZ=0.015042:INTENSITYPERCENT=5 AND MS2PROD=180.0809:TOLERANCEMZ=0.015402:INTENSITYPERCENT=5 ; QUERY scaninfo(MS2DATA) WHERE MS2PROD=168.0808:TOLERANCEMZ=0.015042:INTENSITYPERCENT=5 AND MS2NL=241.095:TOLERANCEMZ=0.01:INTENSITYPERCENT=5\"",
+    "crumbs": [
+      "News",
+      "Articles",
+      "Translating MS/MS Spectra into Diagnostic Queries and MassQL"
+    ]
+  },
+  {
+    "objectID": "CITATION.html",
+    "href": "CITATION.html",
+    "title": "Citation",
+    "section": "",
+    "text": "Citation\nTo cite SpectraToQueries in publications use:\n\nRutz A, Szwarc S (2025). SpectraToQueries: Spectra to queries. R package, version 0.0.0.9002.\n\n\nSzwarc S, Rutz A, Lee K, Mejri Y, Bonnet O, Hazni H, Jagora A, Mbeng Obame R, Jin Kyoung N, Otogo N’Nang E, Alaribe S, Awang K, Bernadat G, Choi Y, Courdavault V, Frederich M, Gaslonde T, Huber F, Kam T, Low Y, Poupon E, van der Hooft J, Kang K, Le Pogam P, Beniddir M (2025). “Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids.” J. Cheminform., 17. ISSN 1758-2946. doi:10.1186/s13321-025-01009-0. https://doi.org/10.1186/s13321-025-01009-0."
+  },
+  {
     "objectID": "LICENSE.html",
     "href": "LICENSE.html",
     "title": "GNU Affero General Public License",
@@ -26,6 +81,30 @@
     "title": "GNU Affero General Public License",
     "section": "",
     "text": "If you develop a new program, and you want it to be of the greatest possible use to the public, the best way to achieve this is to make it free software which everyone can redistribute and change under these terms.\nTo do so, attach the following notices to the program. It is safest to attach them to the start of each source file to most effectively state the exclusion of warranty; and each file should have at least the “copyright” line and a pointer to where the full notice is found.\n    &lt;one line to give the program's name and a brief idea of what it does.&gt;\n    Copyright (C) &lt;year&gt;  &lt;name of author&gt;\n\n    This program is free software: you can redistribute it and/or modify\n    it under the terms of the GNU Affero General Public License as\n    published by the Free Software Foundation, either version 3 of the\n    License, or (at your option) any later version.\n\n    This program is distributed in the hope that it will be useful,\n    but WITHOUT ANY WARRANTY; without even the implied warranty of\n    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n    GNU Affero General Public License for more details.\n\n    You should have received a copy of the GNU Affero General Public License\n    along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.\nAlso add information on how to contact you by electronic and paper mail.\nIf your software can interact with users remotely through a computer network, you should also make sure that it provides a way for users to get its source. For example, if your program is a web application, its interface could display a “Source” link that leads users to an archive of the code. There are many ways you could offer source, and different solutions will be better for different programs; see section 13 for the specific requirements.\nYou should also get your employer (if you work as a programmer) or school, if any, to sign a “copyright disclaimer” for the program, if necessary. For more information on this, and how to apply and follow the GNU AGPL, see https://www.gnu.org/licenses/."
+  },
+  {
+    "objectID": "man/spectra_to_queries.html",
+    "href": "man/spectra_to_queries.html",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "Converts tandem mass spectra into diagnostic fragment (_frag) and neutral-loss (_nl) ion queries ranked by Matthews Correlation Coefficient (MCC), together with ready-to-run MassQL queries.\n\n\n\nspectra_to_queries(\n  spectra = NULL,\n  export = \"data/interim/queries.tsv\",\n  dalton = 0.01,\n  decimals = 4L,\n  intensity_min = 0,\n  ions_max = 10L,\n  n_skel_min = 5L,\n  n_spec_min = 3L,\n  ppm = 30,\n  mcc_min = 0,\n  precision_min = 0,\n  recall_min = 0,\n  zero_val = 0\n)\n\n\n\n\n\n\n\nspectra\n\n\nA Spectra::Spectra object, a portable data.frame (such as mia_spectra_df or mia_spectra_grouped_df), or a file path to an MGF file. If NULL, loads the example mia_spectra_df dataset. If the string “grouped”, loads the grouped example mia_spectra_grouped_df dataset.\n\n\n\n\nexport\n\n\nExport file path for the resulting TSV table (or NULL to skip writing to disk). Default is “data/interim/queries.tsv”.\n\n\n\n\ndalton\n\n\nTolerance in Dalton. Default is 0.01.\n\n\n\n\ndecimals\n\n\nNumber of decimals for rounding. Default is 4L.\n\n\n\n\nintensity_min\n\n\nMinimal relative intensity threshold (0 to 100). Default is 0.0.\n\n\n\n\nions_max\n\n\nMaximal number of ions in a query combination. Default is 10L.\n\n\n\n\nn_skel_min\n\n\nMinimal number of spectra per skeleton class. Default is 5L.\n\n\n\n\nn_spec_min\n\n\nMinimal number of spectra where a signal has to be found. Default is 3L.\n\n\n\n\nppm\n\n\nTolerance in parts per million. Default is 30.0.\n\n\n\n\nmcc_min\n\n\nMinimal single-ion Matthews Correlation Coefficient. Default is 0.0.\n\n\n\n\nprecision_min\n\n\nMinimal single-ion precision (pre-filter before MCC). Default is 0.0.\n\n\n\n\nrecall_min\n\n\nMinimal single-ion recall (pre-filter before MCC). Default is 0.0.\n\n\n\n\nzero_val\n\n\nZero value threshold for intensity. Default is 0.0.\n\n\n\n\n\n\nFor each skeleton class with at least n_skel_min spectra, the pipeline:\n\n\nNormalizes MS2 intensities, removes sub-threshold and non-positive neutral-loss peaks, and aligns m/z values across spectra using intensity-weighted consensus centroids within dalton + mz * ppm / 1e6.\n\n\nEvaluates candidate fragment and neutral-loss centroids against the raw unbinned spectra (requiring precursor_mz - nl &gt; 0).\n\n\nSelects up to ions_max candidate ions per skeleton using greedy hitting-set pruning on 100%-recall ions followed by forward conjunctive MCC selection with negative-class correlation penalty (mRMR).\n\n\nPrunes the power set of ion combinations via Branch-and-Bound when the optimistic zero-FP upper bound cannot reach the current best MCC.\n\n\nReturns the single most parsimonious query achieving the maximum MCC per skeleton and translates it to MassQL via to_massql().\n\n\n\n\n\nInvisibly returns a data.frame with columns skeleton, mcc, combined_ions, and massql, and writes the TSV table to export when export is non-NULL.\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\ndf &lt;- data.frame(\n  msLevel = c(2L, 2L, 2L, 2L),\n  SKELETON = c(\"SkelA\", \"SkelA\", \"SkelB\", \"SkelB\"),\n  precursorMz = c(300.0, 300.0, 300.0, 300.0)\n)\ndf$mz &lt;- list(\n  c(100.0, 150.0),\n  c(100.0, 160.0),\n  c(200.0, 250.0),\n  c(200.0, 260.0)\n)\ndf$intensity &lt;- list(c(80, 100), c(70, 100), c(90, 100), c(85, 100))\nspectra_to_queries(\n  spectra = df,\n  export = NULL,\n  n_skel_min = 2L,\n  n_spec_min = 2L\n)",
+    "crumbs": [
+      "News",
+      "Reference",
+      "spectra_to_queries"
+    ]
+  },
+  {
+    "objectID": "man/spectra_to_queries.html#spectra-to-queries",
+    "href": "man/spectra_to_queries.html#spectra-to-queries",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "Converts tandem mass spectra into diagnostic fragment (_frag) and neutral-loss (_nl) ion queries ranked by Matthews Correlation Coefficient (MCC), together with ready-to-run MassQL queries.\n\n\n\nspectra_to_queries(\n  spectra = NULL,\n  export = \"data/interim/queries.tsv\",\n  dalton = 0.01,\n  decimals = 4L,\n  intensity_min = 0,\n  ions_max = 10L,\n  n_skel_min = 5L,\n  n_spec_min = 3L,\n  ppm = 30,\n  mcc_min = 0,\n  precision_min = 0,\n  recall_min = 0,\n  zero_val = 0\n)\n\n\n\n\n\n\n\nspectra\n\n\nA Spectra::Spectra object, a portable data.frame (such as mia_spectra_df or mia_spectra_grouped_df), or a file path to an MGF file. If NULL, loads the example mia_spectra_df dataset. If the string “grouped”, loads the grouped example mia_spectra_grouped_df dataset.\n\n\n\n\nexport\n\n\nExport file path for the resulting TSV table (or NULL to skip writing to disk). Default is “data/interim/queries.tsv”.\n\n\n\n\ndalton\n\n\nTolerance in Dalton. Default is 0.01.\n\n\n\n\ndecimals\n\n\nNumber of decimals for rounding. Default is 4L.\n\n\n\n\nintensity_min\n\n\nMinimal relative intensity threshold (0 to 100). Default is 0.0.\n\n\n\n\nions_max\n\n\nMaximal number of ions in a query combination. Default is 10L.\n\n\n\n\nn_skel_min\n\n\nMinimal number of spectra per skeleton class. Default is 5L.\n\n\n\n\nn_spec_min\n\n\nMinimal number of spectra where a signal has to be found. Default is 3L.\n\n\n\n\nppm\n\n\nTolerance in parts per million. Default is 30.0.\n\n\n\n\nmcc_min\n\n\nMinimal single-ion Matthews Correlation Coefficient. Default is 0.0.\n\n\n\n\nprecision_min\n\n\nMinimal single-ion precision (pre-filter before MCC). Default is 0.0.\n\n\n\n\nrecall_min\n\n\nMinimal single-ion recall (pre-filter before MCC). Default is 0.0.\n\n\n\n\nzero_val\n\n\nZero value threshold for intensity. Default is 0.0.\n\n\n\n\n\n\nFor each skeleton class with at least n_skel_min spectra, the pipeline:\n\n\nNormalizes MS2 intensities, removes sub-threshold and non-positive neutral-loss peaks, and aligns m/z values across spectra using intensity-weighted consensus centroids within dalton + mz * ppm / 1e6.\n\n\nEvaluates candidate fragment and neutral-loss centroids against the raw unbinned spectra (requiring precursor_mz - nl &gt; 0).\n\n\nSelects up to ions_max candidate ions per skeleton using greedy hitting-set pruning on 100%-recall ions followed by forward conjunctive MCC selection with negative-class correlation penalty (mRMR).\n\n\nPrunes the power set of ion combinations via Branch-and-Bound when the optimistic zero-FP upper bound cannot reach the current best MCC.\n\n\nReturns the single most parsimonious query achieving the maximum MCC per skeleton and translates it to MassQL via to_massql().\n\n\n\n\n\nInvisibly returns a data.frame with columns skeleton, mcc, combined_ions, and massql, and writes the TSV table to export when export is non-NULL.\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\ndf &lt;- data.frame(\n  msLevel = c(2L, 2L, 2L, 2L),\n  SKELETON = c(\"SkelA\", \"SkelA\", \"SkelB\", \"SkelB\"),\n  precursorMz = c(300.0, 300.0, 300.0, 300.0)\n)\ndf$mz &lt;- list(\n  c(100.0, 150.0),\n  c(100.0, 160.0),\n  c(200.0, 250.0),\n  c(200.0, 260.0)\n)\ndf$intensity &lt;- list(c(80, 100), c(70, 100), c(90, 100), c(85, 100))\nspectra_to_queries(\n  spectra = df,\n  export = NULL,\n  n_skel_min = 2L,\n  n_spec_min = 2L\n)",
+    "crumbs": [
+      "News",
+      "Reference",
+      "spectra_to_queries"
+    ]
   },
   {
     "objectID": "man/to_massql.html",
@@ -74,6 +153,65 @@
       "Reference",
       "mia_spectra_grouped_df"
     ]
+  },
+  {
+    "objectID": "man/mia_spectra_df.html",
+    "href": "man/mia_spectra_df.html",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "A data.frame containing 321 MS/MS spectra of monoterpene indole alkaloids (MIAs) from the MIADB (Monoterpene Indole Alkaloid Database) across 81 fine-grained chemical skeletons (SKELETON). This is stored as a portable data.frame with mz and intensity peaks as list columns, and is automatically converted to a Spectra::Spectra object when used in spectra_to_queries().\n\n\n\nmia_spectra_df\n\n\n\n\nA data.frame with 321 rows and 37 columns:\n\n\nMetadata columns: msLevel, rtime, acquisitionNum, TITLE, PRECURSOR_MZ, SKELETON (81 unique skeletons), and other MS/MS spectrum attributes\n\n\nmz (list): Fragment m/z values for each spectrum\n\n\nintensity (list): Fragment intensities for each spectrum\n\n\nTotal of 24,255 peaks across all 321 spectra (median 66 peaks per spectrum).\n\n\n\nThe mia_spectra_df object represents the spectral data with fine-grained skeleton annotations. Use mia_spectra_grouped_df for the variant with broader grouped skeleton annotations.\nThis portable data.frame format enables cross-platform distribution and is automatically converted to a Spectra::Spectra object by spectra_to_queries().\n\n\n\nData extracted from MIADB, a public spectral library of monoterpene indole alkaloids.\nAccompanying publication: Szwarc, S., Rutz, A., Lee, K. et al. (2025). \"Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids.\" Journal of Cheminformatics, 17:62. doi:10.1186/s13321-025-01009-0\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nutils::data(mia_spectra_df, package = \"SpectraToQueries\")\nnrow(mia_spectra_df) # 321 spectra\n\n[1] 321",
+    "crumbs": [
+      "News",
+      "Reference",
+      "mia_spectra_df"
+    ]
+  },
+  {
+    "objectID": "man/mia_spectra_df.html#example-mass-spectrometry-spectra-from-miadb-as-portable-data.frame",
+    "href": "man/mia_spectra_df.html#example-mass-spectrometry-spectra-from-miadb-as-portable-data.frame",
+    "title": "SpectraToQueries",
+    "section": "",
+    "text": "A data.frame containing 321 MS/MS spectra of monoterpene indole alkaloids (MIAs) from the MIADB (Monoterpene Indole Alkaloid Database) across 81 fine-grained chemical skeletons (SKELETON). This is stored as a portable data.frame with mz and intensity peaks as list columns, and is automatically converted to a Spectra::Spectra object when used in spectra_to_queries().\n\n\n\nmia_spectra_df\n\n\n\n\nA data.frame with 321 rows and 37 columns:\n\n\nMetadata columns: msLevel, rtime, acquisitionNum, TITLE, PRECURSOR_MZ, SKELETON (81 unique skeletons), and other MS/MS spectrum attributes\n\n\nmz (list): Fragment m/z values for each spectrum\n\n\nintensity (list): Fragment intensities for each spectrum\n\n\nTotal of 24,255 peaks across all 321 spectra (median 66 peaks per spectrum).\n\n\n\nThe mia_spectra_df object represents the spectral data with fine-grained skeleton annotations. Use mia_spectra_grouped_df for the variant with broader grouped skeleton annotations.\nThis portable data.frame format enables cross-platform distribution and is automatically converted to a Spectra::Spectra object by spectra_to_queries().\n\n\n\nData extracted from MIADB, a public spectral library of monoterpene indole alkaloids.\nAccompanying publication: Szwarc, S., Rutz, A., Lee, K. et al. (2025). \"Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids.\" Journal of Cheminformatics, 17:62. doi:10.1186/s13321-025-01009-0\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nutils::data(mia_spectra_df, package = \"SpectraToQueries\")\nnrow(mia_spectra_df) # 321 spectra\n\n[1] 321",
+    "crumbs": [
+      "News",
+      "Reference",
+      "mia_spectra_df"
+    ]
+  },
+  {
+    "objectID": "NEWS.html#algorithms-massql-support",
+    "href": "NEWS.html#algorithms-massql-support",
+    "title": "SpectraToQueries",
+    "section": "Algorithms & MassQL Support",
+    "text": "Algorithms & MassQL Support\n\nAdded to_massql() and a massql column in spectra_to_queries() output to translate diagnostic fragment (_frag) and neutral-loss (_nl) expressions into directly executable MassQL queries (QUERY scaninfo(MS2DATA) WHERE ...).\nImproved peak alignment and candidate query discovery:\n\nIntensity-weighted consensus centroiding in harmonize_mzs() and fix_binned_mzs() within dalton + mz * ppm / 1e6.\nEnforced physical neutral-loss bounds (nl &gt; 0 and precursor_mz - nl &gt; 0) during preprocessing and query evaluation.\nReplaced top-N single-ion ranking with greedy hitting-set pruning on 100%-recall ions and forward conjunctive MCC selection penalized by negative-class correlation (mRMR).\nAdded Branch-and-Bound pruning of ion combinations using the zero-FP MCC upper bound, Boolean superset absorption in combine_ions_minimal(), and selection of the single most parsimonious query per skeleton."
+  },
+  {
+    "objectID": "NEWS.html#bug-fixes-compatibility",
+    "href": "NEWS.html#bug-fixes-compatibility",
+    "title": "SpectraToQueries",
+    "section": "Bug Fixes & Compatibility",
+    "text": "Bug Fixes & Compatibility\n\nFixed to_massql() and combine_ions_minimal() Boolean precedence and MassQL qualifier handling: parenthesized multi-term OR groups, parsed disjunctive normal form clauses joined by \" ; \", and emitted a single effective tolerance modifier (:TOLERANCEMZ= when dalton &gt; 0, or :TOLERANCEPPM= when dalton == 0 and ppm &gt; 0).\nEnforced relative base-peak intensity filtering [0, 100] via intensity_min during prepare_query_data().\nReplaced internal @backend@ slot access with public Spectra methods so in-memory backends (MsBackendMemory, MsBackendDataFrame) work reliably, and added classed errors (stq_input_error, stq_file_not_found_error) plus lowercase skeleton metadata fallback.\nFixed trailing-digit corruption on skeleton labels ending in digits by replacing names(unlist(...)) with rep(names(...), lengths(...)), and warned if + to . normalization causes skeleton label collisions.\nFixed create_dir() directory creation, duplicate m/z accumulation in create_matrix(), and non-finite intensity filtering in fix_binned_mzs().\nEvaluated helper validations before calling S4 Spectra generics so classed conditions propagate directly without wrapping."
+  },
+  {
+    "objectID": "NEWS.html#performance-optimization",
+    "href": "NEWS.html#performance-optimization",
+    "title": "SpectraToQueries",
+    "section": "Performance & Optimization",
+    "text": "Performance & Optimization\n\nSimplified the pipeline to single-pass candidate evaluation in prune_combinations_bnb() and summarize_best_queries() using precomputed ion hit vectors (precompute_ion_hits()).\nRemoved dead helper code (generate_combinations*(), contains_all_mz*(), perform_query(), perform_list_of_queries*(), merge_diagnostic_ions(), show_progress(), and unused inst/scripts/spectra_to_queries.R), keeping internal helpers hidden with @noRd.\nReplaced nested linear scans in harmonize_mzs() with vectorized findInterval() lookup and avoided redundant Spectra processing passes."
+  },
+  {
+    "objectID": "NEWS.html#dependencies",
+    "href": "NEWS.html#dependencies",
+    "title": "SpectraToQueries",
+    "section": "Dependencies",
+    "text": "Dependencies\n\nNarrowed Imports to MsBackendMgf, Spectra, stats, and utils (removing tidytable, fastmatch, stringi, BiocParallel, data.table, progress, purrr, and tibble)."
+  },
+  {
+    "objectID": "NEWS.html#data-documentation-metadata",
+    "href": "NEWS.html#data-documentation-metadata",
+    "title": "SpectraToQueries",
+    "section": "Data, Documentation & Metadata",
+    "text": "Data, Documentation & Metadata\n\nRegenerated data/mia_spectra_df.rda (321 MS/MS spectra across 81 skeletons; 24,255 peaks) and data/mia_spectra_grouped_df.rda (321 MS/MS spectra across 53 grouped classes) with basename() applied to dataOrigin so no local paths are embedded.\nRegenerated data/interim/queries.tsv and data/interim/queries-grouped.tsv.\nAdded executable @examples for spectra_to_queries() and updated vignette, README, CONTRIBUTING.md, TESTING.md, and CITATION.cff.\nAdded verified EDAM ontology terms (X-EDAM-Topic, X-EDAM-Operation, X-EDAM-Data, X-EDAM-Format, X-schema.org-keywords, biocViews) to DESCRIPTION."
   },
   {
     "objectID": "index.html",
@@ -150,144 +288,6 @@
     "crumbs": [
       "News",
       "Home"
-    ]
-  },
-  {
-    "objectID": "vignettes/spectra-to-queries.html",
-    "href": "vignettes/spectra-to-queries.html",
-    "title": "Translating MS/MS Spectra into Diagnostic Queries and MassQL",
-    "section": "",
-    "text": "SpectraToQueries extracts skeleton-specific diagnostic fragment (_frag) and neutral-loss (_nl) ion queries from annotated MS/MS spectral libraries and translates them into MassQL queries.\nFor each chemical class (SKELETON) with at least n_skel_min spectra, spectra_to_queries() executes five steps:\n\nPreprocessing and intensity-weighted m/z harmonization: MS2 intensities are normalized to 100%, peaks below intensity_min and non-positive neutral losses are removed, and m/z values across spectra are aligned to intensity-weighted consensus centroids within dalton + mz * ppm / 1e6.\nUnbinned centroid evaluation: Candidate fragment and neutral-loss centroids are matched directly against the unbinned spectra, enforcing physical feasibility (precursor_mz - nl &gt; 0).\nCandidate ion selection (hitting set + mRMR): Exact duplicate hit profiles are collapsed. Ions with 100% recall on the target skeleton are pruned via a greedy hitting-set cover of false-positive spectra, and remaining slots up to ions_max are filled by forward conjunctive Matthews Correlation Coefficient (MCC) gain penalized by correlation on negative spectra.\nBranch-and-Bound combination search: When exploring multi-ion conjunctions up to ions_max, branches whose zero-false-positive MCC upper bound cannot reach the best MCC found so far for that skeleton are pruned.\nParsimonious query selection & MassQL export: Among combinations tied for the highest MCC on a skeleton, the combination using the fewest ions is retained and formatted into both a minimal human-readable query (combined_ions) and a directly executable MassQL statement (massql).",
-    "crumbs": [
-      "News",
-      "Articles",
-      "Translating MS/MS Spectra into Diagnostic Queries and MassQL"
-    ]
-  },
-  {
-    "objectID": "vignettes/spectra-to-queries.html#overview",
-    "href": "vignettes/spectra-to-queries.html#overview",
-    "title": "Translating MS/MS Spectra into Diagnostic Queries and MassQL",
-    "section": "",
-    "text": "SpectraToQueries extracts skeleton-specific diagnostic fragment (_frag) and neutral-loss (_nl) ion queries from annotated MS/MS spectral libraries and translates them into MassQL queries.\nFor each chemical class (SKELETON) with at least n_skel_min spectra, spectra_to_queries() executes five steps:\n\nPreprocessing and intensity-weighted m/z harmonization: MS2 intensities are normalized to 100%, peaks below intensity_min and non-positive neutral losses are removed, and m/z values across spectra are aligned to intensity-weighted consensus centroids within dalton + mz * ppm / 1e6.\nUnbinned centroid evaluation: Candidate fragment and neutral-loss centroids are matched directly against the unbinned spectra, enforcing physical feasibility (precursor_mz - nl &gt; 0).\nCandidate ion selection (hitting set + mRMR): Exact duplicate hit profiles are collapsed. Ions with 100% recall on the target skeleton are pruned via a greedy hitting-set cover of false-positive spectra, and remaining slots up to ions_max are filled by forward conjunctive Matthews Correlation Coefficient (MCC) gain penalized by correlation on negative spectra.\nBranch-and-Bound combination search: When exploring multi-ion conjunctions up to ions_max, branches whose zero-false-positive MCC upper bound cannot reach the best MCC found so far for that skeleton are pruned.\nParsimonious query selection & MassQL export: Among combinations tied for the highest MCC on a skeleton, the combination using the fewest ions is retained and formatted into both a minimal human-readable query (combined_ions) and a directly executable MassQL statement (massql).",
-    "crumbs": [
-      "News",
-      "Articles",
-      "Translating MS/MS Spectra into Diagnostic Queries and MassQL"
-    ]
-  },
-  {
-    "objectID": "vignettes/spectra-to-queries.html#generating-queries",
-    "href": "vignettes/spectra-to-queries.html#generating-queries",
-    "title": "Translating MS/MS Spectra into Diagnostic Queries and MassQL",
-    "section": "Generating queries",
-    "text": "Generating queries\nRun spectra_to_queries() on a small subset of the bundled Monoterpene Indole Alkaloids Database (mia_spectra_df):\n\nlibrary(SpectraToQueries)\n\nutils::data(mia_spectra_df, package = \"SpectraToQueries\")\n\nkeep &lt;- mia_spectra_df$SKELETON %in%\n  c(\"Corynanthean\", \"Iboga\", \"Aspidosperma\")\nqueries &lt;- spectra_to_queries(\n  spectra = mia_spectra_df[keep, ],\n  export = NULL,\n  ions_max = 4L\n)\n\nknitr::kable(queries, digits = 4)\n\n\n\n\n\n\n\n\n\n\nskeleton\nmcc\ncombined_ions\nmassql\n\n\n\n\nAspidosperma\n0.6947\n134.0951_frag & 199.1217_nl\nQUERY scaninfo(MS2DATA) WHERE MS2PROD=134.0951:TOLERANCEMZ=0.014023 AND MS2NL=199.1217:TOLERANCEMZ=0.01\n\n\nIboga\n0.6896\n121.091_frag & 224.1054_frag\nQUERY scaninfo(MS2DATA) WHERE MS2PROD=121.091:TOLERANCEMZ=0.013633 AND MS2PROD=224.1054:TOLERANCEMZ=0.016723\n\n\nCorynanthean\n0.5021\n116.0562_frag & 143.0735_nl\nQUERY scaninfo(MS2DATA) WHERE MS2PROD=116.0562:TOLERANCEMZ=0.013482 AND MS2NL=143.0735:TOLERANCEMZ=0.01\n\n\n\n\n\nOn the full bundled dataset (spectra_to_queries()), pass spectra = NULL (raw skeletons) or spectra = \"grouped\" (grouped skeleton classes), or supply a path to an .mgf file containing a SKELETON metadata field.",
-    "crumbs": [
-      "News",
-      "Articles",
-      "Translating MS/MS Spectra into Diagnostic Queries and MassQL"
-    ]
-  },
-  {
-    "objectID": "vignettes/spectra-to-queries.html#converting-expressions-to-massql",
-    "href": "vignettes/spectra-to-queries.html#converting-expressions-to-massql",
-    "title": "Translating MS/MS Spectra into Diagnostic Queries and MassQL",
-    "section": "Converting expressions to MassQL",
-    "text": "Converting expressions to MassQL\nto_massql() converts any ion expression (or list of ion vectors) into a MassQL query. Because MassQL ignores TOLERANCEMZ when TOLERANCEPPM is present on the same condition, to_massql() emits a single effective tolerance modifier per condition: :TOLERANCEMZ= (round(dalton + max(mz) * ppm / 1e6, 6) on MS2PROD, and static dalton on MS2NL) when dalton &gt; 0, or :TOLERANCEPPM= when dalton == 0 and ppm &gt; 0, plus optional :INTENSITYPERCENT= when intensity_min &gt; 0. Disjunctive (|) clauses are expanded to disjunctive normal form and joined with ;.\n\nto_massql(\n  c(\n    \"144.0807_frag & 171.0935_nl\",\n    \"168.0808_frag & (180.0809_frag | 241.095_nl)\"\n  ),\n  dalton = 0.01,\n  ppm = 30.0,\n  intensity_min = 5.0\n)\n#&gt; [1] \"QUERY scaninfo(MS2DATA) WHERE MS2PROD=144.0807:TOLERANCEMZ=0.014322:INTENSITYPERCENT=5 AND MS2NL=171.0935:TOLERANCEMZ=0.01:INTENSITYPERCENT=5\"                                                                                                                                                     \n#&gt; [2] \"QUERY scaninfo(MS2DATA) WHERE MS2PROD=168.0808:TOLERANCEMZ=0.015042:INTENSITYPERCENT=5 AND MS2PROD=180.0809:TOLERANCEMZ=0.015402:INTENSITYPERCENT=5 ; QUERY scaninfo(MS2DATA) WHERE MS2PROD=168.0808:TOLERANCEMZ=0.015042:INTENSITYPERCENT=5 AND MS2NL=241.095:TOLERANCEMZ=0.01:INTENSITYPERCENT=5\"",
-    "crumbs": [
-      "News",
-      "Articles",
-      "Translating MS/MS Spectra into Diagnostic Queries and MassQL"
-    ]
-  },
-  {
-    "objectID": "CITATION.html",
-    "href": "CITATION.html",
-    "title": "Citation",
-    "section": "",
-    "text": "Citation\nTo cite SpectraToQueries in publications use:\n\nRutz A, Szwarc S (2025). SpectraToQueries: Spectra to queries. R package, version 0.0.0.9002.\n\n\nSzwarc S, Rutz A, Lee K, Mejri Y, Bonnet O, Hazni H, Jagora A, Mbeng Obame R, Jin Kyoung N, Otogo N’Nang E, Alaribe S, Awang K, Bernadat G, Choi Y, Courdavault V, Frederich M, Gaslonde T, Huber F, Kam T, Low Y, Poupon E, van der Hooft J, Kang K, Le Pogam P, Beniddir M (2025). “Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids.” J. Cheminform., 17. ISSN 1758-2946. doi:10.1186/s13321-025-01009-0. https://doi.org/10.1186/s13321-025-01009-0."
-  },
-  {
-    "objectID": "NEWS.html#algorithms-massql-support",
-    "href": "NEWS.html#algorithms-massql-support",
-    "title": "SpectraToQueries",
-    "section": "Algorithms & MassQL Support",
-    "text": "Algorithms & MassQL Support\n\nAdded to_massql() and a massql column in spectra_to_queries() output to translate diagnostic fragment (_frag) and neutral-loss (_nl) expressions into directly executable MassQL queries (QUERY scaninfo(MS2DATA) WHERE ...).\nImproved peak alignment and candidate query discovery:\n\nIntensity-weighted consensus centroiding in harmonize_mzs() and fix_binned_mzs() within dalton + mz * ppm / 1e6.\nEnforced physical neutral-loss bounds (nl &gt; 0 and precursor_mz - nl &gt; 0) during preprocessing and query evaluation.\nReplaced top-N single-ion ranking with greedy hitting-set pruning on 100%-recall ions and forward conjunctive MCC selection penalized by negative-class correlation (mRMR).\nAdded Branch-and-Bound pruning of ion combinations using the zero-FP MCC upper bound, Boolean superset absorption in combine_ions_minimal(), and selection of the single most parsimonious query per skeleton."
-  },
-  {
-    "objectID": "NEWS.html#bug-fixes-compatibility",
-    "href": "NEWS.html#bug-fixes-compatibility",
-    "title": "SpectraToQueries",
-    "section": "Bug Fixes & Compatibility",
-    "text": "Bug Fixes & Compatibility\n\nFixed to_massql() and combine_ions_minimal() Boolean precedence and MassQL qualifier handling: parenthesized multi-term OR groups, parsed disjunctive normal form clauses joined by \" ; \", and emitted a single effective tolerance modifier (:TOLERANCEMZ= when dalton &gt; 0, or :TOLERANCEPPM= when dalton == 0 and ppm &gt; 0).\nEnforced relative base-peak intensity filtering [0, 100] via intensity_min during prepare_query_data().\nReplaced internal @backend@ slot access with public Spectra methods so in-memory backends (MsBackendMemory, MsBackendDataFrame) work reliably, and added classed errors (stq_input_error, stq_file_not_found_error) plus lowercase skeleton metadata fallback.\nFixed trailing-digit corruption on skeleton labels ending in digits by replacing names(unlist(...)) with rep(names(...), lengths(...)), and warned if + to . normalization causes skeleton label collisions.\nFixed create_dir() directory creation, duplicate m/z accumulation in create_matrix(), and non-finite intensity filtering in fix_binned_mzs().\nEvaluated helper validations before calling S4 Spectra generics so classed conditions propagate directly without wrapping."
-  },
-  {
-    "objectID": "NEWS.html#performance-optimization",
-    "href": "NEWS.html#performance-optimization",
-    "title": "SpectraToQueries",
-    "section": "Performance & Optimization",
-    "text": "Performance & Optimization\n\nSimplified the pipeline to single-pass candidate evaluation in prune_combinations_bnb() and summarize_best_queries() using precomputed ion hit vectors (precompute_ion_hits()).\nRemoved dead helper code (generate_combinations*(), contains_all_mz*(), perform_query(), perform_list_of_queries*(), merge_diagnostic_ions(), show_progress(), and unused inst/scripts/spectra_to_queries.R), keeping internal helpers hidden with @noRd.\nReplaced nested linear scans in harmonize_mzs() with vectorized findInterval() lookup and avoided redundant Spectra processing passes."
-  },
-  {
-    "objectID": "NEWS.html#dependencies",
-    "href": "NEWS.html#dependencies",
-    "title": "SpectraToQueries",
-    "section": "Dependencies",
-    "text": "Dependencies\n\nNarrowed Imports to MsBackendMgf, Spectra, stats, and utils (removing tidytable, fastmatch, stringi, BiocParallel, data.table, progress, purrr, and tibble)."
-  },
-  {
-    "objectID": "NEWS.html#data-documentation-metadata",
-    "href": "NEWS.html#data-documentation-metadata",
-    "title": "SpectraToQueries",
-    "section": "Data, Documentation & Metadata",
-    "text": "Data, Documentation & Metadata\n\nRegenerated data/mia_spectra_df.rda (321 MS/MS spectra across 81 skeletons; 24,255 peaks) and data/mia_spectra_grouped_df.rda (321 MS/MS spectra across 53 grouped classes) with basename() applied to dataOrigin so no local paths are embedded.\nRegenerated data/interim/queries.tsv and data/interim/queries-grouped.tsv.\nAdded executable @examples for spectra_to_queries() and updated vignette, README, CONTRIBUTING.md, TESTING.md, and CITATION.cff.\nAdded verified EDAM ontology terms (X-EDAM-Topic, X-EDAM-Operation, X-EDAM-Data, X-EDAM-Format, X-schema.org-keywords, biocViews) to DESCRIPTION."
-  },
-  {
-    "objectID": "man/mia_spectra_df.html",
-    "href": "man/mia_spectra_df.html",
-    "title": "SpectraToQueries",
-    "section": "",
-    "text": "A data.frame containing 321 MS/MS spectra of monoterpene indole alkaloids (MIAs) from the MIADB (Monoterpene Indole Alkaloid Database) across 81 fine-grained chemical skeletons (SKELETON). This is stored as a portable data.frame with mz and intensity peaks as list columns, and is automatically converted to a Spectra::Spectra object when used in spectra_to_queries().\n\n\n\nmia_spectra_df\n\n\n\n\nA data.frame with 321 rows and 37 columns:\n\n\nMetadata columns: msLevel, rtime, acquisitionNum, TITLE, PRECURSOR_MZ, SKELETON (81 unique skeletons), and other MS/MS spectrum attributes\n\n\nmz (list): Fragment m/z values for each spectrum\n\n\nintensity (list): Fragment intensities for each spectrum\n\n\nTotal of 24,255 peaks across all 321 spectra (median 66 peaks per spectrum).\n\n\n\nThe mia_spectra_df object represents the spectral data with fine-grained skeleton annotations. Use mia_spectra_grouped_df for the variant with broader grouped skeleton annotations.\nThis portable data.frame format enables cross-platform distribution and is automatically converted to a Spectra::Spectra object by spectra_to_queries().\n\n\n\nData extracted from MIADB, a public spectral library of monoterpene indole alkaloids.\nAccompanying publication: Szwarc, S., Rutz, A., Lee, K. et al. (2025). \"Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids.\" Journal of Cheminformatics, 17:62. doi:10.1186/s13321-025-01009-0\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nutils::data(mia_spectra_df, package = \"SpectraToQueries\")\nnrow(mia_spectra_df) # 321 spectra\n\n[1] 321",
-    "crumbs": [
-      "News",
-      "Reference",
-      "mia_spectra_df"
-    ]
-  },
-  {
-    "objectID": "man/mia_spectra_df.html#example-mass-spectrometry-spectra-from-miadb-as-portable-data.frame",
-    "href": "man/mia_spectra_df.html#example-mass-spectrometry-spectra-from-miadb-as-portable-data.frame",
-    "title": "SpectraToQueries",
-    "section": "",
-    "text": "A data.frame containing 321 MS/MS spectra of monoterpene indole alkaloids (MIAs) from the MIADB (Monoterpene Indole Alkaloid Database) across 81 fine-grained chemical skeletons (SKELETON). This is stored as a portable data.frame with mz and intensity peaks as list columns, and is automatically converted to a Spectra::Spectra object when used in spectra_to_queries().\n\n\n\nmia_spectra_df\n\n\n\n\nA data.frame with 321 rows and 37 columns:\n\n\nMetadata columns: msLevel, rtime, acquisitionNum, TITLE, PRECURSOR_MZ, SKELETON (81 unique skeletons), and other MS/MS spectrum attributes\n\n\nmz (list): Fragment m/z values for each spectrum\n\n\nintensity (list): Fragment intensities for each spectrum\n\n\nTotal of 24,255 peaks across all 321 spectra (median 66 peaks per spectrum).\n\n\n\nThe mia_spectra_df object represents the spectral data with fine-grained skeleton annotations. Use mia_spectra_grouped_df for the variant with broader grouped skeleton annotations.\nThis portable data.frame format enables cross-platform distribution and is automatically converted to a Spectra::Spectra object by spectra_to_queries().\n\n\n\nData extracted from MIADB, a public spectral library of monoterpene indole alkaloids.\nAccompanying publication: Szwarc, S., Rutz, A., Lee, K. et al. (2025). \"Translating community-wide spectral library into actionable chemical knowledge: a proof of concept with monoterpene indole alkaloids.\" Journal of Cheminformatics, 17:62. doi:10.1186/s13321-025-01009-0\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\nutils::data(mia_spectra_df, package = \"SpectraToQueries\")\nnrow(mia_spectra_df) # 321 spectra\n\n[1] 321",
-    "crumbs": [
-      "News",
-      "Reference",
-      "mia_spectra_df"
-    ]
-  },
-  {
-    "objectID": "man/spectra_to_queries.html",
-    "href": "man/spectra_to_queries.html",
-    "title": "SpectraToQueries",
-    "section": "",
-    "text": "Converts tandem mass spectra into diagnostic fragment (_frag) and neutral-loss (_nl) ion queries ranked by Matthews Correlation Coefficient (MCC), together with ready-to-run MassQL queries.\n\n\n\nspectra_to_queries(\n  spectra = NULL,\n  export = \"data/interim/queries.tsv\",\n  dalton = 0.01,\n  decimals = 4L,\n  intensity_min = 0,\n  ions_max = 10L,\n  n_skel_min = 5L,\n  n_spec_min = 3L,\n  ppm = 30,\n  mcc_min = 0,\n  precision_min = 0,\n  recall_min = 0,\n  zero_val = 0\n)\n\n\n\n\n\n\n\nspectra\n\n\nA Spectra::Spectra object, a portable data.frame (such as mia_spectra_df or mia_spectra_grouped_df), or a file path to an MGF file. If NULL, loads the example mia_spectra_df dataset. If the string “grouped”, loads the grouped example mia_spectra_grouped_df dataset.\n\n\n\n\nexport\n\n\nExport file path for the resulting TSV table (or NULL to skip writing to disk). Default is “data/interim/queries.tsv”.\n\n\n\n\ndalton\n\n\nTolerance in Dalton. Default is 0.01.\n\n\n\n\ndecimals\n\n\nNumber of decimals for rounding. Default is 4L.\n\n\n\n\nintensity_min\n\n\nMinimal relative intensity threshold (0 to 100). Default is 0.0.\n\n\n\n\nions_max\n\n\nMaximal number of ions in a query combination. Default is 10L.\n\n\n\n\nn_skel_min\n\n\nMinimal number of spectra per skeleton class. Default is 5L.\n\n\n\n\nn_spec_min\n\n\nMinimal number of spectra where a signal has to be found. Default is 3L.\n\n\n\n\nppm\n\n\nTolerance in parts per million. Default is 30.0.\n\n\n\n\nmcc_min\n\n\nMinimal single-ion Matthews Correlation Coefficient. Default is 0.0.\n\n\n\n\nprecision_min\n\n\nMinimal single-ion precision (pre-filter before MCC). Default is 0.0.\n\n\n\n\nrecall_min\n\n\nMinimal single-ion recall (pre-filter before MCC). Default is 0.0.\n\n\n\n\nzero_val\n\n\nZero value threshold for intensity. Default is 0.0.\n\n\n\n\n\n\nFor each skeleton class with at least n_skel_min spectra, the pipeline:\n\n\nNormalizes MS2 intensities, removes sub-threshold and non-positive neutral-loss peaks, and aligns m/z values across spectra using intensity-weighted consensus centroids within dalton + mz * ppm / 1e6.\n\n\nEvaluates candidate fragment and neutral-loss centroids against the raw unbinned spectra (requiring precursor_mz - nl &gt; 0).\n\n\nSelects up to ions_max candidate ions per skeleton using greedy hitting-set pruning on 100%-recall ions followed by forward conjunctive MCC selection with negative-class correlation penalty (mRMR).\n\n\nPrunes the power set of ion combinations via Branch-and-Bound when the optimistic zero-FP upper bound cannot reach the current best MCC.\n\n\nReturns the single most parsimonious query achieving the maximum MCC per skeleton and translates it to MassQL via to_massql().\n\n\n\n\n\nInvisibly returns a data.frame with columns skeleton, mcc, combined_ions, and massql, and writes the TSV table to export when export is non-NULL.\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\ndf &lt;- data.frame(\n  msLevel = c(2L, 2L, 2L, 2L),\n  SKELETON = c(\"SkelA\", \"SkelA\", \"SkelB\", \"SkelB\"),\n  precursorMz = c(300.0, 300.0, 300.0, 300.0)\n)\ndf$mz &lt;- list(\n  c(100.0, 150.0),\n  c(100.0, 160.0),\n  c(200.0, 250.0),\n  c(200.0, 260.0)\n)\ndf$intensity &lt;- list(c(80, 100), c(70, 100), c(90, 100), c(85, 100))\nspectra_to_queries(\n  spectra = df,\n  export = NULL,\n  n_skel_min = 2L,\n  n_spec_min = 2L\n)",
-    "crumbs": [
-      "News",
-      "Reference",
-      "spectra_to_queries"
-    ]
-  },
-  {
-    "objectID": "man/spectra_to_queries.html#spectra-to-queries",
-    "href": "man/spectra_to_queries.html#spectra-to-queries",
-    "title": "SpectraToQueries",
-    "section": "",
-    "text": "Converts tandem mass spectra into diagnostic fragment (_frag) and neutral-loss (_nl) ion queries ranked by Matthews Correlation Coefficient (MCC), together with ready-to-run MassQL queries.\n\n\n\nspectra_to_queries(\n  spectra = NULL,\n  export = \"data/interim/queries.tsv\",\n  dalton = 0.01,\n  decimals = 4L,\n  intensity_min = 0,\n  ions_max = 10L,\n  n_skel_min = 5L,\n  n_spec_min = 3L,\n  ppm = 30,\n  mcc_min = 0,\n  precision_min = 0,\n  recall_min = 0,\n  zero_val = 0\n)\n\n\n\n\n\n\n\nspectra\n\n\nA Spectra::Spectra object, a portable data.frame (such as mia_spectra_df or mia_spectra_grouped_df), or a file path to an MGF file. If NULL, loads the example mia_spectra_df dataset. If the string “grouped”, loads the grouped example mia_spectra_grouped_df dataset.\n\n\n\n\nexport\n\n\nExport file path for the resulting TSV table (or NULL to skip writing to disk). Default is “data/interim/queries.tsv”.\n\n\n\n\ndalton\n\n\nTolerance in Dalton. Default is 0.01.\n\n\n\n\ndecimals\n\n\nNumber of decimals for rounding. Default is 4L.\n\n\n\n\nintensity_min\n\n\nMinimal relative intensity threshold (0 to 100). Default is 0.0.\n\n\n\n\nions_max\n\n\nMaximal number of ions in a query combination. Default is 10L.\n\n\n\n\nn_skel_min\n\n\nMinimal number of spectra per skeleton class. Default is 5L.\n\n\n\n\nn_spec_min\n\n\nMinimal number of spectra where a signal has to be found. Default is 3L.\n\n\n\n\nppm\n\n\nTolerance in parts per million. Default is 30.0.\n\n\n\n\nmcc_min\n\n\nMinimal single-ion Matthews Correlation Coefficient. Default is 0.0.\n\n\n\n\nprecision_min\n\n\nMinimal single-ion precision (pre-filter before MCC). Default is 0.0.\n\n\n\n\nrecall_min\n\n\nMinimal single-ion recall (pre-filter before MCC). Default is 0.0.\n\n\n\n\nzero_val\n\n\nZero value threshold for intensity. Default is 0.0.\n\n\n\n\n\n\nFor each skeleton class with at least n_skel_min spectra, the pipeline:\n\n\nNormalizes MS2 intensities, removes sub-threshold and non-positive neutral-loss peaks, and aligns m/z values across spectra using intensity-weighted consensus centroids within dalton + mz * ppm / 1e6.\n\n\nEvaluates candidate fragment and neutral-loss centroids against the raw unbinned spectra (requiring precursor_mz - nl &gt; 0).\n\n\nSelects up to ions_max candidate ions per skeleton using greedy hitting-set pruning on 100%-recall ions followed by forward conjunctive MCC selection with negative-class correlation penalty (mRMR).\n\n\nPrunes the power set of ion combinations via Branch-and-Bound when the optimistic zero-FP upper bound cannot reach the current best MCC.\n\n\nReturns the single most parsimonious query achieving the maximum MCC per skeleton and translates it to MassQL via to_massql().\n\n\n\n\n\nInvisibly returns a data.frame with columns skeleton, mcc, combined_ions, and massql, and writes the TSV table to export when export is non-NULL.\n\n\n\n\nlibrary(\"SpectraToQueries\")\n\ndf &lt;- data.frame(\n  msLevel = c(2L, 2L, 2L, 2L),\n  SKELETON = c(\"SkelA\", \"SkelA\", \"SkelB\", \"SkelB\"),\n  precursorMz = c(300.0, 300.0, 300.0, 300.0)\n)\ndf$mz &lt;- list(\n  c(100.0, 150.0),\n  c(100.0, 160.0),\n  c(200.0, 250.0),\n  c(200.0, 260.0)\n)\ndf$intensity &lt;- list(c(80, 100), c(70, 100), c(90, 100), c(85, 100))\nspectra_to_queries(\n  spectra = df,\n  export = NULL,\n  n_skel_min = 2L,\n  n_spec_min = 2L\n)",
-    "crumbs": [
-      "News",
-      "Reference",
-      "spectra_to_queries"
     ]
   }
 ]

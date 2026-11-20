@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/LICENSE.html</loc>
-    <lastmod>2026-11-20T15:33:46.592Z</lastmod>
-  </url>
-  <url>
-    <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/to_massql.html</loc>
-    <lastmod>2026-11-20T15:33:48.014Z</lastmod>
-  </url>
-  <url>
-    <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/mia_spectra_grouped_df.html</loc>
-    <lastmod>2026-11-20T15:33:46.808Z</lastmod>
-  </url>
-  <url>
-    <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/index.html</loc>
-    <lastmod>2026-11-20T15:33:46.603Z</lastmod>
-  </url>
-  <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/vignettes/spectra-to-queries.html</loc>
-    <lastmod>2026-11-20T15:33:49.013Z</lastmod>
+    <lastmod>2026-11-20T18:59:38.512Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/CITATION.html</loc>
-    <lastmod>2026-11-20T15:33:46.637Z</lastmod>
+    <lastmod>2026-11-20T18:59:36.398Z</lastmod>
   </url>
   <url>
-    <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/NEWS.html</loc>
-    <lastmod>2026-11-20T15:33:46.579Z</lastmod>
-  </url>
-  <url>
-    <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/mia_spectra_df.html</loc>
-    <lastmod>2026-11-20T15:33:46.766Z</lastmod>
+    <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/LICENSE.html</loc>
+    <lastmod>2026-11-20T18:59:36.341Z</lastmod>
   </url>
   <url>
     <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/spectra_to_queries.html</loc>
-    <lastmod>2026-11-20T15:33:46.852Z</lastmod>
+    <lastmod>2026-11-20T18:59:36.586Z</lastmod>
+  </url>
+  <url>
+    <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/to_massql.html</loc>
+    <lastmod>2026-11-20T18:59:37.614Z</lastmod>
+  </url>
+  <url>
+    <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/mia_spectra_grouped_df.html</loc>
+    <lastmod>2026-11-20T18:59:36.530Z</lastmod>
+  </url>
+  <url>
+    <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/man/mia_spectra_df.html</loc>
+    <lastmod>2026-11-20T18:59:36.479Z</lastmod>
+  </url>
+  <url>
+    <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/NEWS.html</loc>
+    <lastmod>2026-11-20T18:59:36.324Z</lastmod>
+  </url>
+  <url>
+    <loc>https://spectra-to-knowledge.github.io/SpectraToQueries/index.html</loc>
+    <lastmod>2026-11-20T18:59:36.355Z</lastmod>
   </url>
 </urlset>
