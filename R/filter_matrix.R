@@ -9,6 +9,5 @@
 #' @keywords internal
 #' @noRd
 filter_matrix <- function(matrix, n) {
-  keep_cols <- colSums(matrix > 0) >= n
-  matrix[, keep_cols, drop = FALSE]
+  matrix[, colSums(matrix > 0) >= n, drop = FALSE]
 }

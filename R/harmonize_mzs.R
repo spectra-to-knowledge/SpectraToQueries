@@ -13,12 +13,11 @@
 #' @keywords internal
 #' @noRd
 harmonize_mzs <- function(spectra, dalton, ppm) {
-  spectra_new <- spectra
-  if (length(spectra_new) == 0L) {
-    return(spectra_new)
+  if (length(spectra) == 0L) {
+    return(spectra)
   }
 
-  combined_peaks <- spectra_new |>
+  combined_peaks <- spectra |>
     Spectra::peaksData() |>
     Spectra::combinePeaksData(
       tolerance = dalton,
@@ -31,7 +30,7 @@ harmonize_mzs <- function(spectra, dalton, ppm) {
   n_avg <- length(consensus_mzs)
 
   if (n_avg == 0L) {
-    return(spectra_new)
+    return(spectra)
   }
 
   align_mzs <- function(x, ...) {
@@ -58,7 +57,7 @@ harmonize_mzs <- function(spectra, dalton, ppm) {
     x
   }
 
-  sp_aligned <- Spectra::addProcessing(spectra_new, align_mzs)
+  sp_aligned <- Spectra::addProcessing(spectra, align_mzs)
   tryCatch(
     Spectra::applyProcessing(sp_aligned),
     error = function(e) {

@@ -63,35 +63,12 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
   }
 
   new_colnames_rounded <- round(new_colnames, decimals)
-  unique_cols <- unique(new_colnames_rounded)
 
   # Fast path when all rounded column names are already unique
-  if (length(unique_cols) == length(new_colnames_rounded)) {
-    result_matrix <- binned_m
-    colnames(result_matrix) <- as.character(unique_cols)
-    return(result_matrix)
+  if (!anyDuplicated(new_colnames_rounded)) {
+    colnames(binned_m) <- as.character(new_colnames_rounded)
+    return(binned_m)
   }
 
-  col_groups <- split(
-    seq_along(new_colnames_rounded),
-    factor(new_colnames_rounded, levels = unique_cols)
-  )
-
-  result_matrix <- matrix(
-    0,
-    nrow = nrow(binned_m),
-    ncol = length(unique_cols),
-    dimnames = list(rownames(binned_m), as.character(unique_cols))
-  )
-
-  for (i in seq_along(col_groups)) {
-    matching_cols <- col_groups[[i]]
-    if (length(matching_cols) == 1L) {
-      result_matrix[, i] <- binned_m[, matching_cols]
-    } else {
-      result_matrix[, i] <- rowSums(binned_m[, matching_cols, drop = FALSE])
-    }
-  }
-
-  result_matrix
+  t(rowsum(t(binned_m), new_colnames_rounded, reorder = FALSE))
 }

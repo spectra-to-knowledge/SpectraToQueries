@@ -15,17 +15,10 @@ fmt_num <- function(x) {
 absorb_dnf_clauses <- function(ion_lists) {
   sort_ions <- function(ions) {
     parsed <- parse_query_ions(unique(ions))
-    frags_sorted <- if (length(parsed$frags) > 0L) {
-      paste0(fmt_num(sort(parsed$frags)), "_frag")
-    } else {
-      character(0)
-    }
-    nls_sorted <- if (length(parsed$nls) > 0L) {
-      paste0(fmt_num(sort(parsed$nls)), "_nl")
-    } else {
-      character(0)
-    }
-    c(frags_sorted, nls_sorted)
+    c(
+      sprintf("%s_frag", fmt_num(sort(parsed$frags))),
+      sprintf("%s_nl", fmt_num(sort(parsed$nls)))
+    )
   }
 
   clauses <- unique(Filter(length, lapply(ion_lists, sort_ions)))
@@ -74,22 +67,13 @@ combine_ions_minimal <- function(ion_lists) {
     return(paste(ion_lists[[1L]], collapse = " & "))
   }
 
-  common_sorted <- Reduce(
-    function(x, y) x[match(x, y, nomatch = 0L) > 0L],
-    ion_lists
-  )
-
-  remaining <- lapply(ion_lists, function(x) {
-    x[match(x, common_sorted, nomatch = 0L) == 0L]
-  })
+  common_sorted <- Reduce(intersect, ion_lists)
+  remaining <- lapply(ion_lists, setdiff, common_sorted)
 
   or_parts <- vapply(
     remaining,
-    function(sorted) {
-      if (length(sorted) == 1L) {
-        return(sorted)
-      }
-      paste0("(", paste(sorted, collapse = " & "), ")")
+    function(s) {
+      if (length(s) == 1L) s else sprintf("(%s)", paste(s, collapse = " & "))
     },
     character(1L)
   )
@@ -261,20 +245,16 @@ to_massql <- function(
 
   format_conjunction <- function(ions_vec, extra_clause = NULL) {
     parsed <- parse_query_ions(ions_vec)
-    frag_clauses <- if (length(parsed$frags) > 0L) {
-      vapply(
-        parsed$frags,
-        function(mz) paste0("MS2PROD=", fmt_num(mz), tol_mod(mz, FALSE)),
-        character(1L)
-      )
-    } else {
-      character(0)
-    }
-    nl_clauses <- if (length(parsed$nls) > 0L) {
-      paste0("MS2NL=", fmt_num(parsed$nls), tol_mod(parsed$nls, TRUE))
-    } else {
-      character(0)
-    }
+    frag_clauses <- vapply(
+      parsed$frags,
+      function(mz) paste0("MS2PROD=", fmt_num(mz), tol_mod(mz, FALSE)),
+      character(1L)
+    )
+    nl_clauses <- sprintf(
+      "MS2NL=%s%s",
+      fmt_num(parsed$nls),
+      tol_mod(parsed$nls, TRUE)
+    )
     clauses <- c(frag_clauses, nl_clauses, extra_clause)
     paste0(
       "QUERY scaninfo(MS2DATA) WHERE ",
@@ -296,13 +276,8 @@ to_massql <- function(
         return(format_conjunction(clauses[[1L]]))
       }
 
-      common_ions <- Reduce(
-        function(x, y) x[match(x, y, nomatch = 0L) > 0L],
-        clauses
-      )
-      remaining <- lapply(clauses, function(x) {
-        x[match(x, common_ions, nomatch = 0L) == 0L]
-      })
+      common_ions <- Reduce(intersect, clauses)
+      remaining <- lapply(clauses, setdiff, common_ions)
 
       if (all(lengths(remaining) == 1L)) {
         alt_ions <- unlist(remaining, use.names = FALSE)

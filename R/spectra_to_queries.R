@@ -216,8 +216,7 @@ select_mrmr_ions <- function(
 
   # Deduplicate ions with identical binary presence/absence vectors
   sub_mat <- nz_mat[, cand_ions, drop = FALSE]
-  col_keys <- apply(sub_mat, 2L, paste, collapse = "")
-  keep_unique <- !duplicated(col_keys)
+  keep_unique <- !duplicated(sub_mat, MARGIN = 2L)
   cand_ions <- cand_ions[keep_unique]
   cand_mcc <- cand_mcc[keep_unique]
   cand_recall <- cand_recall[keep_unique]
@@ -251,23 +250,19 @@ select_mrmr_ions <- function(
     if (!(d_first %in% selected) && length(selected) < ions_max) {
       selected <- c(selected, d_first)
     }
-    diag_fp_vec <- sub_mat[neg_mask, d_first]
+    diag_fp_vec <- neg_mat[, d_first]
     rem_diag <- setdiff(diag_pool, selected)
     while (
       length(rem_diag) > 0L &&
         any(diag_fp_vec) &&
         length(selected) < ions_max
     ) {
-      fp_after <- vapply(
-        rem_diag,
-        function(idx) sum(diag_fp_vec & sub_mat[neg_mask, idx]),
-        integer(1L)
-      )
+      fp_after <- colSums(diag_fp_vec & neg_mat[, rem_diag, drop = FALSE])
       min_pos <- which.min(fp_after)
       if (fp_after[min_pos] < sum(diag_fp_vec)) {
         chosen_d <- rem_diag[min_pos]
         selected <- c(selected, chosen_d)
-        diag_fp_vec <- diag_fp_vec & sub_mat[neg_mask, chosen_d]
+        diag_fp_vec <- diag_fp_vec & neg_mat[, chosen_d]
         rem_diag <- rem_diag[-min_pos]
       } else {
         break
@@ -281,11 +276,10 @@ select_mrmr_ions <- function(
 
   while (length(selected) < ions_max && length(remaining) > 0L) {
     redundancy <- rowMeans(phi_mat[remaining, selected, drop = FALSE])
-    best_conj_mcc <- numeric(length(remaining))
-    best_conj_vec <- vector("list", length(remaining))
+    best_conj_mcc <- cand_mcc[remaining]
+    best_conj_k <- integer(length(remaining))
     for (r_i in seq_along(remaining)) {
-      idx <- remaining[r_i]
-      col_v <- sub_mat[, idx]
+      col_v <- sub_mat[, remaining[r_i]]
       mccs_k <- vapply(
         active_conjs,
         function(ac) calc_mcc(ac & col_v),
@@ -294,20 +288,19 @@ select_mrmr_ions <- function(
       bk <- which.max(mccs_k)
       if (mccs_k[bk] > active_mccs[bk]) {
         best_conj_mcc[r_i] <- mccs_k[bk]
-        best_conj_vec[[r_i]] <- active_conjs[[bk]] & col_v
-      } else {
-        best_conj_mcc[r_i] <- cand_mcc[idx]
-        best_conj_vec[[r_i]] <- col_v
+        best_conj_k[r_i] <- bk
       }
     }
     scores <- best_conj_mcc - 0.3 * redundancy
     best_pos <- which.max(scores)
     chosen <- remaining[best_pos]
     selected <- c(selected, chosen)
-    active_conjs[[length(active_conjs) + 1L]] <- sub_mat[, chosen]
+    chosen_vec <- sub_mat[, chosen]
+    active_conjs[[length(active_conjs) + 1L]] <- chosen_vec
     active_mccs <- c(active_mccs, cand_mcc[chosen])
     if (best_conj_mcc[best_pos] > cand_mcc[chosen]) {
-      active_conjs[[length(active_conjs) + 1L]] <- best_conj_vec[[best_pos]]
+      conj_vec <- active_conjs[[best_conj_k[best_pos]]] & chosen_vec
+      active_conjs[[length(active_conjs) + 1L]] <- conj_vec
       active_mccs <- c(active_mccs, best_conj_mcc[best_pos])
     }
     remaining <- remaining[-best_pos]
@@ -440,52 +433,42 @@ prune_combinations_bnb <- function(
     return(empty_eval)
   }
 
-  all_skel <- character(0)
-  all_ions <- list()
-  all_tp <- numeric(0)
-  all_fp <- numeric(0)
+  parts <- Filter(
+    Negate(is.null),
+    lapply(skel_names, function(s) {
+      cands <- intersect(ions_list[[s]], valid_names)
+      m <- length(cands)
+      if (m == 0L) {
+        return(NULL)
+      }
 
-  for (s in skel_names) {
-    cands <- intersect(ions_list[[s]], valid_names)
-    m <- length(cands)
-    if (m == 0L) {
-      next
-    }
+      is_pos <- !is.na(skeleton) & (skeleton == s)
+      is_neg <- !is.na(skeleton) & (skeleton != s)
+      n_pos <- sum(is_pos)
 
-    is_pos <- !is.na(skeleton) & (skeleton == s)
-    is_neg <- !is.na(skeleton) & (skeleton != s)
-    n_pos <- sum(is_pos)
+      pos_hits <- lapply(cands, function(u) hits_lookup[[u]][is_pos])
+      neg_hits <- lapply(cands, function(u) hits_lookup[[u]][is_neg])
 
-    pos_hits <- lapply(cands, function(u) hits_lookup[[u]][is_pos])
-    neg_hits <- lapply(cands, function(u) hits_lookup[[u]][is_neg])
+      kept_combs <- as.list(cands)
+      kept_tp <- as.numeric(vapply(pos_hits, sum, integer(1L)))
+      kept_fp <- as.numeric(vapply(neg_hits, sum, integer(1L)))
+      active <- lapply(seq_len(m), function(j) {
+        list(
+          idx = j,
+          last = j,
+          ph = pos_hits[[j]],
+          nh = neg_hits[[j]],
+          tp = kept_tp[j],
+          fp = kept_fp[j]
+        )
+      })
+      best_mcc <- max(round(
+        calc_mcc_vec(kept_tp, kept_fp, n_pos, total_spectra),
+        decimals
+      ))
+      max_k <- min(m, as.integer(max_ions))
 
-    kept_combs <- as.list(cands)
-    kept_tp <- numeric(m)
-    kept_fp <- numeric(m)
-    active <- vector("list", m)
-    for (j in seq_len(m)) {
-      ph <- pos_hits[[j]]
-      nh <- neg_hits[[j]]
-      tp <- sum(ph)
-      fp <- sum(nh)
-      kept_tp[j] <- tp
-      kept_fp[j] <- fp
-      active[[j]] <- list(
-        idx = j,
-        last = j,
-        ph = ph,
-        nh = nh,
-        tp = tp,
-        fp = fp,
-        mcc = round(calc_mcc_vec(tp, fp, n_pos, total_spectra), decimals)
-      )
-    }
-
-    best_mcc <- max(vapply(active, `[[`, numeric(1L), "mcc"))
-    max_k <- min(m, as.integer(max_ions))
-
-    if (max_k >= 2L) {
-      for (k in 2L:max_k) {
+      for (k in seq_len(max(0L, max_k - 1L))) {
         # Prune nodes that cannot strictly beat best_mcc at larger cardinality
         expandable <- Filter(
           function(node) {
@@ -518,6 +501,9 @@ prune_combinations_bnb <- function(
                   calc_mcc_vec(tp_new, fp_new, n_pos, total_spectra),
                   decimals
                 )
+                if (mcc_new > best_mcc) {
+                  best_mcc <- mcc_new
+                }
                 idx_new <- c(node$idx, j)
                 kept_idx <- length(kept_combs) + 1L
                 kept_combs[[kept_idx]] <- cands[idx_new]
@@ -529,8 +515,7 @@ prune_combinations_bnb <- function(
                   ph = ph_new,
                   nh = nh_new,
                   tp = tp_new,
-                  fp = fp_new,
-                  mcc = mcc_new
+                  fp = fp_new
                 )
               }
             }
@@ -539,25 +524,32 @@ prune_combinations_bnb <- function(
         if (length(next_active) == 0L) {
           break
         }
-        lvl_max <- max(vapply(next_active, `[[`, numeric(1L), "mcc"))
-        if (lvl_max > best_mcc) {
-          best_mcc <- lvl_max
-        }
         active <- next_active
       }
-    }
 
-    all_skel <- c(all_skel, rep(s, length(kept_combs)))
-    all_ions <- c(all_ions, kept_combs)
-    all_tp <- c(all_tp, kept_tp)
-    all_fp <- c(all_fp, kept_fp)
-  }
+      list(
+        skeleton = rep(s, length(kept_combs)),
+        ions = kept_combs,
+        tp = kept_tp,
+        fp = kept_fp
+      )
+    })
+  )
 
   list(
-    skeleton = all_skel,
-    ions = all_ions,
-    tp = all_tp,
-    fp = all_fp
+    skeleton = unlist(
+      c(list(character(0)), lapply(parts, `[[`, "skeleton")),
+      use.names = FALSE
+    ),
+    ions = do.call(c, c(list(list()), lapply(parts, `[[`, "ions"))),
+    tp = unlist(
+      c(list(numeric(0)), lapply(parts, `[[`, "tp")),
+      use.names = FALSE
+    ),
+    fp = unlist(
+      c(list(numeric(0)), lapply(parts, `[[`, "fp")),
+      use.names = FALSE
+    )
   )
 }
 
@@ -607,28 +599,16 @@ summarize_best_queries <- function(
   mcc_vec <- mcc_vec[ord]
   ions_vec <- ions_vec[ord]
 
-  max_mcc_by_skel <- tapply(mcc_vec, skel_vec, max)
-  keep_best <- mcc_vec == as.numeric(max_mcc_by_skel[skel_vec])
-
-  skel_best <- skel_vec[keep_best]
-  mcc_best <- mcc_vec[keep_best]
-  ions_best <- ions_vec[keep_best]
-
-  u_skel <- unique(skel_best)
+  first <- !duplicated(skel_vec)
   combined_vec <- vapply(
-    u_skel,
-    function(s) combine_ions_minimal(ions_best[skel_best == s][1L]),
+    ions_vec[first],
+    function(x) combine_ions_minimal(list(x)),
     character(1L),
     USE.NAMES = FALSE
   )
-  final_queries <- data.frame(
-    skeleton = u_skel,
-    mcc = vapply(
-      u_skel,
-      function(s) mcc_best[skel_best == s][1L],
-      numeric(1L),
-      USE.NAMES = FALSE
-    ),
+  data.frame(
+    skeleton = skel_vec[first],
+    mcc = mcc_vec[first],
     combined_ions = combined_vec,
     massql = to_massql(
       combined_vec,
@@ -638,13 +618,6 @@ summarize_best_queries <- function(
     ),
     stringsAsFactors = FALSE
   )
-  final_queries <- final_queries[
-    order(final_queries$mcc, decreasing = TRUE),
-    ,
-    drop = FALSE
-  ]
-  rownames(final_queries) <- NULL
-  final_queries
 }
 
 #' @title Spectra to queries
@@ -839,16 +812,14 @@ spectra_to_queries <- function(
 
   message("Create a matrix containing fragments and neutral losses.")
   message("Round the values to ", decimals, ".")
-  frag_names <- if (ncol(spectra_mat) > 0L) {
-    paste0(round(as.numeric(colnames(spectra_mat)), decimals), "_frag")
-  } else {
-    character(0)
-  }
-  nl_names <- if (ncol(spectra_nl_mat) > 0L) {
-    paste0(round(as.numeric(colnames(spectra_nl_mat)), decimals), "_nl")
-  } else {
-    character(0)
-  }
+  frag_names <- sprintf(
+    "%s_frag",
+    round(as.numeric(colnames(spectra_mat)), decimals)
+  )
+  nl_names <- sprintf(
+    "%s_nl",
+    round(as.numeric(colnames(spectra_nl_mat)), decimals)
+  )
 
   merged_mat <- cbind(spectra_mat, spectra_nl_mat)
   rm(spectra_mat, spectra_nl_mat)
