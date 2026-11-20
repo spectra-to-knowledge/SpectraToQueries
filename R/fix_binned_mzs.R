@@ -12,7 +12,6 @@
 #'
 #' @return Matrix with corrected m/z column names
 #'
-#' @examples NULL
 #' @keywords internal
 #' @noRd
 fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {

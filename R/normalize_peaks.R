@@ -3,7 +3,6 @@
 #' @return A function that normalizes a spectrum peak matrix to a maximum
 #'   intensity of 100
 #'
-#' @examples NULL
 #' @keywords internal
 #' @noRd
 normalize_peaks <- function() {

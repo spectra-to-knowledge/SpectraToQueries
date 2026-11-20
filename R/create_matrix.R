@@ -6,7 +6,6 @@
 #'
 #' @return A matrix with spectra intensity data and m/z column names
 #'
-#' @examples NULL
 #' @keywords internal
 #' @noRd
 create_matrix <- function(spectra, zero_val = 0, name) {

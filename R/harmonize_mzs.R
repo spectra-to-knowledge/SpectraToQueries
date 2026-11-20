@@ -9,7 +9,6 @@
 #'
 #' @return Spectra with harmonized m/z values
 #'
-#' @examples NULL
 #' @keywords internal
 #' @noRd
 harmonize_mzs <- function(spectra, dalton, ppm) {
