@@ -80,33 +80,17 @@ validate_stq_inputs <- function(
     abort_input("`export` must be NULL or a non-empty character string.")
   }
 
-  nonneg_msg <- "must be a single finite non-negative number."
-  check_num(dalton, paste("`dalton`", nonneg_msg), lower = 0)
-  check_num(ppm, paste("`ppm`", nonneg_msg), lower = 0)
-  check_num(decimals, paste("`decimals`", nonneg_msg), lower = 0)
-
-  ge1_msg <- "must be a single finite number >= 1."
-  check_num(ions_max, paste("`ions_max`", ge1_msg), lower = 1)
-  check_num(n_skel_min, paste("`n_skel_min`", ge1_msg), lower = 1)
-  check_num(n_spec_min, paste("`n_spec_min`", ge1_msg), lower = 1)
-
-  unit_msg <- "must be a single finite number in [0, 1]."
-  check_num(precision_min, paste("`precision_min`", unit_msg), 0, 1)
-  check_num(recall_min, paste("`recall_min`", unit_msg), 0, 1)
-  check_num(
-    mcc_min,
-    "`mcc_min` must be a single finite number in [-1, 1].",
-    lower = -1,
-    upper = 1
-  )
-
-  check_num(
-    intensity_min,
-    "`intensity_min` must be a single finite number in [0, 100].",
-    lower = 0,
-    upper = 100
-  )
-  check_num(zero_val, "`zero_val` must be a single finite number.")
+  check_num(dalton, "dalton", lower = 0)
+  check_num(ppm, "ppm", lower = 0)
+  check_num(decimals, "decimals", lower = 0)
+  check_num(ions_max, "ions_max", lower = 1)
+  check_num(n_skel_min, "n_skel_min", lower = 1)
+  check_num(n_spec_min, "n_spec_min", lower = 1)
+  check_num(precision_min, "precision_min", lower = 0, upper = 1)
+  check_num(recall_min, "recall_min", lower = 0, upper = 1)
+  check_num(mcc_min, "mcc_min", lower = -1, upper = 1)
+  check_num(intensity_min, "intensity_min", lower = 0, upper = 100)
+  check_num(zero_val, "zero_val")
   invisible(TRUE)
 }
 
@@ -114,26 +98,22 @@ validate_stq_inputs <- function(
 #' @keywords internal
 #' @noRd
 load_input_spectra <- function(spectra) {
+  load_dataset <- function(name) {
+    data_env <- new.env(parent = emptyenv())
+    utils::data(
+      list = name,
+      package = "SpectraToQueries",
+      envir = data_env
+    )
+    df_to_spectra(data_env[[name]])
+  }
+
   if (is.null(spectra)) {
     message("No spectra given, loading example spectra.")
-    data_env <- new.env(parent = emptyenv())
-    utils::data(
-      "mia_spectra_df",
-      package = "SpectraToQueries",
-      envir = data_env
-    )
-    mia_spectra <- df_to_spectra(data_env$mia_spectra_df)
-  } else if (
-    is.character(spectra) && length(spectra) == 1L && spectra == "grouped"
-  ) {
+    mia_spectra <- load_dataset("mia_spectra_df")
+  } else if (identical(spectra, "grouped")) {
     message("Loading grouped example spectra.")
-    data_env <- new.env(parent = emptyenv())
-    utils::data(
-      "mia_spectra_grouped_df",
-      package = "SpectraToQueries",
-      envir = data_env
-    )
-    mia_spectra <- df_to_spectra(data_env$mia_spectra_grouped_df)
+    mia_spectra <- load_dataset("mia_spectra_grouped_df")
   } else if (is.character(spectra)) {
     if (!file.exists(spectra)) {
       stop(errorCondition(
@@ -156,10 +136,7 @@ load_input_spectra <- function(spectra) {
     if ("skeleton" %in% vars) {
       mia_spectra$SKELETON <- mia_spectra$skeleton
     } else {
-      stop(errorCondition(
-        "`spectra` must contain a `SKELETON` metadata variable.",
-        class = "stq_input_error"
-      ))
+      abort_input("`spectra` must contain a `SKELETON` metadata variable.")
     }
   }
   if ("PRECURSOR_MZ" %in% vars) {

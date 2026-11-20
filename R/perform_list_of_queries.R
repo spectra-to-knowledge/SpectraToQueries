@@ -49,26 +49,14 @@ prepare_query_data <- function(spectra, intensity_min = 0.0) {
 parse_query_ions <- function(ions) {
   ions <- trimws(as.character(ions))
   ions <- ions[!is.na(ions) & nzchar(ions)]
-  is_frag <- endsWith(ions, "_frag")
-  is_nl <- endsWith(ions, "_nl")
-
-  frags <- if (any(is_frag)) {
-    raw_f <- substr(ions[is_frag], 1L, nchar(ions[is_frag]) - 5L)
-    vals <- suppressWarnings(as.numeric(raw_f))
+  extract_suffix <- function(suffix) {
+    hit <- ions[endsWith(ions, suffix)]
+    vals <- suppressWarnings(
+      as.numeric(substr(hit, 1L, nchar(hit) - nchar(suffix)))
+    )
     vals[is.finite(vals)]
-  } else {
-    numeric(0)
   }
-
-  nls <- if (any(is_nl)) {
-    raw_n <- substr(ions[is_nl], 1L, nchar(ions[is_nl]) - 3L)
-    vals <- suppressWarnings(as.numeric(raw_n))
-    vals[is.finite(vals)]
-  } else {
-    numeric(0)
-  }
-
-  list(frags = frags, nls = nls)
+  list(frags = extract_suffix("_frag"), nls = extract_suffix("_nl"))
 }
 
 #' @title Precompute single-ion logical hit vectors across all spectra

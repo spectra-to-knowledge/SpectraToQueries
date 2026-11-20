@@ -117,6 +117,12 @@ parse_massql_dnf <- function(q) {
   state <- new.env(parent = emptyenv())
   state$pos <- 1L
   peek <- function() if (state$pos <= n_tok) tokens[state$pos] else ""
+  unexpected_tok <- function(tok) {
+    abort_input(sprintf(
+      "Unexpected token '%s' in MassQL query expression.",
+      tok
+    ))
+  }
 
   dnf_and <- function(lhs, rhs) {
     if (length(lhs) == 0L || length(rhs) == 0L) {
@@ -166,10 +172,7 @@ parse_massql_dnf <- function(q) {
       return(inner)
     }
     if (tok %in% c(")", "&", "|")) {
-      abort_input(sprintf(
-        "Unexpected token '%s' in MassQL query expression.",
-        tok
-      ))
+      unexpected_tok(tok)
     }
     state$pos <- state$pos + 1L
     absorb_dnf_clauses(list(tok))
@@ -177,10 +180,7 @@ parse_massql_dnf <- function(q) {
 
   clauses <- parse_or()
   if (state$pos <= n_tok) {
-    abort_input(sprintf(
-      "Unexpected token '%s' in MassQL query expression.",
-      peek()
-    ))
+    unexpected_tok(peek())
   }
   clauses
 }
@@ -219,15 +219,9 @@ to_massql <- function(
   ppm = 30.0,
   intensity_min = 0.0
 ) {
-  nonneg_msg <- "must be a single finite non-negative number."
-  check_num(dalton, paste("`dalton`", nonneg_msg), lower = 0)
-  check_num(ppm, paste("`ppm`", nonneg_msg), lower = 0)
-  check_num(
-    intensity_min,
-    "`intensity_min` must be a single finite number in [0, 100].",
-    lower = 0,
-    upper = 100
-  )
+  check_num(dalton, "dalton", lower = 0)
+  check_num(ppm, "ppm", lower = 0)
+  check_num(intensity_min, "intensity_min", lower = 0, upper = 100)
 
   if (is.null(query) || length(query) == 0L) {
     return(character(0))
@@ -322,21 +316,14 @@ to_massql <- function(
       if (all(lengths(remaining) == 1L)) {
         alt_ions <- unlist(remaining, use.names = FALSE)
         alt_parsed <- parse_query_ions(alt_ions)
-        if (length(alt_parsed$frags) == length(alt_ions)) {
-          or_clause <- paste0(
-            "MS2PROD=(",
-            paste(fmt_num(alt_parsed$frags), collapse = " OR "),
-            ")",
-            tol_mod(alt_parsed$frags, FALSE)
-          )
-          return(format_conjunction(common_ions, or_clause))
-        }
-        if (length(alt_parsed$nls) == length(alt_ions)) {
-          or_clause <- paste0(
-            "MS2NL=(",
-            paste(fmt_num(alt_parsed$nls), collapse = " OR "),
-            ")",
-            tol_mod(alt_parsed$nls, TRUE)
+        is_all_frag <- length(alt_parsed$frags) == length(alt_ions)
+        if (is_all_frag || length(alt_parsed$nls) == length(alt_ions)) {
+          vals <- if (is_all_frag) alt_parsed$frags else alt_parsed$nls
+          or_clause <- sprintf(
+            "%s=(%s)%s",
+            if (is_all_frag) "MS2PROD" else "MS2NL",
+            paste(fmt_num(vals), collapse = " OR "),
+            tol_mod(vals, !is_all_frag)
           )
           return(format_conjunction(common_ions, or_clause))
         }
