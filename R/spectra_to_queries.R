@@ -149,24 +149,19 @@ load_input_spectra <- function(spectra) {
 #' @keywords internal
 #' @noRd
 preprocess_spectra <- function(spectra_obj, dalton, ppm, intensity_min) {
-  combine_by_title <- function(x) {
-    if (!("TITLE" %in% Spectra::spectraVariables(x))) {
-      return(x)
-    }
-    titles <- x$TITLE
+  sp <- Spectra::reduceSpectra(spectra_obj, tolerance = dalton, ppm = ppm)
+  if ("TITLE" %in% Spectra::spectraVariables(sp)) {
+    titles <- sp$TITLE
     if (
       !is.null(titles) &&
-        isTRUE(anyDuplicated(titles) > 0L || is.unsorted(titles, na.rm = TRUE))
+        isTRUE(
+          anyDuplicated(titles) > 0L || is.unsorted(titles, na.rm = TRUE)
+        )
     ) {
-      Spectra::combineSpectra(x, f = titles)
-    } else {
-      x
+      sp <- Spectra::combineSpectra(sp, f = titles)
     }
   }
-
-  spectra_obj |>
-    Spectra::reduceSpectra(tolerance = dalton, ppm = ppm) |>
-    combine_by_title() |>
+  sp |>
     Spectra::deisotopeSpectra(tolerance = dalton, ppm = ppm) |>
     Spectra::filterPrecursorPeaks(
       tolerance = dalton,
@@ -177,17 +172,6 @@ preprocess_spectra <- function(spectra_obj, dalton, ppm, intensity_min) {
     Spectra::filterIntensity(intensity = c(intensity_min, Inf)) |>
     Spectra::applyProcessing() |>
     Spectra::filterEmptySpectra()
-}
-
-#' @title Preprocess neutral-loss spectra (reduce, normalize, filter intensity)
-#' @keywords internal
-#' @noRd
-preprocess_nl_spectra <- function(spectra_obj, dalton, ppm, intensity_min) {
-  spectra_obj |>
-    Spectra::reduceSpectra(tolerance = dalton, ppm = ppm) |>
-    Spectra::addProcessing(normalize_peaks()) |>
-    Spectra::filterIntensity(intensity = c(intensity_min, Inf)) |>
-    Spectra::applyProcessing()
 }
 
 #' @title Build feature matrix from harmonized spectra and fix m/z centroids
@@ -847,11 +831,10 @@ spectra_to_queries <- function(
         ppm = ppm
       )
     ) |>
-    preprocess_nl_spectra(
-      dalton = dalton,
-      ppm = ppm,
-      intensity_min = intensity_min
-    )
+    Spectra::reduceSpectra(tolerance = dalton, ppm = ppm) |>
+    Spectra::addProcessing(normalize_peaks()) |>
+    Spectra::filterIntensity(intensity = c(intensity_min, Inf)) |>
+    Spectra::applyProcessing()
 
   mia_spectra_w_nl <- harmonize_mzs(mia_spectra_nl, dalton = dalton, ppm = ppm)
 

@@ -83,14 +83,16 @@ combine_ions_minimal <- function(ion_lists) {
     x[match(x, common_sorted, nomatch = 0L) == 0L]
   })
 
-  build_and <- function(sorted) {
-    if (length(sorted) == 1L) {
-      return(sorted)
-    }
-    paste0("(", paste(sorted, collapse = " & "), ")")
-  }
-
-  or_parts <- vapply(remaining, build_and, character(1L))
+  or_parts <- vapply(
+    remaining,
+    function(sorted) {
+      if (length(sorted) == 1L) {
+        return(sorted)
+      }
+      paste0("(", paste(sorted, collapse = " & "), ")")
+    },
+    character(1L)
+  )
   or_expr <- paste(or_parts, collapse = " | ")
 
   if (length(common_sorted) > 0L) {
