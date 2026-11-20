@@ -152,12 +152,7 @@ preprocess_spectra <- function(spectra_obj, dalton, ppm, intensity_min) {
   sp <- Spectra::reduceSpectra(spectra_obj, tolerance = dalton, ppm = ppm)
   if ("TITLE" %in% Spectra::spectraVariables(sp)) {
     titles <- sp$TITLE
-    if (
-      !is.null(titles) &&
-        isTRUE(
-          anyDuplicated(titles) > 0L || is.unsorted(titles, na.rm = TRUE)
-        )
-    ) {
+    if (anyDuplicated(titles) > 0L || is.unsorted(titles, na.rm = TRUE)) {
       sp <- Spectra::combineSpectra(sp, f = titles)
     }
   }
@@ -185,16 +180,6 @@ bin_and_fix_spectra <- function(
   decimals,
   n_spec_min
 ) {
-  if (sum(lengths(spectra_obj)) == 0L) {
-    message("Fixing mzs (", label, ")")
-    return(matrix(
-      0,
-      nrow = length(spectra_obj),
-      ncol = 0L,
-      dimnames = list(spectra_obj$SKELETON, character(0))
-    ))
-  }
-
   mat <- create_matrix(spectra_obj, name = spectra_obj$SKELETON)
   message("Fixing mzs (", label, ")")
   fix_binned_mzs(
@@ -246,11 +231,10 @@ select_mrmr_ions <- function(
   # False-positive (negative-class) binary phi correlation for redundancy
   neg_mask <- !is_group
   neg_mat <- sub_mat[neg_mask, , drop = FALSE]
-  storage.mode(neg_mat) <- "double"
   phi_mat <- suppressWarnings(abs(stats::cor(neg_mat)))
   phi_mat[!is.finite(phi_mat)] <- 0.0
 
-  n_pos <- as.numeric(sum(is_group))
+  n_pos <- sum(is_group)
   calc_mcc <- function(vec) {
     calc_mcc_vec(
       tp = sum(vec[is_group]),
@@ -399,8 +383,8 @@ extract_candidate_ions <- function(
   ]
 
   # Matthews Correlation Coefficient (MCC) for a single ion and group pair
-  tp <- as.numeric(ions_df$count_per_ion_per_group)
-  fp <- as.numeric(ions_df$count_per_ion) - tp
+  tp <- ions_df$count_per_ion_per_group
+  fp <- ions_df$count_per_ion - tp
   ions_df$mcc <- calc_mcc_vec(
     tp = tp,
     fp = fp,
@@ -443,7 +427,7 @@ prune_combinations_bnb <- function(
   max_ions,
   decimals
 ) {
-  total_spectra <- as.numeric(sum(!is.na(skeleton)))
+  total_spectra <- sum(!is.na(skeleton))
   valid_names <- names(hits_lookup)
   skel_names <- names(ions_list)
   empty_eval <- list(
@@ -470,7 +454,7 @@ prune_combinations_bnb <- function(
 
     is_pos <- !is.na(skeleton) & (skeleton == s)
     is_neg <- !is.na(skeleton) & (skeleton != s)
-    n_pos <- as.numeric(sum(is_pos))
+    n_pos <- sum(is_pos)
 
     pos_hits <- lapply(cands, function(u) hits_lookup[[u]][is_pos])
     neg_hits <- lapply(cands, function(u) hits_lookup[[u]][is_neg])
@@ -482,8 +466,8 @@ prune_combinations_bnb <- function(
     for (j in seq_len(m)) {
       ph <- pos_hits[[j]]
       nh <- neg_hits[[j]]
-      tp <- as.numeric(sum(ph))
-      fp <- as.numeric(sum(nh))
+      tp <- sum(ph)
+      fp <- sum(nh)
       kept_tp[j] <- tp
       kept_fp[j] <- fp
       active[[j]] <- list(
@@ -524,11 +508,11 @@ prune_combinations_bnb <- function(
         for (node in expandable) {
           for (j in (node$last + 1L):m) {
             nh_new <- node$nh & neg_hits[[j]]
-            fp_new <- as.numeric(sum(nh_new))
+            fp_new <- sum(nh_new)
             # Prune if adding ion j fails to eliminate any false positives
             if (fp_new < node$fp) {
               ph_new <- node$ph & pos_hits[[j]]
-              tp_new <- as.numeric(sum(ph_new))
+              tp_new <- sum(ph_new)
               if (tp_new > 0) {
                 mcc_new <- round(
                   calc_mcc_vec(tp_new, fp_new, n_pos, total_spectra),
@@ -595,20 +579,14 @@ summarize_best_queries <- function(
 
   skel_vec <- candidates$skeleton
   ions_vec <- candidates$ions
-  tp <- as.numeric(candidates$tp)
-  fp <- as.numeric(candidates$fp)
-  n_pos <- as.numeric(skeleton_counts[skel_vec])
+  tp <- candidates$tp
+  fp <- candidates$fp
+  n_pos <- skeleton_counts[skel_vec]
 
   mcc_raw_vec <- calc_mcc_vec(tp, fp, n_pos, total_spectra)
   mcc_vec <- round(mcc_raw_vec, decimals)
   prec_vec <- ifelse(tp + fp > 0, tp / (tp + fp), 0.0)
 
-  valid_mcc <- !is.nan(mcc_vec)
-  skel_vec <- skel_vec[valid_mcc]
-  mcc_vec <- mcc_vec[valid_mcc]
-  mcc_raw_vec <- mcc_raw_vec[valid_mcc]
-  prec_vec <- prec_vec[valid_mcc]
-  ions_vec <- ions_vec[valid_mcc]
   n_ions_vec <- lengths(ions_vec)
   n_frags_vec <- vapply(
     ions_vec,
@@ -780,8 +758,8 @@ spectra_to_queries <- function(
     skel_raw <- skel_raw[valid_skel]
   }
 
-  total_spectra <- as.numeric(length(mia_spectra))
-  if (total_spectra == 0) {
+  total_spectra <- length(mia_spectra)
+  if (total_spectra == 0L) {
     return(write_query_table(empty_query_table(), export))
   }
 

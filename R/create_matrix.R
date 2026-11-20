@@ -24,7 +24,6 @@ create_matrix <- function(spectra, zero_val = 0, name) {
   ref_mz <- pks[[1L]][, 1L]
   if (
     length(unique(lens)) == 1L &&
-      lens[1L] > 0L &&
       !is.unsorted(ref_mz, strictly = TRUE) &&
       all(vapply(
         pks[-1L],
@@ -35,13 +34,8 @@ create_matrix <- function(spectra, zero_val = 0, name) {
     all_int <- unlist(lapply(pks, function(x) x[, 2L]), use.names = FALSE)
     dim(all_int) <- c(lens[1L], n_spectra)
     keep_cols <- rowSums(all_int) > zero_val
-    if (!any(keep_cols)) {
-      spectra_mat <- matrix(0, nrow = n_spectra, ncol = 0L)
-      rownames(spectra_mat) <- name
-      return(spectra_mat)
-    }
     spectra_mat <- t(all_int[keep_cols, , drop = FALSE])
-    colnames(spectra_mat) <- pks[[1L]][keep_cols, 1L]
+    colnames(spectra_mat) <- ref_mz[keep_cols]
     rownames(spectra_mat) <- name
     return(spectra_mat)
   }
@@ -68,12 +62,6 @@ create_matrix <- function(spectra, zero_val = 0, name) {
   }
 
   keep_cols <- colSums(spectra_mat) > zero_val
-  if (!any(keep_cols)) {
-    spectra_mat <- matrix(0, nrow = n_spectra, ncol = 0L)
-    rownames(spectra_mat) <- name
-    return(spectra_mat)
-  }
-
   spectra_mat <- spectra_mat[, keep_cols, drop = FALSE]
   colnames(spectra_mat) <- u_mz[keep_cols]
   rownames(spectra_mat) <- name

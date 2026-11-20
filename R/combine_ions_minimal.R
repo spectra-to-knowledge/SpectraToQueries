@@ -112,9 +112,6 @@ parse_massql_dnf <- function(q) {
     gregexpr("\\(|\\)|&|\\||[^()&|[:space:]]+", q)
   )[[1L]]
   n_tok <- length(tokens)
-  if (n_tok == 0L) {
-    return(list())
-  }
 
   state <- new.env(parent = emptyenv())
   state$pos <- 1L
@@ -127,9 +124,6 @@ parse_massql_dnf <- function(q) {
   }
 
   dnf_and <- function(lhs, rhs) {
-    if (length(lhs) == 0L || length(rhs) == 0L) {
-      return(list())
-    }
     out <- vector("list", length(lhs) * length(rhs))
     idx <- 0L
     for (a in lhs) {
@@ -225,20 +219,18 @@ to_massql <- function(
   check_num(ppm, "ppm", lower = 0)
   check_num(intensity_min, "intensity_min", lower = 0, upper = 100)
 
-  if (is.null(query) || length(query) == 0L) {
+  if (length(query) == 0L) {
     return(character(0))
   }
   if (is.list(query)) {
     query <- vapply(
       query,
       function(x) {
-        if (is.null(x) || length(x) == 0L) {
-          return("")
-        }
         if (length(x) == 1L) {
-          return(as.character(x))
+          as.character(x)
+        } else {
+          combine_ions_minimal(list(as.character(x)))
         }
-        combine_ions_minimal(list(as.character(x)))
       },
       character(1L)
     )
@@ -284,9 +276,6 @@ to_massql <- function(
       character(0)
     }
     clauses <- c(frag_clauses, nl_clauses, extra_clause)
-    if (length(clauses) == 0L) {
-      return("")
-    }
     paste0(
       "QUERY scaninfo(MS2DATA) WHERE ",
       paste(clauses, collapse = " AND ")
@@ -331,13 +320,10 @@ to_massql <- function(
         }
       }
 
-      sub_queries <- vapply(
-        clauses,
-        format_conjunction,
-        character(1L)
+      paste(
+        vapply(clauses, format_conjunction, character(1L)),
+        collapse = " ; "
       )
-      sub_queries <- sub_queries[nzchar(sub_queries)]
-      paste(sub_queries, collapse = " ; ")
     },
     character(1L),
     USE.NAMES = FALSE
