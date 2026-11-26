@@ -264,7 +264,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="unnumbered anchored" data-anchor-id="example-mass-spectrometry-spectra-from-miadb-as-portable-data.frame">Example mass spectrometry spectra from MIADB (as portable data.frame)</h2>
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
-<p>A <code>data.frame</code> containing 321 MS/MS spectra of monoterpene indole alkaloids (MIAs) from the MIADB (Monoterpene Indole Alkaloid Database) across 81 fine-grained chemical skeletons (<code>SKELETON</code>). This is stored as a portable <code>data.frame</code> with <code>mz</code> and <code>intensity</code> peaks as list columns, and is automatically converted to a Spectra::Spectra object when used in <code>spectra_to_queries()</code>.</p>
+<p>A <code>data.frame</code> containing 321 MS/MS spectra of monoterpene indole alkaloids (MIAs) from the MIADB (Monoterpene Indole Alkaloid Database) across 81 fine-grained chemical skeletons (<code>SKELETON</code>). This is stored as a portable <code>data.frame</code> with <code>mz</code> and <code>intensity</code> peaks as list columns; <code>spectra_to_queries()</code> converts it with <code>Spectra::Spectra()</code>.</p>
 </section>
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
@@ -290,7 +290,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="details" class="level3">
 <h3 class="anchored" data-anchor-id="details">Details</h3>
 <p>The <code>mia_spectra_df</code> object represents the spectral data with fine-grained skeleton annotations. Use <code>mia_spectra_grouped_df</code> for the variant with broader grouped skeleton annotations.</p>
-<p>This portable <code>data.frame</code> format enables cross-platform distribution and is automatically converted to a Spectra::Spectra object by <code>spectra_to_queries()</code>.</p>
 </section>
 <section id="source" class="level3">
 <h3 class="anchored" data-anchor-id="source">Source</h3>

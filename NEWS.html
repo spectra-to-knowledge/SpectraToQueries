@@ -205,7 +205,11 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#spectratoqueries" id="toc-spectratoqueries" class="nav-link active" data-scroll-target="#spectratoqueries">SpectraToQueries</a></li>
+  <li><a href="#spectratoqueries-development-version" id="toc-spectratoqueries-development-version" class="nav-link active" data-scroll-target="#spectratoqueries-development-version">SpectraToQueries (development version)</a>
+  <ul class="collapse">
+  <li><a href="#bug-fixes" id="toc-bug-fixes" class="nav-link" data-scroll-target="#bug-fixes">Bug fixes</a></li>
+  <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
+  </ul></li>
   <li><a href="#spectratoqueries-0.0.0.9002" id="toc-spectratoqueries-0.0.0.9002" class="nav-link" data-scroll-target="#spectratoqueries-0.0.0.9002">SpectraToQueries 0.0.0.9002</a>
   <ul class="collapse">
   <li><a href="#algorithms-massql-support" id="toc-algorithms-massql-support" class="nav-link" data-scroll-target="#algorithms-massql-support">Algorithms &amp; MassQL Support</a></li>
@@ -225,8 +229,24 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="spectratoqueries" class="level1">
-<h1>SpectraToQueries</h1>
+<section id="spectratoqueries-development-version" class="level1">
+<h1>SpectraToQueries (development version)</h1>
+<section id="bug-fixes" class="level2">
+<h2 class="anchored" data-anchor-id="bug-fixes">Bug fixes</h2>
+<ul>
+<li>Spectra without a <code>TITLE</code> are no longer dropped during preprocessing.</li>
+<li><code>to_massql()</code> raises <code>stq_input_error</code> on malformed or non-positive ion tokens instead of dropping them.</li>
+<li><code>MS2PROD</code> <code>TOLERANCEMZ</code> values are rounded up to 1e-6 Da so the emitted window contains the window used to compute MCC (bundled reference queries: 20 tolerances +1e-6 Da; MCC and ion combinations unchanged).</li>
+<li><code>decimals</code>, <code>ions_max</code>, <code>n_skel_min</code>, and <code>n_spec_min</code> must be whole numbers.</li>
+</ul>
+</section>
+<section id="documentation" class="level2">
+<h2 class="anchored" data-anchor-id="documentation">Documentation</h2>
+<ul>
+<li><code>?to_massql</code> documents where emitted MassQL differs from the matching used for MCC (<code>MS2NL</code> tolerance, <code>INTENSITYPERCENT</code> boundary, <code>" ; "</code> joins).</li>
+<li><code>?spectra_to_queries</code> states the MCC definition and the meaning of <code>dalton</code>, <code>ppm</code>, <code>zero_val</code>, and <code>n_skel_min</code>.</li>
+</ul>
+</section>
 </section>
 <section id="spectratoqueries-0.0.0.9002" class="level1">
 <h1>SpectraToQueries 0.0.0.9002</h1>

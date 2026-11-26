@@ -309,7 +309,7 @@ Export file path for the resulting TSV table (or <code>NULL</code> to skip writi
 <code id="dalton">dalton</code>
 </td>
 <td>
-Tolerance in Dalton. Default is <code>0.01</code>.
+Absolute m/z tolerance in Da, added to the <code>ppm</code> term: two m/z values match when <code style="white-space: pre;">|a - b| &lt;= dalton + b * ppm / 1e6</code>. Default is <code>0.01</code>.
 </td>
 </tr>
 <tr>
@@ -317,7 +317,7 @@ Tolerance in Dalton. Default is <code>0.01</code>.
 <code id="decimals">decimals</code>
 </td>
 <td>
-Number of decimals for rounding. Default is <code>4L</code>.
+Decimal places for reported m/z values and MCC; MCC ties are resolved at this precision. Default is <code>4L</code>.
 </td>
 </tr>
 <tr>
@@ -341,7 +341,7 @@ Maximal number of ions in a query combination. Default is <code>10L</code>.
 <code id="n_skel_min">n_skel_min</code>
 </td>
 <td>
-Minimal number of spectra per skeleton class. Default is <code>5L</code>.
+Minimal number of MS2 spectra per skeleton class (spectra without peaks count). Default is <code>5L</code>.
 </td>
 </tr>
 <tr>
@@ -349,7 +349,7 @@ Minimal number of spectra per skeleton class. Default is <code>5L</code>.
 <code id="n_spec_min">n_spec_min</code>
 </td>
 <td>
-Minimal number of spectra where a signal has to be found. Default is <code>3L</code>.
+Minimal number of spectra (all classes) in which a fragment or neutral loss must be found to be a candidate. Default is <code>3L</code>.
 </td>
 </tr>
 <tr>
@@ -357,7 +357,7 @@ Minimal number of spectra where a signal has to be found. Default is <code>3L</c
 <code id="ppm">ppm</code>
 </td>
 <td>
-Tolerance in parts per million. Default is <code>30.0</code>.
+Relative m/z tolerance in parts per million, added to <code>dalton</code>. Default is <code>30.0</code>.
 </td>
 </tr>
 <tr>
@@ -365,7 +365,7 @@ Tolerance in parts per million. Default is <code>30.0</code>.
 <code id="mcc_min">mcc_min</code>
 </td>
 <td>
-Minimal single-ion Matthews Correlation Coefficient. Default is <code>0.0</code>.
+Minimal single-ion Matthews Correlation Coefficient, in <code style="white-space: pre;">[-1, 1]</code>. Default is <code>0.0</code>.
 </td>
 </tr>
 <tr>
@@ -389,7 +389,7 @@ Minimal single-ion recall (pre-filter before MCC). Default is <code>0.0</code>.
 <code id="zero_val">zero_val</code>
 </td>
 <td>
-Zero value threshold for intensity. Default is <code>0.0</code>.
+Feature filter: fragment and neutral-loss features whose relative intensity (0 to 100 per spectrum), summed over all spectra, is <code style="white-space: pre;">&lt;= zero_val</code> are not evaluated. Default is <code>0.0</code> (drop all-zero features).
 </td>
 </tr>
 </tbody></table>
@@ -402,7 +402,7 @@ Zero value threshold for intensity. Default is <code>0.0</code>.
 <p>Normalizes MS2 intensities, removes sub-threshold and non-positive neutral-loss peaks, and aligns m/z values across spectra using intensity-weighted consensus centroids within <code>dalton + mz * ppm / 1e6</code>.</p>
 </li>
 <li>
-<p>Evaluates candidate fragment and neutral-loss centroids against the raw unbinned spectra (requiring <code>precursor_mz - nl &gt; 0</code>).</p>
+<p>Evaluates candidate fragment and neutral-loss centroids against the input spectra after <code>intensity_min</code> filtering only (requiring <code>precursor_mz - nl &gt; 0</code>).</p>
 </li>
 <li>
 <p>Selects up to <code>ions_max</code> candidate ions per skeleton using greedy hitting-set pruning on 100%-recall ions followed by forward conjunctive MCC selection with negative-class correlation penalty (mRMR).</p>
@@ -411,9 +411,13 @@ Zero value threshold for intensity. Default is <code>0.0</code>.
 <p>Prunes the power set of ion combinations via Branch-and-Bound when the optimistic zero-FP upper bound cannot reach the current best MCC.</p>
 </li>
 <li>
-<p>Returns the single most parsimonious query achieving the maximum MCC per skeleton and translates it to MassQL via <code>to_massql()</code>.</p>
+<p>Returns, per skeleton, the conjunction with the highest MCC (rounded to <code>decimals</code>); ties go to fewer ions, then higher unrounded MCC, higher precision, and more fragments. It is translated to MassQL via <code>to_massql()</code>.</p>
 </li>
 </ol>
+<p>MCC is computed over all MS2 spectra with a non-empty <code>SKELETON</code>, with the skeleton as the positive class and all other skeletons as negatives:</p>
+<p style="text-align: center;">
+</p><p><code class="reqn"> MCC = {} </code></p>
+<p>and is set to 0 when the denominator is 0 (Matthews 1975, <a href="https://doi.org/10.1016/0005-2795(75)90109-9">doi:10.1016/0005-2795(75)90109-9</a>; Chicco and Jurman 2020, <a href="https://doi.org/10.1186/s12864-019-6413-7">doi:10.1186/s12864-019-6413-7</a>).</p>
 </section>
 <section id="value" class="level3">
 <h3 class="anchored" data-anchor-id="value">Value</h3>
