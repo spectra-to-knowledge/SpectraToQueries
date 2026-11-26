@@ -56,12 +56,7 @@ harmonize_mzs <- function(spectra, dalton, ppm) {
     x
   }
 
-  sp_aligned <- Spectra::addProcessing(spectra, align_mzs)
-  tryCatch(
-    Spectra::applyProcessing(sp_aligned),
-    error = function(e) {
-      Spectra::setBackend(sp_aligned, Spectra::MsBackendMemory()) |>
-        Spectra::applyProcessing()
-    }
-  )
+  spectra |>
+    Spectra::addProcessing(align_mzs) |>
+    Spectra::applyProcessing()
 }
