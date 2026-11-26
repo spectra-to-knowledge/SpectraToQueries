@@ -1161,3 +1161,106 @@ testthat::test_that("count arguments must be whole numbers", {
     )
   }
 })
+
+testthat::test_that("calc_mcc_vec matches hand-computed confusion matrices", {
+  # (tp, fp, n_pos, total) -> MCC computed by hand from TP, FP, FN, TN
+  # TP=3 FP=0 FN=0 TN=3: (9 - 0) / sqrt(3 * 3 * 3 * 3) = 1
+  # TP=2 FP=1 FN=1 TN=2: (4 - 1) / sqrt(3 * 3 * 3 * 3) = 1/3
+  # TP=0 FP=3 FN=3 TN=0: (0 - 9) / 9 = -1
+  # TP=4 FP=2 FN=1 TN=13: (52 - 2) / sqrt(6 * 5 * 15 * 14) = 50 / sqrt(6300)
+  testthat::expect_equal(
+    calc_mcc_vec(
+      tp = c(3, 2, 0, 4),
+      fp = c(0, 1, 3, 2),
+      n_pos = c(3, 3, 3, 5),
+      total_spectra = c(6, 6, 6, 20)
+    ),
+    c(1, 1 / 3, -1, 50 / sqrt(6300)),
+    tolerance = 1e-12
+  )
+  # Zero denominator (no predicted positives, or one class only) -> 0
+  testthat::expect_identical(calc_mcc_vec(0, 0, 3, 6), 0)
+  testthat::expect_identical(calc_mcc_vec(3, 0, 3, 3), 0)
+})
+
+testthat::test_that("branch-and-bound selection equals exhaustive search", {
+  mcc_oracle <- function(tp, fp, p, n) {
+    fn <- p - tp
+    tn <- n - p - fp
+    d <- sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+    if (d == 0) 0 else (tp * tn - fp * fn) / d
+  }
+  set.seed(42L)
+  for (iter in seq_len(150L)) {
+    n_spec <- 14L
+    m <- sample(2:6, 1L)
+    max_ions <- sample(1:4, 1L)
+    skeleton <- sample(c("G1", "G2", "G3"), n_spec, replace = TRUE)
+    skeleton[1:2] <- "G1"
+    ions <- sprintf("%d_frag", seq_len(m) * 100L)
+    hits <- stats::setNames(
+      lapply(ions, function(i) stats::runif(n_spec) < 0.6),
+      ions
+    )
+    p <- sum(skeleton == "G1")
+
+    best <- c(mcc = -Inf, n_ions = Inf)
+    for (k in seq_len(min(m, max_ions))) {
+      for (cmb in utils::combn(m, k, simplify = FALSE)) {
+        v <- Reduce(`&`, hits[cmb])
+        tp <- sum(v & skeleton == "G1")
+        if (tp == 0L) {
+          next
+        }
+        mcc <- round(mcc_oracle(tp, sum(v & skeleton != "G1"), p, n_spec), 4L)
+        if (
+          mcc > best[["mcc"]] || (mcc == best[["mcc"]] && k < best[["n_ions"]])
+        ) {
+          best <- c(mcc = mcc, n_ions = k)
+        }
+      }
+    }
+
+    cands <- prune_combinations_bnb(
+      ions_list = list(G1 = ions),
+      skeleton = skeleton,
+      hits_lookup = hits,
+      max_ions = max_ions,
+      decimals = 4L
+    )
+    res <- summarize_best_queries(
+      candidates = cands,
+      skeleton_counts = table(skeleton),
+      total_spectra = n_spec,
+      decimals = 4L,
+      dalton = 0.01,
+      ppm = 0,
+      intensity_min = 0
+    )
+    if (is.infinite(best[["mcc"]])) {
+      testthat::expect_identical(nrow(res), 0L)
+      next
+    }
+    testthat::expect_equal(res$mcc, best[["mcc"]], tolerance = 1e-12)
+    testthat::expect_identical(
+      length(strsplit(res$combined_ions, " & ", fixed = TRUE)[[1L]]),
+      as.integer(best[["n_ions"]])
+    )
+  }
+})
+
+testthat::test_that("spectra_to_queries is invariant to spectrum order", {
+  utils::data(
+    mia_spectra_df,
+    package = "SpectraToQueries",
+    envir = environment()
+  )
+  keep <- mia_spectra_df$SKELETON %in%
+    c("Corynanthean", "Iboga", "Aspidosperma")
+  sub_df <- mia_spectra_df[keep, ]
+  run <- function(df) {
+    suppressMessages(spectra_to_queries(df, export = NULL, ions_max = 3L))
+  }
+  set.seed(7L)
+  testthat::expect_identical(run(sub_df[sample(nrow(sub_df)), ]), run(sub_df))
+})
