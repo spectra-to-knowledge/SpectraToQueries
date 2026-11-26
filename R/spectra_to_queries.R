@@ -177,14 +177,12 @@ preprocess_spectra <- function(spectra_obj, dalton, ppm, intensity_min) {
 #' @noRd
 build_feature_matrix <- function(
   spectra_obj,
-  label,
   dalton,
   ppm,
   decimals,
   n_spec_min
 ) {
   mat <- create_matrix(spectra_obj, name = spectra_obj$SKELETON)
-  message("Fixing mzs (", label, ")")
   refine_feature_mzs(
     mat,
     spectra = spectra_obj,
@@ -194,6 +192,13 @@ build_feature_matrix <- function(
   ) |>
     filter_matrix(n = n_spec_min)
 }
+
+#' Weight of the redundancy penalty in `select_mrmr_ions()`: score =
+#' best conjunctive MCC - weight * mean |phi| with already selected ions, phi
+#' computed on negative-class spectra only. Empirical choice, not derived.
+#' @keywords internal
+#' @noRd
+mrmr_redundancy_weight <- 0.3
 
 #' @title Select candidate ions via forward conjunction gain and mRMR
 #' @keywords internal
@@ -294,7 +299,7 @@ select_mrmr_ions <- function(
         best_conj_k[r_i] <- bk
       }
     }
-    scores <- best_conj_mcc - 0.3 * redundancy
+    scores <- best_conj_mcc - mrmr_redundancy_weight * redundancy
     best_pos <- which.max(scores)
     chosen <- remaining[best_pos]
     selected <- c(selected, chosen)
@@ -359,7 +364,6 @@ extract_candidate_ions <- function(
     stringsAsFactors = FALSE
   )
 
-  message("Extract the best ions to perform a query.")
   grp_ion_key <- paste(ions_df$group, ions_df$ion, sep = "\r")
   u_grp_ion <- unique(grp_ion_key)
   grp_ion_tab <- tabulate(
@@ -748,9 +752,11 @@ spectra_to_queries <- function(
   }
 
   message(
-    "Cut the fragments lower than ",
+    "Preprocessing ",
+    total_spectra,
+    " MS2 spectra (relative intensity >= ",
     intensity_min,
-    " and rough preprocessing"
+    "%)."
   )
   mia_spectra_1 <- preprocess_spectra(
     mia_spectra,
@@ -760,22 +766,14 @@ spectra_to_queries <- function(
   )
 
   message(
-    "Harmonize m/z values across spectra, given ",
+    "Harmonizing fragment and neutral-loss m/z values (tolerance ",
     dalton,
-    " Da or ",
+    " Da + ",
     ppm,
-    " ppm tolerance."
+    " ppm)."
   )
   mia_spectra_w <- harmonize_mzs(mia_spectra_1, dalton = dalton, ppm = ppm)
 
-  message(
-    "Calculate neutral losses, given ",
-    dalton,
-    " Da or ",
-    ppm,
-    " ppm tolerance."
-  )
-  message("Remove the ones above the precursor.")
   mia_spectra_nl <- mia_spectra_1 |>
     Spectra::neutralLoss(
       Spectra::PrecursorMzParam(
@@ -792,13 +790,8 @@ spectra_to_queries <- function(
 
   mia_spectra_w_nl <- harmonize_mzs(mia_spectra_nl, dalton = dalton, ppm = ppm)
 
-  message("Align consensus m/z values into feature matrix.")
-  message("Create fragments and neutral-loss feature matrix.")
-  message("Remove features not appearing in at least ", n_spec_min, " spectra.")
-
   spectra_mat <- build_feature_matrix(
     mia_spectra_w,
-    label = "fragments",
     dalton = dalton,
     ppm = ppm,
     decimals = decimals,
@@ -806,15 +799,12 @@ spectra_to_queries <- function(
   )
   spectra_nl_mat <- build_feature_matrix(
     mia_spectra_w_nl,
-    label = "losses",
     dalton = dalton,
     ppm = ppm,
     decimals = decimals,
     n_spec_min = n_spec_min
   )
 
-  message("Create a matrix containing fragments and neutral losses.")
-  message("Round the values to ", decimals, ".")
   frag_names <- sprintf(
     "%s_frag",
     round(as.numeric(colnames(spectra_mat)), decimals)
@@ -857,7 +847,7 @@ spectra_to_queries <- function(
     )
   }
 
-  message("Count the number of members per skeleton and pivot the matrix.")
+  message("Selecting candidate ions per skeleton.")
   ions_list <- extract_candidate_ions(
     merged_mat = merged_mat,
     total_spectra = total_spectra,
@@ -874,7 +864,7 @@ spectra_to_queries <- function(
     return(write_query_table(empty_query_table(), export))
   }
 
-  message("Evaluate candidate combinations via Branch-and-Bound.")
+  message("Searching ion combinations.")
   candidates <- prune_combinations_bnb(
     ions_list = ions_list,
     skeleton = qd$skeleton,
@@ -884,7 +874,6 @@ spectra_to_queries <- function(
   )
   rm(ions_list, hits)
 
-  message("Rank best queries by MCC.")
   skeleton_counts <- table(qd$skeleton)
 
   final_queries <- summarize_best_queries(
@@ -897,6 +886,5 @@ spectra_to_queries <- function(
     intensity_min = intensity_min
   )
 
-  message("Export the best queries for further use.")
   write_query_table(final_queries, export)
 }

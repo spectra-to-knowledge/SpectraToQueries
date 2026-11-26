@@ -597,7 +597,7 @@ testthat::test_that("spectra_to_queries validates inputs and synthetic cases", {
   # Startup message coverage
   testthat::expect_message(
     .onAttach(NULL, "SpectraToQueries"),
-    "Welcome to SpectraToQueries"
+    "To cite SpectraToQueries"
   )
 
   # Synthetic 6-spectrum dataset with distinct PRECURSOR_MZ and TITLEs:
