@@ -638,15 +638,30 @@ summarize_best_queries <- function(
 #' 1. Normalizes MS2 intensities, removes sub-threshold and non-positive
 #'    neutral-loss peaks, and aligns m/z values across spectra using
 #'    intensity-weighted consensus centroids within `dalton + mz * ppm / 1e6`.
-#' 2. Evaluates candidate fragment and neutral-loss centroids against the raw
-#'    unprocessed spectra (requiring `precursor_mz - nl > 0`).
+#' 2. Evaluates candidate fragment and neutral-loss centroids against the input
+#'    spectra after `intensity_min` filtering only (requiring
+#'    `precursor_mz - nl > 0`).
 #' 3. Selects up to `ions_max` candidate ions per skeleton using greedy
 #'    hitting-set pruning on 100%-recall ions followed by forward conjunctive
 #'    MCC selection with negative-class correlation penalty (mRMR).
 #' 4. Prunes the power set of ion combinations via Branch-and-Bound when the
 #'    optimistic zero-FP upper bound cannot reach the current best MCC.
-#' 5. Returns the single most parsimonious query achieving the maximum MCC per
-#'    skeleton and translates it to MassQL via [to_massql()].
+#' 5. Returns, per skeleton, the conjunction with the highest MCC (rounded to
+#'    `decimals`); ties go to fewer ions, then higher unrounded MCC, higher
+#'    precision, and more fragments. It is translated to MassQL via
+#'    [to_massql()].
+#'
+#' MCC is computed over all MS2 spectra with a non-empty `SKELETON`, with the
+#' skeleton as the positive class and all other skeletons as negatives:
+#' \deqn{
+#'   MCC = \frac{TP \cdot TN - FP \cdot FN}
+#'   {\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}
+#' }{
+#'   MCC = (TP*TN - FP*FN) / sqrt((TP+FP)(TP+FN)(TN+FP)(TN+FN))
+#' }
+#' and is set to 0 when the denominator is 0 (Matthews 1975,
+#' \doi{10.1016/0005-2795(75)90109-9}; Chicco and Jurman 2020,
+#' \doi{10.1186/s12864-019-6413-7}).
 #'
 #' @param spectra A [Spectra::Spectra] object, a portable `data.frame` (such as
 #'   [mia_spectra_df] or [mia_spectra_grouped_df]), or a file path to an MGF
@@ -654,24 +669,29 @@ summarize_best_queries <- function(
 #'   `"grouped"`, loads the grouped example [mia_spectra_grouped_df] dataset.
 #' @param export Export file path for the resulting TSV table (or `NULL` to
 #'   skip writing to disk). Default is `"data/interim/queries.tsv"`.
-#' @param dalton Tolerance in Dalton. Default is `0.01`.
-#' @param decimals Number of decimals for rounding. Default is `4L`.
+#' @param dalton Absolute m/z tolerance in Da, added to the `ppm` term: two m/z
+#'   values match when `|a - b| <= dalton + b * ppm / 1e6`. Default is `0.01`.
+#' @param decimals Decimal places for reported m/z values and MCC; MCC ties are
+#'   resolved at this precision. Default is `4L`.
 #' @param intensity_min Minimal relative intensity threshold (0 to 100). Default
 #'   is `0.0`.
 #' @param ions_max Maximal number of ions in a query combination. Default is
 #'   `10L`.
-#' @param n_skel_min Minimal number of spectra per skeleton class. Default is
-#'   `5L`.
-#' @param n_spec_min Minimal number of spectra where a signal has to be found.
-#'   Default is `3L`.
-#' @param ppm Tolerance in parts per million. Default is `30.0`.
-#' @param mcc_min Minimal single-ion Matthews Correlation Coefficient. Default
-#'   is `0.0`.
+#' @param n_skel_min Minimal number of MS2 spectra per skeleton class
+#'   (spectra without peaks count). Default is `5L`.
+#' @param n_spec_min Minimal number of spectra (all classes) in which a fragment
+#'   or neutral loss must be found to be a candidate. Default is `3L`.
+#' @param ppm Relative m/z tolerance in parts per million, added to `dalton`.
+#'   Default is `30.0`.
+#' @param mcc_min Minimal single-ion Matthews Correlation Coefficient, in
+#'   `[-1, 1]`. Default is `0.0`.
 #' @param precision_min Minimal single-ion precision (pre-filter before MCC).
 #'   Default is `0.0`.
 #' @param recall_min Minimal single-ion recall (pre-filter before MCC). Default
 #'   is `0.0`.
-#' @param zero_val Zero value threshold for intensity. Default is `0.0`.
+#' @param zero_val Feature filter: fragment and neutral-loss features whose
+#'   relative intensity (0 to 100 per spectrum), summed over all spectra, is
+#'   `<= zero_val` are not evaluated. Default is `0.0` (drop all-zero features).
 #'
 #' @return Invisibly returns a `data.frame` with columns `skeleton`, `mcc`,
 #'   `combined_ions`, and `massql`, and writes the TSV table to `export` when

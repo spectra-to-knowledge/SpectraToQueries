@@ -10,10 +10,10 @@ to_massql(query, dalton = 0.01, ppm = 30, intensity_min = 0)
 \item{query}{Character vector of query expressions, or a \code{list} of character
 vectors of ions or expression strings.}
 
-\item{dalton}{Tolerance in Dalton (\code{TOLERANCEMZ}). Default is \code{0.01}.}
+\item{dalton}{Absolute m/z tolerance in Da. Default is \code{0.01}.}
 
-\item{ppm}{Tolerance in parts per million (\code{TOLERANCEPPM}). Default is
-\code{30.0}.}
+\item{ppm}{Relative m/z tolerance in parts per million, added to \code{dalton}.
+Default is \code{30.0}.}
 
 \item{intensity_min}{Minimal relative intensity threshold in percent
 (\code{INTENSITYPERCENT}). Omitted when \verb{<= 0}. Default is \code{0.0}.}
@@ -28,13 +28,44 @@ list of ion vectors/expressions) into MassQL queries
 (\verb{QUERY scaninfo(MS2DATA) WHERE ...}).
 }
 \details{
-MassQL ignores \code{TOLERANCEMZ} when \code{TOLERANCEPPM} is present on the
-same condition. When \code{dalton > 0}, \code{to_massql()} emits a single effective
-\code{TOLERANCEMZ} modifier (\code{round(dalton + max(mz) * ppm / 1e6, 6)} for
-\code{MS2PROD}, and static \code{dalton} for \code{MS2NL}). When \code{dalton == 0} and
-\code{ppm > 0}, it emits \code{TOLERANCEPPM}. Disjunctive normal form clauses that
-cannot share a single \code{OR} group are joined with \code{" ; "}.
+Ion tokens are \verb{<m/z>_frag} (fragment m/z) and \verb{<mass>_nl}
+(neutral loss in Da), combined with \code{&}, \code{|} and parentheses (\code{&} binds
+tighter). Malformed tokens raise an error of class \code{stq_input_error}.
+
+MassQL uses \code{TOLERANCEPPM} and ignores \code{TOLERANCEMZ} when both are given,
+and defaults to 0.1 Da when neither is given, so one tolerance modifier is
+emitted per condition:
+\itemize{
+\item \code{dalton > 0}: \code{TOLERANCEMZ} = \code{dalton + max(mz) * ppm / 1e6} rounded up
+to 1e-6 Da for \code{MS2PROD}, and \code{dalton} for \code{MS2NL};
+\item \code{dalton == 0}, \code{ppm > 0}: \code{TOLERANCEPPM} = \code{ppm};
+\item \code{dalton == 0}, \code{ppm == 0}: \code{TOLERANCEMZ=0}.
+}
+
+Differences from the matching used by \code{\link[=spectra_to_queries]{spectra_to_queries()}} to compute
+MCC:
+\itemize{
+\item \code{MS2NL}: the pipeline matches a peak within
+\code{dalton + (precursor - nl) * ppm / 1e6} of \code{precursor - nl}; the emitted
+\code{TOLERANCEMZ} is \code{dalton} alone, and MassQL applies \code{TOLERANCEPPM} to the
+neutral-loss value. A query with neutral losses can match fewer spectra
+than its reported MCC implies.
+\item \code{INTENSITYPERCENT}: MassQL keeps peaks strictly above the threshold; the
+pipeline keeps peaks at or above \code{intensity_min}.
+}
+
+Expressions are expanded to disjunctive normal form and absorbed
+(\code{A | (A & B) = A}). When all clauses share a common conjunction and differ
+by one ion of the same type, one \verb{MS2PROD=(a OR b)} or \verb{MS2NL=(a OR b)}
+condition is emitted. Otherwise one MassQL query per clause is returned,
+joined by \code{" ; "}; split on \code{" ; "} and run each query separately, as the
+MassQL grammar has no query separator.
 }
 \examples{
 to_massql("108.0804_frag & 241.095_nl", dalton = 0.01, ppm = 30)
+}
+\references{
+Damiani et al. (2025) A universal language for finding mass
+spectrometry data patterns. \doi{10.1038/s41592-025-02660-z};
+\url{https://mwang87.github.io/MassQueryLanguage_Documentation/}
 }

@@ -33,8 +33,7 @@ score.
 - **MS2 spectra with class metadata**: an `.mgf` file, a `Spectra` object, or a
   compatible `data.frame` containing MS2 scans, `precursorMz` values, and a
   `SKELETON` metadata column (lowercase `skeleton` is accepted as a fallback).
-  Skeleton classes with fewer than `n_skel_min` non-empty MS2 spectra are
-  skipped.
+  Skeleton classes with fewer than `n_skel_min` MS2 spectra are skipped.
 
 ## Installation
 
@@ -103,13 +102,14 @@ qualifying skeleton class:
 
 - `skeleton`: chemical class identifier.
 - `mcc`: Matthews Correlation Coefficient on the input MS2 library.
-- `combined_ions`: minimal conjunctive/disjunctive combination of fragments
-  (`_frag`) and neutral losses (`_nl`).
+- `combined_ions`: conjunction (`&`) of fragments (`_frag`, m/z) and neutral
+  losses (`_nl`, Da).
 - `massql`: executable
   [MassQL](https://mwang87.github.io/MassQueryLanguage_Documentation/) query
   (`QUERY scaninfo(MS2DATA) WHERE ...`).
 
-You can also convert ion expressions or vectors directly with `to_massql()`:
+Ion expressions, including disjunctions, can be converted directly with
+`to_massql()`:
 
 ```r
 SpectraToQueries::to_massql(
@@ -121,16 +121,11 @@ SpectraToQueries::to_massql(
 
 Notes on query semantics:
 
-- MassQL ignores `TOLERANCEMZ` when `TOLERANCEPPM` is present on the same
-  condition. When `dalton > 0`, `to_massql()` emits a single `:TOLERANCEMZ=`
-  modifier (`round(dalton + max(mz) * ppm / 1e6, 6)` on `MS2PROD` and static
-  `dalton` on `MS2NL`). When `dalton == 0` and `ppm > 0`, it emits
-  `:TOLERANCEPPM=`.
-- Disjunctive clauses in `combined_ions` are expanded to disjunctive normal form
-  and separated by `" ; "` in `massql`.
-- Peak matching evaluates binary peak presence after relative base-peak
-  normalization (`0` to `100`) and `intensity_min` filtering; relative intensity
-  ratios between fragments are not encoded in the queries.
+- Queries encode peak presence after base-peak normalization (`0` to `100`) and
+  `intensity_min` filtering; intensity ratios between peaks are not encoded.
+- Tolerance modifiers, and where the emitted MassQL differs from the matching
+  used to compute `mcc` (neutral-loss tolerance, `INTENSITYPERCENT` boundary),
+  are documented in `?to_massql`.
 - `+` characters in `SKELETON` labels are replaced with `.` for internal
   grouping (a warning is emitted if distinct labels collide).
 

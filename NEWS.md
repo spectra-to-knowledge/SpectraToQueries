@@ -1,4 +1,21 @@
-# SpectraToQueries
+# SpectraToQueries (development version)
+
+## Bug fixes
+
+- Spectra without a `TITLE` are no longer dropped during preprocessing.
+- `to_massql()` raises `stq_input_error` on malformed or non-positive ion tokens
+  instead of dropping them.
+- `MS2PROD` `TOLERANCEMZ` values are rounded up to 1e-6 Da so the emitted window
+  contains the window used to compute MCC (bundled reference queries: 20
+  tolerances +1e-6 Da; MCC and ion combinations unchanged).
+- `decimals`, `ions_max`, `n_skel_min`, and `n_spec_min` must be whole numbers.
+
+## Documentation
+
+- `?to_massql` documents where emitted MassQL differs from the matching used for
+  MCC (`MS2NL` tolerance, `INTENSITYPERCENT` boundary, `" ; "` joins).
+- `?spectra_to_queries` states the MCC definition and the meaning of `dalton`,
+  `ppm`, `zero_val`, and `n_skel_min`.
 
 # SpectraToQueries 0.0.0.9002
 

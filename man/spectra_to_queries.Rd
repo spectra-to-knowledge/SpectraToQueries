@@ -29,9 +29,11 @@ file. If \code{NULL}, loads the example \link{mia_spectra_df} dataset. If the st
 \item{export}{Export file path for the resulting TSV table (or \code{NULL} to
 skip writing to disk). Default is \code{"data/interim/queries.tsv"}.}
 
-\item{dalton}{Tolerance in Dalton. Default is \code{0.01}.}
+\item{dalton}{Absolute m/z tolerance in Da, added to the \code{ppm} term: two m/z
+values match when \verb{|a - b| <= dalton + b * ppm / 1e6}. Default is \code{0.01}.}
 
-\item{decimals}{Number of decimals for rounding. Default is \code{4L}.}
+\item{decimals}{Decimal places for reported m/z values and MCC; MCC ties are
+resolved at this precision. Default is \code{4L}.}
 
 \item{intensity_min}{Minimal relative intensity threshold (0 to 100). Default
 is \code{0.0}.}
@@ -39,16 +41,17 @@ is \code{0.0}.}
 \item{ions_max}{Maximal number of ions in a query combination. Default is
 \code{10L}.}
 
-\item{n_skel_min}{Minimal number of spectra per skeleton class. Default is
-\code{5L}.}
+\item{n_skel_min}{Minimal number of MS2 spectra per skeleton class
+(spectra without peaks count). Default is \code{5L}.}
 
-\item{n_spec_min}{Minimal number of spectra where a signal has to be found.
-Default is \code{3L}.}
+\item{n_spec_min}{Minimal number of spectra (all classes) in which a fragment
+or neutral loss must be found to be a candidate. Default is \code{3L}.}
 
-\item{ppm}{Tolerance in parts per million. Default is \code{30.0}.}
+\item{ppm}{Relative m/z tolerance in parts per million, added to \code{dalton}.
+Default is \code{30.0}.}
 
-\item{mcc_min}{Minimal single-ion Matthews Correlation Coefficient. Default
-is \code{0.0}.}
+\item{mcc_min}{Minimal single-ion Matthews Correlation Coefficient, in
+\verb{[-1, 1]}. Default is \code{0.0}.}
 
 \item{precision_min}{Minimal single-ion precision (pre-filter before MCC).
 Default is \code{0.0}.}
@@ -56,7 +59,9 @@ Default is \code{0.0}.}
 \item{recall_min}{Minimal single-ion recall (pre-filter before MCC). Default
 is \code{0.0}.}
 
-\item{zero_val}{Zero value threshold for intensity. Default is \code{0.0}.}
+\item{zero_val}{Feature filter: fragment and neutral-loss features whose
+relative intensity (0 to 100 per spectrum), summed over all spectra, is
+\verb{<= zero_val} are not evaluated. Default is \code{0.0} (drop all-zero features).}
 }
 \value{
 Invisibly returns a \code{data.frame} with columns \code{skeleton}, \code{mcc},
@@ -74,16 +79,31 @@ For each skeleton class with at least \code{n_skel_min} spectra, the pipeline:
 \item Normalizes MS2 intensities, removes sub-threshold and non-positive
 neutral-loss peaks, and aligns m/z values across spectra using
 intensity-weighted consensus centroids within \code{dalton + mz * ppm / 1e6}.
-\item Evaluates candidate fragment and neutral-loss centroids against the raw
-unprocessed spectra (requiring \code{precursor_mz - nl > 0}).
+\item Evaluates candidate fragment and neutral-loss centroids against the input
+spectra after \code{intensity_min} filtering only (requiring
+\code{precursor_mz - nl > 0}).
 \item Selects up to \code{ions_max} candidate ions per skeleton using greedy
 hitting-set pruning on 100\%-recall ions followed by forward conjunctive
 MCC selection with negative-class correlation penalty (mRMR).
 \item Prunes the power set of ion combinations via Branch-and-Bound when the
 optimistic zero-FP upper bound cannot reach the current best MCC.
-\item Returns the single most parsimonious query achieving the maximum MCC per
-skeleton and translates it to MassQL via \code{\link[=to_massql]{to_massql()}}.
+\item Returns, per skeleton, the conjunction with the highest MCC (rounded to
+\code{decimals}); ties go to fewer ions, then higher unrounded MCC, higher
+precision, and more fragments. It is translated to MassQL via
+\code{\link[=to_massql]{to_massql()}}.
 }
+
+MCC is computed over all MS2 spectra with a non-empty \code{SKELETON}, with the
+skeleton as the positive class and all other skeletons as negatives:
+\deqn{
+  MCC = \frac{TP \cdot TN - FP \cdot FN}
+  {\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}
+}{
+  MCC = (TP*TN - FP*FN) / sqrt((TP+FP)(TP+FN)(TN+FP)(TN+FN))
+}
+and is set to 0 when the denominator is 0 (Matthews 1975,
+\doi{10.1016/0005-2795(75)90109-9}; Chicco and Jurman 2020,
+\doi{10.1186/s12864-019-6413-7}).
 }
 \examples{
 df <- data.frame(

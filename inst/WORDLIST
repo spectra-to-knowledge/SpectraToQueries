@@ -3,12 +3,16 @@ BiocVersion
 CMD
 Cheminform
 Cheminformatics
+Chicco
 Codecov
 Connor
+Da
+Damiani
 FP
 Gatto
 Gibb
 Indole
+Jurman
 Kyungha
 Liesa
 Lifecycle
@@ -26,10 +30,10 @@ Rainer
 Salzer
 Spectrometry
 TSV
-Unbinned
 Vicini
 al
 centroiding
+disjunctions
 et
 github
 https
@@ -42,4 +46,4 @@ pre
 spectrometry
 taxonomicallyinformedannotation
 tima
-unbinned
+unrounded

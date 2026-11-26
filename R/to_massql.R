@@ -143,18 +143,44 @@ parse_massql_dnf <- function(q) {
 #'   list of ion vectors/expressions) into MassQL queries
 #'   (`QUERY scaninfo(MS2DATA) WHERE ...`).
 #'
-#' @details MassQL ignores `TOLERANCEMZ` when `TOLERANCEPPM` is present on the
-#'   same condition. When `dalton > 0`, `to_massql()` emits a single effective
-#'   `TOLERANCEMZ` modifier (`round(dalton + max(mz) * ppm / 1e6, 6)` for
-#'   `MS2PROD`, and static `dalton` for `MS2NL`). When `dalton == 0` and
-#'   `ppm > 0`, it emits `TOLERANCEPPM`. Disjunctive normal form clauses that
-#'   cannot share a single `OR` group are joined with `" ; "`.
+#' @details Ion tokens are `<m/z>_frag` (fragment m/z) and `<mass>_nl`
+#'   (neutral loss in Da), combined with `&`, `|` and parentheses (`&` binds
+#'   tighter). Malformed tokens raise an error of class `stq_input_error`.
+#'
+#'   MassQL uses `TOLERANCEPPM` and ignores `TOLERANCEMZ` when both are given,
+#'   and defaults to 0.1 Da when neither is given, so one tolerance modifier is
+#'   emitted per condition:
+#'   - `dalton > 0`: `TOLERANCEMZ` = `dalton + max(mz) * ppm / 1e6` rounded up
+#'     to 1e-6 Da for `MS2PROD`, and `dalton` for `MS2NL`;
+#'   - `dalton == 0`, `ppm > 0`: `TOLERANCEPPM` = `ppm`;
+#'   - `dalton == 0`, `ppm == 0`: `TOLERANCEMZ=0`.
+#'
+#'   Differences from the matching used by [spectra_to_queries()] to compute
+#'   MCC:
+#'   - `MS2NL`: the pipeline matches a peak within
+#'     `dalton + (precursor - nl) * ppm / 1e6` of `precursor - nl`; the emitted
+#'     `TOLERANCEMZ` is `dalton` alone, and MassQL applies `TOLERANCEPPM` to the
+#'     neutral-loss value. A query with neutral losses can match fewer spectra
+#'     than its reported MCC implies.
+#'   - `INTENSITYPERCENT`: MassQL keeps peaks strictly above the threshold; the
+#'     pipeline keeps peaks at or above `intensity_min`.
+#'
+#'   Expressions are expanded to disjunctive normal form and absorbed
+#'   (`A | (A & B) = A`). When all clauses share a common conjunction and differ
+#'   by one ion of the same type, one `MS2PROD=(a OR b)` or `MS2NL=(a OR b)`
+#'   condition is emitted. Otherwise one MassQL query per clause is returned,
+#'   joined by `" ; "`; split on `" ; "` and run each query separately, as the
+#'   MassQL grammar has no query separator.
+#'
+#' @references Damiani et al. (2025) A universal language for finding mass
+#'   spectrometry data patterns. \doi{10.1038/s41592-025-02660-z};
+#'   <https://mwang87.github.io/MassQueryLanguage_Documentation/>
 #'
 #' @param query Character vector of query expressions, or a `list` of character
 #'   vectors of ions or expression strings.
-#' @param dalton Tolerance in Dalton (`TOLERANCEMZ`). Default is `0.01`.
-#' @param ppm Tolerance in parts per million (`TOLERANCEPPM`). Default is
-#'   `30.0`.
+#' @param dalton Absolute m/z tolerance in Da. Default is `0.01`.
+#' @param ppm Relative m/z tolerance in parts per million, added to `dalton`.
+#'   Default is `30.0`.
 #' @param intensity_min Minimal relative intensity threshold in percent
 #'   (`INTENSITYPERCENT`). Omitted when `<= 0`. Default is `0.0`.
 #'

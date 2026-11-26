@@ -28,8 +28,8 @@ For each chemical class (`SKELETON`) with at least `n_skel_min` spectra,
    losses are removed, and m/z values across spectra are aligned to
    intensity-weighted consensus centroids within `dalton + mz * ppm / 1e6`.
 2. **Centroid evaluation on unprocessed spectra**: Candidate fragment and
-   neutral-loss centroids are matched directly against the unprocessed spectra,
-   enforcing physical feasibility (`precursor_mz - nl > 0`).
+   neutral-loss centroids are matched against the input spectra after
+   `intensity_min` filtering only, requiring `precursor_mz - nl > 0`.
 3. **Candidate ion selection (hitting set + mRMR)**: Exact duplicate hit
    profiles are collapsed. Ions with 100% recall on the target skeleton are
    pruned via a greedy hitting-set cover of false-positive spectra, and
@@ -74,14 +74,9 @@ to an `.mgf` file containing a `SKELETON` metadata field.
 
 ## Converting expressions to MassQL
 
-`to_massql()` converts any ion expression (or list of ion vectors) into a MassQL
-query. Because MassQL ignores `TOLERANCEMZ` when `TOLERANCEPPM` is present on
-the same condition, `to_massql()` emits a single effective tolerance modifier
-per condition: `:TOLERANCEMZ=` (`round(dalton + max(mz) * ppm / 1e6, 6)` on
-`MS2PROD`, and static `dalton` on `MS2NL`) when `dalton > 0`, or
-`:TOLERANCEPPM=` when `dalton == 0` and `ppm > 0`, plus optional
-`:INTENSITYPERCENT=` when `intensity_min > 0`. Disjunctive (`|`) clauses are
-expanded to disjunctive normal form and joined with `; `.
+`to_massql()` converts any ion expression (or list of ion vectors) into MassQL.
+Tolerance modifiers and the differences from the matching used to compute MCC
+are documented in `?to_massql`.
 
 ```{r}
 #| label: "to-massql"
