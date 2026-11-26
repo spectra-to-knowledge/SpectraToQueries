@@ -2,6 +2,7 @@
 ^.*\.iml$
 ^.*\.log$
 ^AGENTS[.]md$
+^AUDIT\.md$
 ^CITATION\.cff$
 ^CLAUDE[.]md$
 ^CONTRIBUTING\.md$
