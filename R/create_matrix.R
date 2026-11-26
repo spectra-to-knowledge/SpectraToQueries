@@ -1,14 +1,14 @@
 #' @title Create matrix
 #'
 #' @param spectra Spectra object (binned)
-#' @param zero_val Zero value threshold for filtering columns
 #' @param name Row names for the resulting matrix
 #'
-#' @return A matrix with spectra intensity data and m/z column names
+#' @return Spectra x m/z intensity matrix; columns whose intensities are all
+#'   zero are dropped.
 #'
 #' @keywords internal
 #' @noRd
-create_matrix <- function(spectra, zero_val = 0, name) {
+create_matrix <- function(spectra, name) {
   pks <- Spectra::peaksData(spectra)
   n_spectra <- length(pks)
 
@@ -32,7 +32,7 @@ create_matrix <- function(spectra, zero_val = 0, name) {
   ) {
     all_int <- unlist(lapply(pks, function(x) x[, 2L]), use.names = FALSE)
     dim(all_int) <- c(lens[1L], n_spectra)
-    keep_cols <- rowSums(all_int) > zero_val
+    keep_cols <- rowSums(all_int) > 0
     spectra_mat <- t(all_int[keep_cols, , drop = FALSE])
     colnames(spectra_mat) <- ref_mz[keep_cols]
     rownames(spectra_mat) <- name
@@ -60,7 +60,7 @@ create_matrix <- function(spectra, zero_val = 0, name) {
     spectra_mat[cbind(row_idx, col_idx)] <- all_int
   }
 
-  keep_cols <- colSums(spectra_mat) > zero_val
+  keep_cols <- colSums(spectra_mat) > 0
   spectra_mat <- spectra_mat[, keep_cols, drop = FALSE]
   colnames(spectra_mat) <- u_mz[keep_cols]
   rownames(spectra_mat) <- name

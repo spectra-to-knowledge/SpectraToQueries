@@ -309,7 +309,7 @@ testthat::test_that("spectra conversion and matrix helpers round-trip", {
 
 testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
   # 0 spectra
-  mat_0 <- create_matrix(Spectra::Spectra(), zero_val = 0, name = character(0))
+  mat_0 <- create_matrix(Spectra::Spectra(), name = character(0))
   testthat::expect_identical(dim(mat_0), c(0L, 0L))
 
   # Spectra with 0 peaks
@@ -319,7 +319,6 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
   )
   mat_no_pks <- create_matrix(
     df_to_spectra(df_no_pks),
-    zero_val = 0,
     name = c("A", "B")
   )
   testthat::expect_identical(dim(mat_no_pks), c(2L, 0L))
@@ -333,7 +332,6 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
   )
   mat_one_empty <- create_matrix(
     df_to_spectra(df_one_empty),
-    zero_val = 0,
     name = c("A", "B")
   )
   testthat::expect_identical(
@@ -346,18 +344,14 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
     )
   )
 
-  # Fast path (shared sorted m/z grid) zero_val boundary
+  # Fast path (shared sorted m/z grid) drops all-zero columns
   df_same <- make_spectra_df(
     c("S1", "S2"),
     list(c(100, 200), c(100, 200)),
-    list(c(4, 10), c(6, 20))
+    list(c(0, 10), c(0, 20))
   )
-  sp_same <- df_to_spectra(df_same)
-
-  # Column "100" has sum 10; with zero_val = 10 it must be dropped (> not >=)
-  mat_same_z10 <- create_matrix(sp_same, zero_val = 10, name = c("S1", "S2"))
   testthat::expect_identical(
-    mat_same_z10,
+    create_matrix(df_to_spectra(df_same), name = c("S1", "S2")),
     matrix(
       c(10, 20),
       nrow = 2L,
@@ -365,12 +359,8 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
       dimnames = list(c("S1", "S2"), "200")
     )
   )
-  # All columns <= zero_val in fast path
-  mat_same_z50 <- create_matrix(sp_same, zero_val = 50, name = c("S1", "S2"))
-  testthat::expect_identical(dim(mat_same_z50), c(2L, 0L))
-  testthat::expect_identical(rownames(mat_same_z50), c("S1", "S2"))
 
-  # Middle-spectrum grid difference (sparse path) + zero_val boundaries
+  # Middle-spectrum grid difference (sparse path)
   df_mid_diff <- make_spectra_df(
     c("S1", "S2", "S3"),
     list(c(100, 200), c(100, 300), c(100, 200)),
@@ -380,7 +370,6 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
 
   mat_mid <- create_matrix(
     sp_mid_diff,
-    zero_val = 0,
     name = df_mid_diff$SKELETON
   )
   expected_mid <- matrix(
@@ -400,23 +389,6 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
     dimnames = list(c("S1", "S2", "S3"), c("100", "200", "300"))
   )
   testthat::expect_identical(mat_mid, expected_mid)
-
-  # Sparse path boundary: colSums are 90, 80, 40; zero_val = 40 drops "300"
-  mat_mid_z40 <- create_matrix(
-    sp_mid_diff,
-    zero_val = 40,
-    name = df_mid_diff$SKELETON
-  )
-  testthat::expect_identical(colnames(mat_mid_z40), c("100", "200"))
-
-  # Sparse path all columns <= zero_val
-  mat_mid_z100 <- create_matrix(
-    sp_mid_diff,
-    zero_val = 100,
-    name = df_mid_diff$SKELETON
-  )
-  testthat::expect_identical(dim(mat_mid_z100), c(3L, 0L))
-  testthat::expect_identical(rownames(mat_mid_z100), c("S1", "S2", "S3"))
 })
 
 testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
@@ -893,7 +865,10 @@ testthat::test_that("extracted pipeline helpers handle boundaries and ties", {
     candidates = cands_in,
     skeleton_counts = skel_counts,
     total_spectra = 4,
-    decimals = 4L
+    decimals = 4L,
+    dalton = 0.01,
+    ppm = 30,
+    intensity_min = 0
   )
   testthat::expect_identical(summary_df$skeleton, c("SkelA", "SkelB"))
   testthat::expect_equal(summary_df$mcc, c(1.0, 0.0))
@@ -1117,7 +1092,6 @@ testthat::test_that("pipeline handles numeric skeletons and backends", {
   )
   mat_dup_mz <- create_matrix(
     df_to_spectra(df_dup_mz),
-    zero_val = 0,
     name = c("A", "B")
   )
   testthat::expect_identical(mat_dup_mz["A", "100"], 35.0)

@@ -564,9 +564,9 @@ summarize_best_queries <- function(
   skeleton_counts,
   total_spectra,
   decimals,
-  dalton = 0.01,
-  ppm = 30.0,
-  intensity_min = 0.0
+  dalton,
+  ppm,
+  intensity_min
 ) {
   if (length(candidates$ions) == 0L) {
     return(empty_query_table())
