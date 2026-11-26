@@ -152,7 +152,10 @@ preprocess_spectra <- function(spectra_obj, dalton, ppm, intensity_min) {
   sp <- Spectra::reduceSpectra(spectra_obj, tolerance = dalton, ppm = ppm)
   if ("TITLE" %in% Spectra::spectraVariables(sp)) {
     titles <- sp$TITLE
-    if (anyDuplicated(titles) > 0L || is.unsorted(titles, na.rm = TRUE)) {
+    if (anyDuplicated(titles, incomparables = NA) > 0L) {
+      # `combineSpectra()` drops spectra whose grouping key is NA
+      no_title <- is.na(titles)
+      titles[no_title] <- sprintf("\r%d", which(no_title))
       sp <- Spectra::combineSpectra(sp, f = titles)
     }
   }

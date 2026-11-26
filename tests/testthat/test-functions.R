@@ -1155,3 +1155,16 @@ testthat::test_that("spectra_to_queries works when TITLE is absent", {
   testthat::expect_equal(res$mcc, c(1.0, 1.0), tolerance = 1e-12)
   testthat::expect_identical(res$combined_ions, c("100_frag", "200_frag"))
 })
+
+testthat::test_that("preprocess_spectra keeps spectra with missing TITLE", {
+  sp <- df_to_spectra(make_spectra_df(
+    c("A", "A", "B", "B"),
+    list(c(100.0, 150.0), c(100.0, 160.0), c(200.0, 250.0), c(200.0, 260.0)),
+    TITLE = c("t1", NA, "t1", NA),
+    precursorMz = rep(300.0, 4L)
+  ))
+  out <- preprocess_spectra(sp, dalton = 0.01, ppm = 30, intensity_min = 0)
+  # "t1" spectra are merged; each NA-TITLE spectrum stays a separate spectrum
+  testthat::expect_identical(length(out), 3L)
+  testthat::expect_setequal(out$SKELETON, c("A", "A", "B"))
+})
