@@ -1195,3 +1195,17 @@ testthat::test_that("MS2PROD TOLERANCEMZ contains the internal match window", {
   testthat::expect_true(all(tols >= exact - 1e-12))
   testthat::expect_true(all(tols - exact < 1e-6))
 })
+
+testthat::test_that("count arguments must be whole numbers", {
+  for (args in list(
+    list(ions_max = 2.5),
+    list(n_skel_min = 1.5),
+    list(n_spec_min = 2.2),
+    list(decimals = 3.5)
+  )) {
+    testthat::expect_error(
+      do.call(spectra_to_queries, c(list(export = NULL), args)),
+      class = "stq_input_error"
+    )
+  }
+})
