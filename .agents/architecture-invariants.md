@@ -51,28 +51,29 @@ Every invariant below is tested in `tests/testthat/test-architecture.R` or
   `total_spectra` or MCC denominators. Accept lowercase `skeleton` as fallback
   in `load_input_spectra()`.
 
-## 5. Boolean Precedence and MassQL Semantics (`to_massql`, `combine_ions_minimal`)
+## 5. Boolean Precedence and MassQL Semantics (`to_massql`)
 
 - Match `_frag` and `_nl` suffixes strictly at token end (`endsWith()`), never
-  by unanchored substring search.
-- Parenthesize multi-term OR clauses produced by `combine_ions_minimal()` so
-  `A & (B | C)` never collapses into `A & B | C`.
+  by unanchored substring search. Malformed or non-positive tokens raise
+  `stq_input_error` in `parse_query_ions()`; never drop them silently.
 - Parse expressions in `to_massql()` using `parse_massql_dnf()` (explicit env
   cursor state, no `<<-` superassignment), distribute to DNF, apply superset
   absorption, and join independent OR clauses with `" ; "`.
 - Upstream MassQL ignores `TOLERANCEMZ` whenever `TOLERANCEPPM` is present on
   the same condition. Therefore emit a single effective tolerance modifier per
   condition:
-  - When `dalton > 0`: `:TOLERANCEMZ=round(dalton + max(mz) * ppm / 1e6, 6L)` on
-    `MS2PROD` and static `:TOLERANCEMZ=dalton` on `MS2NL`.
+  - When `dalton > 0`: `:TOLERANCEMZ=` `dalton + max(mz) * ppm / 1e6` rounded up
+    to 1e-6 Da on `MS2PROD` (the emitted window must contain the evaluation
+    window), and static `:TOLERANCEMZ=dalton` on `MS2NL`.
   - When `dalton == 0 && ppm > 0`: `:TOLERANCEPPM=ppm`.
-  - Omit tolerance modifier when both `dalton == 0` and `ppm == 0`.
+  - When `dalton == 0 && ppm == 0`: `:TOLERANCEMZ=0`. Never omit the modifier:
+    MassQL defaults to 0.1 Da.
 - Format numeric literals via `fmt_num()` (`scientific = FALSE`, `trim = TRUE`,
   `digits = 15L`) so values like `1e-04` never enter MassQL queries.
 
 ## 6. Dataset Provenance Hygiene
 
-- `spectra_to_df()` in `R/spectra_utils.R` must strip directory prefixes from
+- `spectra_to_df()` in `R/spectra_df.R` must strip directory prefixes from
   non-`NA` `dataOrigin` values with `basename()`.
 - Bundled `mia_spectra_df` and `mia_spectra_grouped_df` must never contain `/`
   or `\` in `dataOrigin` (`test-architecture.R`).

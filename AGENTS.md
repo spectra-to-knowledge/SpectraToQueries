@@ -27,10 +27,10 @@ reference `AGENTS.md` or `.agents/` from human docs, `R/`, `man/`, or
 
 ## Repository Map
 
-- `R/`: Package source (`spectra_to_queries.R`, `combine_ions_minimal.R`,
-  `harmonize_mzs.R`, `fix_binned_mzs.R`, `create_matrix.R`, `filter_matrix.R`,
-  `normalize_peaks.R`, `perform_list_of_queries.R`, `create_dir.R`,
-  `spectra_utils.R`, `data.R`, `SpectraToQueries-package.R`).
+- `R/`: Package source (`spectra_to_queries.R`, `to_massql.R`,
+  `harmonize_mzs.R`, `refine_feature_mzs.R`, `create_matrix.R`,
+  `filter_matrix.R`, `normalize_peaks.R`, `query_hits.R`, `create_dir.R`,
+  `input_checks.R`, `spectra_df.R`, `data.R`, `SpectraToQueries-package.R`).
 - `tests/testthat/`: `test-architecture.R` (contracts and characterization) and
   `test-functions.R` (unit, boundary, backend, and pipeline tests).
 - `data/` & `data-raw/`: `mia_spectra_df.rda`, `mia_spectra_grouped_df.rda`, and
