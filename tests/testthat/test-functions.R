@@ -2,7 +2,6 @@ testthat::test_that("combine_ions_minimal simplifies and sorts expressions", {
   testthat::expect_identical(combine_ions_minimal(list()), "")
   testthat::expect_identical(combine_ions_minimal(list(character(0))), "")
   testthat::expect_identical(combine_ions_minimal(list(c("", NA))), "")
-  testthat::expect_identical(combine_ions_minimal(list("not_an_ion")), "")
 
   # Single ion and numeric (not lexicographic) sorting of fragments then NLs
   testthat::expect_identical(combine_ions_minimal(list("100_frag")), "100_frag")
@@ -19,18 +18,13 @@ testthat::test_that("combine_ions_minimal simplifies and sorts expressions", {
     "5_frag & 100_frag & 200_frag & 5_nl & 20_nl & 50_nl"
   )
 
-  # Strict suffix matching ignores malformed tokens without warnings
-  testthat::expect_no_warning(
-    testthat::expect_identical(
-      combine_ions_minimal(list(
-        "100_fragment",
-        "abc_frag",
-        "Inf_nl",
-        "100_frag"
-      )),
-      "100_frag"
+  # Malformed tokens fail loudly instead of being dropped
+  for (bad in c("100_fragment", "abc_frag", "Inf_nl", "0_frag", "-5_nl")) {
+    testthat::expect_error(
+      combine_ions_minimal(list(c(bad, "100_frag"))),
+      class = "stq_input_error"
     )
-  )
+  }
 
   # Common ions factored out with OR branches (both single and multi-ion)
   testthat::expect_identical(
@@ -88,10 +82,6 @@ testthat::test_that("combine_ions_minimal simplifies and sorts expressions", {
 
   # to_massql translations, precedence, and tolerance qualifier rules
   testthat::expect_identical(to_massql(character(0)), character(0))
-  testthat::expect_identical(
-    to_massql(c("", NA_character_, "bad_ion", "100_fragment")),
-    c("", "", "", "")
-  )
   testthat::expect_identical(
     to_massql("100_frag & 50_nl", dalton = 0.01, ppm = 30, intensity_min = 5),
     paste0(
@@ -562,24 +552,24 @@ testthat::test_that("query matching helpers work across all branches", {
   all_mz <- list(c(100.0, 150.0), c(0.0, 100.0, 200.0), c(250.0), numeric(0))
   prec_mz <- c(Inf, 250.0, 300.0, 250.0)
   valid_ps <- is.finite(prec_mz) & (lengths(all_mz) > 0L)
-  pre <- precompute_ion_hits(
-    unique_ions = c(
-      "100_frag",
-      "50_nl",
-      "300_nl",
-      "250_nl",
-      "bad_ion",
-      "Inf_frag",
-      "100_fragment"
-    ),
-    all_mz = all_mz,
-    precursor_mz = prec_mz,
-    valid_prec_and_spec = valid_ps,
-    dalton = 0.01,
-    ppm = 10
+  for (bad in c("bad_ion", "Inf_frag", "100_fragment")) {
+    testthat::expect_error(
+      precompute_ion_hits(bad, all_mz, prec_mz, valid_ps, 0.01, 10),
+      class = "stq_input_error"
+    )
+  }
+  pre <- list(
+    hits = precompute_ion_hits(
+      unique_ions = c("100_frag", "50_nl", "300_nl", "250_nl"),
+      all_mz = all_mz,
+      precursor_mz = prec_mz,
+      valid_prec_and_spec = valid_ps,
+      dalton = 0.01,
+      ppm = 10
+    )
   )
   testthat::expect_identical(
-    pre$names,
+    names(pre$hits),
     c("100_frag", "50_nl", "300_nl", "250_nl")
   )
   testthat::expect_identical(
@@ -792,7 +782,7 @@ testthat::test_that("pipeline functions handle empty and filtered-out inputs", {
 
 testthat::test_that("extracted pipeline helpers handle boundaries and ties", {
   # parse_query_ions
-  parsed <- parse_query_ions(c("100.5_frag", "bad_frag", "50.25_nl", "Inf_nl"))
+  parsed <- parse_query_ions(c("100.5_frag", "", NA, "50.25_nl"))
   testthat::expect_identical(parsed$frags, 100.5)
   testthat::expect_identical(parsed$nls, 50.25)
   parsed_empty <- parse_query_ions(character(0))
@@ -1167,4 +1157,15 @@ testthat::test_that("preprocess_spectra keeps spectra with missing TITLE", {
   # "t1" spectra are merged; each NA-TITLE spectrum stays a separate spectrum
   testthat::expect_identical(length(out), 3L)
   testthat::expect_setequal(out$SKELETON, c("A", "A", "B"))
+})
+
+testthat::test_that("to_massql rejects malformed ion tokens", {
+  for (q in c("bad_ion", "100_fragment", "100_frag & junk", "abc_frag")) {
+    testthat::expect_error(to_massql(q), class = "stq_input_error")
+  }
+  testthat::expect_error(
+    to_massql(list(c("100_frag", "junk"))),
+    class = "stq_input_error"
+  )
+  testthat::expect_identical(to_massql(c("", NA_character_)), c("", ""))
 })

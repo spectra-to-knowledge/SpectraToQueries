@@ -43,23 +43,42 @@ prepare_query_data <- function(spectra, intensity_min = 0.0) {
   )
 }
 
-#' @title Parse fragment and neutral-loss ions from query character vector
+#' @title Parse fragment and neutral-loss ion tokens
+#' @description Splits tokens of the form `<m/z>_frag` (fragment m/z) and
+#'   `<mass>_nl` (neutral loss, Da) into numeric vectors. Empty and `NA` tokens
+#'   are skipped; any other token without a positive finite value and an exact
+#'   `_frag` or `_nl` suffix raises `stq_input_error`.
 #' @keywords internal
 #' @noRd
 parse_query_ions <- function(ions) {
   ions <- trimws(as.character(ions))
   ions <- ions[!is.na(ions) & nzchar(ions)]
-  extract_suffix <- function(suffix) {
-    hit <- ions[endsWith(ions, suffix)]
-    vals <- suppressWarnings(
-      as.numeric(substr(hit, 1L, nchar(hit) - nchar(suffix)))
-    )
-    vals[is.finite(vals)]
+  is_frag <- endsWith(ions, "_frag")
+  is_nl <- endsWith(ions, "_nl")
+  vals <- suppressWarnings(as.numeric(
+    substr(ions, 1L, nchar(ions) - ifelse(is_frag, 5L, 3L))
+  ))
+  bad <- !(is_frag | is_nl) | !is.finite(vals) | vals <= 0
+  if (any(bad)) {
+    abort_input(sprintf(
+      paste(
+        "Malformed ion token(s): %s.",
+        "Expected `<positive number>_frag` or `<positive number>_nl`."
+      ),
+      paste0("'", ions[bad], "'", collapse = ", ")
+    ))
   }
-  list(frags = extract_suffix("_frag"), nls = extract_suffix("_nl"))
+  list(frags = vals[is_frag], nls = vals[is_nl])
 }
 
-#' @title Precompute single-ion logical hit vectors across all spectra
+#' @title Precompute single-ion hit vectors across all spectra
+#' @description For each ion token returns a logical vector over spectra. A
+#'   fragment `f_frag` hits a spectrum with a peak within
+#'   `dalton + f * ppm / 1e6` of `f`. A neutral loss `n_nl` hits a spectrum
+#'   with finite precursor m/z `p` when `p - n > 0` and a peak lies within
+#'   `dalton + (p - n) * ppm / 1e6` of `p - n` (window on the fragment m/z).
+#'   Intervals are closed.
+#' @return Named list of logical vectors, one per element of `unique_ions`.
 #' @keywords internal
 #' @noRd
 precompute_ion_hits <- function(
@@ -72,37 +91,24 @@ precompute_ion_hits <- function(
 ) {
   n_spec <- length(all_mz)
   valid_idx <- which(valid_prec_and_spec)
-  hits <- list()
-
-  for (u in unique_ions) {
-    if (endsWith(u, "_frag")) {
-      val <- suppressWarnings(as.numeric(substr(u, 1L, nchar(u) - 5L)))
-      if (is.finite(val)) {
-        tol <- dalton + val * (ppm / 1e6)
-        hits[[u]] <- vapply(
-          all_mz,
-          function(spec_mz) any(abs(spec_mz - val) <= tol),
-          logical(1L)
-        )
-      }
-    } else if (endsWith(u, "_nl")) {
-      val <- suppressWarnings(as.numeric(substr(u, 1L, nchar(u) - 3L)))
-      if (is.finite(val)) {
-        vec <- logical(n_spec)
-        for (idx in valid_idx) {
-          tmz <- precursor_mz[idx] - val
-          if (tmz > 0) {
-            tol <- dalton + tmz * (ppm / 1e6)
-            vec[idx] <- any(abs(all_mz[[idx]] - tmz) <= tol)
-          }
-        }
-        hits[[u]] <- vec
-      }
-    }
+  hit_any <- function(spec_mz, target) {
+    any(abs(spec_mz - target) <= dalton + target * (ppm / 1e6))
   }
 
-  list(
-    names = names(hits),
-    hits = hits
-  )
+  hits <- lapply(unique_ions, function(u) {
+    parsed <- parse_query_ions(u)
+    if (length(parsed$frags) == 1L) {
+      return(vapply(all_mz, hit_any, logical(1L), target = parsed$frags))
+    }
+    vec <- logical(n_spec)
+    for (idx in valid_idx) {
+      tmz <- precursor_mz[idx] - parsed$nls
+      if (tmz > 0) {
+        vec[idx] <- hit_any(all_mz[[idx]], tmz)
+      }
+    }
+    vec
+  })
+  names(hits) <- unique_ions
+  hits
 }

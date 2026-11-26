@@ -831,7 +831,7 @@ spectra_to_queries <- function(
   if (!all(zeros)) {
     cand_cols <- unique(c(frag_names, nl_names)[!zeros])
     qd <- prepare_query_data(mia_spectra, intensity_min = intensity_min)
-    pre <- precompute_ion_hits(
+    hits <- precompute_ion_hits(
       unique_ions = cand_cols,
       all_mz = qd$mz,
       precursor_mz = qd$precursor_mz,
@@ -842,7 +842,7 @@ spectra_to_queries <- function(
     merged_mat <- matrix(
       vapply(
         cand_cols,
-        function(u) as.numeric(pre$hits[[u]]),
+        function(u) as.numeric(hits[[u]]),
         numeric(length(mia_spectra))
       ),
       nrow = length(mia_spectra),
@@ -878,11 +878,11 @@ spectra_to_queries <- function(
   candidates <- prune_combinations_bnb(
     ions_list = ions_list,
     skeleton = qd$skeleton,
-    hits_lookup = pre$hits,
+    hits_lookup = hits,
     max_ions = ions_max,
     decimals = decimals
   )
-  rm(ions_list, pre)
+  rm(ions_list, hits)
 
   message("Rank best queries by MCC.")
   skeleton_counts <- table(qd$skeleton)
