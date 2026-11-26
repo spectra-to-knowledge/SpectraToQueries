@@ -605,7 +605,7 @@ summarize_best_queries <- function(
   first <- !duplicated(skel_vec)
   combined_vec <- vapply(
     ions_vec[first],
-    function(x) combine_ions_minimal(list(x)),
+    canonical_ion_conjunction,
     character(1L),
     USE.NAMES = FALSE
   )

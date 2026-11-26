@@ -46,45 +46,16 @@ absorb_dnf_clauses <- function(ion_lists) {
   clauses[keep_min]
 }
 
-#' @title Combine ions into minimal AND/OR expression with sorting
-#'
-#' @description Simplifies a list of conjunctive ion clauses into a minimal
-#'   Boolean expression by canonical sorting (`_frag` then `_nl`), Boolean
-#'   absorption (`A | (A & B) = A`), and common-factor extraction.
-#'
-#' @param ion_lists List of character vectors representing ion combinations
-#'
-#' @return Single character string representing nested AND/OR expression
-#'
+#' @title Format one ion conjunction in canonical order
+#' @description Deduplicates ion tokens and joins them with `" & "`, fragments
+#'   first then neutral losses, each in ascending numeric order.
+#' @param ions Character vector of `_frag` / `_nl` tokens.
+#' @return Single string; `""` when `ions` has no non-empty tokens.
 #' @keywords internal
 #' @noRd
-combine_ions_minimal <- function(ion_lists) {
-  ion_lists <- absorb_dnf_clauses(ion_lists)
-  if (length(ion_lists) == 0L) {
-    return("")
-  }
-  if (length(ion_lists) == 1L) {
-    return(paste(ion_lists[[1L]], collapse = " & "))
-  }
-
-  common_sorted <- Reduce(intersect, ion_lists)
-  remaining <- lapply(ion_lists, setdiff, common_sorted)
-
-  or_parts <- vapply(
-    remaining,
-    function(s) {
-      if (length(s) == 1L) s else sprintf("(%s)", paste(s, collapse = " & "))
-    },
-    character(1L)
-  )
-  or_expr <- paste(or_parts, collapse = " | ")
-
-  if (length(common_sorted) > 0L) {
-    common_expr <- paste(common_sorted, collapse = " & ")
-    paste0(common_expr, " & (", or_expr, ")")
-  } else {
-    or_expr
-  }
+canonical_ion_conjunction <- function(ions) {
+  clause <- absorb_dnf_clauses(list(ions))
+  if (length(clause) == 0L) "" else paste(clause[[1L]], collapse = " & ")
 }
 
 #' @title Parse Boolean ion query string into absorbed DNF clauses
@@ -213,7 +184,7 @@ to_massql <- function(
         if (length(x) == 1L) {
           as.character(x)
         } else {
-          combine_ions_minimal(list(as.character(x)))
+          canonical_ion_conjunction(as.character(x))
         }
       },
       character(1L)

@@ -1,83 +1,61 @@
-testthat::test_that("combine_ions_minimal simplifies and sorts expressions", {
-  testthat::expect_identical(combine_ions_minimal(list()), "")
-  testthat::expect_identical(combine_ions_minimal(list(character(0))), "")
-  testthat::expect_identical(combine_ions_minimal(list(c("", NA))), "")
-
-  # Single ion and numeric (not lexicographic) sorting of fragments then NLs
-  testthat::expect_identical(combine_ions_minimal(list("100_frag")), "100_frag")
-  testthat::expect_identical(combine_ions_minimal(list("50_nl")), "50_nl")
+testthat::test_that("canonical_ion_conjunction sorts and deduplicates", {
+  testthat::expect_identical(canonical_ion_conjunction(character(0)), "")
+  testthat::expect_identical(canonical_ion_conjunction(c("", NA)), "")
+  testthat::expect_identical(canonical_ion_conjunction("100_frag"), "100_frag")
+  testthat::expect_identical(canonical_ion_conjunction("50_nl"), "50_nl")
+  # Numeric (not lexicographic) order, fragments before neutral losses
   testthat::expect_identical(
-    combine_ions_minimal(list(c(
+    canonical_ion_conjunction(c(
       "200_frag",
       "50_nl",
       "100_frag",
       "5_frag",
       "20_nl",
-      "5_nl"
-    ))),
+      "5_nl",
+      "100_frag"
+    )),
     "5_frag & 100_frag & 200_frag & 5_nl & 20_nl & 50_nl"
   )
-
-  # Malformed tokens fail loudly instead of being dropped
   for (bad in c("100_fragment", "abc_frag", "Inf_nl", "0_frag", "-5_nl")) {
     testthat::expect_error(
-      combine_ions_minimal(list(c(bad, "100_frag"))),
+      canonical_ion_conjunction(c(bad, "100_frag")),
       class = "stq_input_error"
     )
   }
+})
 
-  # Common ions factored out with OR branches (both single and multi-ion)
+testthat::test_that("to_massql distributes, absorbs, and formats queries", {
+  # Absorption A | (A & B) = A
   testthat::expect_identical(
-    combine_ions_minimal(list(
-      c("100_frag", "200_frag"),
-      c("100_frag", "50_nl", "60_nl")
-    )),
-    "100_frag & (200_frag | (50_nl & 60_nl))"
+    to_massql(
+      "(100_frag & 200_frag) | 100_frag | (100_frag & 300_frag)",
+      dalton = 0.01,
+      ppm = 0
+    ),
+    "QUERY scaninfo(MS2DATA) WHERE MS2PROD=100:TOLERANCEMZ=0.01"
   )
-
-  # Disjoint sets (no common ions)
+  # Strict superset clause absorbed; remaining clauses share a common factor
   testthat::expect_identical(
-    combine_ions_minimal(list(
-      c("200_frag", "100_frag"),
-      c("50_nl")
-    )),
-    "(100_frag & 200_frag) | 50_nl"
+    to_massql(
+      paste(
+        "(100_frag & 200_frag) | (100_frag & 300_frag) |",
+        "(100_frag & 200_frag & 300_frag)"
+      ),
+      dalton = 0.01,
+      ppm = 0
+    ),
+    paste0(
+      "QUERY scaninfo(MS2DATA) WHERE MS2PROD=100:TOLERANCEMZ=0.01 AND ",
+      "MS2PROD=(200 OR 300):TOLERANCEMZ=0.01"
+    )
   )
-
-  # Subset query absorbs superset queries into common ions (kills any -> all)
+  # Duplicate clauses in different order collapse
   testthat::expect_identical(
-    combine_ions_minimal(list(
-      c("100_frag", "200_frag"),
-      c("100_frag"),
-      c("100_frag", "300_frag")
-    )),
-    "100_frag"
-  )
-  # Multi-ion superset absorbed by smaller subset when other clauses remain
-  testthat::expect_identical(
-    combine_ions_minimal(list(
-      c("100_frag", "200_frag"),
-      c("100_frag", "300_frag"),
-      c("100_frag", "200_frag", "300_frag")
-    )),
-    "100_frag & (200_frag | 300_frag)"
-  )
-
-  # Duplicate ions within a query and order-variant remaining sets
-  testthat::expect_identical(
-    combine_ions_minimal(list(
-      c("100_frag", "100_frag", "200_frag"),
-      c("100_frag", "300_frag")
-    )),
-    "100_frag & (200_frag | 300_frag)"
-  )
-  testthat::expect_identical(
-    combine_ions_minimal(list(
-      c("100_frag", "200_frag"),
-      c("300_frag", "400_frag"),
-      c("400_frag", "300_frag")
-    )),
-    "(100_frag & 200_frag) | (300_frag & 400_frag)"
+    to_massql("(300_frag & 400_frag) | (400_frag & 300_frag)", 0.01, 0),
+    paste0(
+      "QUERY scaninfo(MS2DATA) WHERE MS2PROD=300:TOLERANCEMZ=0.01 AND ",
+      "MS2PROD=400:TOLERANCEMZ=0.01"
+    )
   )
 
   # to_massql translations, precedence, and tolerance qualifier rules

@@ -37,7 +37,6 @@ Suggests:
 ByteCompile: TRUE
 Collate:
     'SpectraToQueries-package.R'
-    'combine_ions_minimal.R'
     'create_dir.R'
     'create_matrix.R'
     'data.R'
@@ -48,6 +47,7 @@ Collate:
     'perform_list_of_queries.R'
     'spectra_to_queries.R'
     'spectra_utils.R'
+    'to_massql.R'
 Config/roxygen2/markdown: TRUE
 Config/roxygen2/version: 8.1.1
 Config/testthat/edition: 3
