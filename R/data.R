@@ -4,8 +4,7 @@
 #' indole alkaloids (MIAs) from the MIADB (Monoterpene Indole Alkaloid
 #' Database) across 81 fine-grained chemical skeletons (`SKELETON`). This is
 #' stored as a portable `data.frame` with `mz` and `intensity` peaks as list
-#' columns, and is automatically converted to a [Spectra::Spectra] object
-#' when used in [spectra_to_queries()].
+#' columns; [spectra_to_queries()] converts it with [Spectra::Spectra()].
 #'
 #' @format A `data.frame` with 321 rows and 37 columns:
 #'   - **Metadata columns**: `msLevel`, `rtime`, `acquisitionNum`, `TITLE`,
@@ -30,10 +29,6 @@
 #' The `mia_spectra_df` object represents the spectral data with fine-grained
 #' skeleton annotations. Use `mia_spectra_grouped_df` for the variant with
 #' broader grouped skeleton annotations.
-#'
-#' This portable `data.frame` format enables cross-platform distribution and
-#' is automatically converted to a [Spectra::Spectra] object by
-#' [spectra_to_queries()].
 #'
 #' @examples
 #' utils::data(mia_spectra_df, package = "SpectraToQueries")
@@ -70,10 +65,6 @@
 #' In this dataset, closely related sub-skeletons are merged into broader
 #' skeleton classes (e.g., `corynanthean_1+corynanthean_2+...`) to evaluate
 #' diagnostic ion queries at a higher structural hierarchy level.
-#'
-#' This portable `data.frame` format enables cross-platform distribution and
-#' is automatically converted to a [Spectra::Spectra] object by
-#' [spectra_to_queries()].
 #'
 #' @examples
 #' utils::data(mia_spectra_grouped_df, package = "SpectraToQueries")

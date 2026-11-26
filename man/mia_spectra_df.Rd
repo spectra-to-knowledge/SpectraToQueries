@@ -35,17 +35,12 @@ A \code{data.frame} containing 321 MS/MS spectra of monoterpene
 indole alkaloids (MIAs) from the MIADB (Monoterpene Indole Alkaloid
 Database) across 81 fine-grained chemical skeletons (\code{SKELETON}). This is
 stored as a portable \code{data.frame} with \code{mz} and \code{intensity} peaks as list
-columns, and is automatically converted to a \link[Spectra:Spectra]{Spectra::Spectra} object
-when used in \code{\link[=spectra_to_queries]{spectra_to_queries()}}.
+columns; \code{\link[=spectra_to_queries]{spectra_to_queries()}} converts it with \code{\link[Spectra:Spectra]{Spectra::Spectra()}}.
 }
 \details{
 The \code{mia_spectra_df} object represents the spectral data with fine-grained
 skeleton annotations. Use \code{mia_spectra_grouped_df} for the variant with
 broader grouped skeleton annotations.
-
-This portable \code{data.frame} format enables cross-platform distribution and
-is automatically converted to a \link[Spectra:Spectra]{Spectra::Spectra} object by
-\code{\link[=spectra_to_queries]{spectra_to_queries()}}.
 }
 \examples{
 utils::data(mia_spectra_df, package = "SpectraToQueries")

@@ -40,10 +40,6 @@ with \code{mz} and \code{intensity} peaks as list columns.
 In this dataset, closely related sub-skeletons are merged into broader
 skeleton classes (e.g., \code{corynanthean_1+corynanthean_2+...}) to evaluate
 diagnostic ion queries at a higher structural hierarchy level.
-
-This portable \code{data.frame} format enables cross-platform distribution and
-is automatically converted to a \link[Spectra:Spectra]{Spectra::Spectra} object by
-\code{\link[=spectra_to_queries]{spectra_to_queries()}}.
 }
 \examples{
 utils::data(mia_spectra_grouped_df, package = "SpectraToQueries")
