@@ -1169,3 +1169,29 @@ testthat::test_that("to_massql rejects malformed ion tokens", {
   )
   testthat::expect_identical(to_massql(c("", NA_character_)), c("", ""))
 })
+
+testthat::test_that("MS2PROD TOLERANCEMZ contains the internal match window", {
+  # 0.01 + 108.0804 * 30 / 1e6 = 0.013242412 Da; 6-decimal emission rounds up
+  testthat::expect_identical(
+    to_massql("108.0804_frag", dalton = 0.01, ppm = 30),
+    "QUERY scaninfo(MS2DATA) WHERE MS2PROD=108.0804:TOLERANCEMZ=0.013243"
+  )
+  # Exact 6-decimal windows are emitted unchanged
+  testthat::expect_identical(
+    to_massql("100_frag", dalton = 0.01, ppm = 30),
+    "QUERY scaninfo(MS2DATA) WHERE MS2PROD=100:TOLERANCEMZ=0.013"
+  )
+  set.seed(1L)
+  mzs <- round(stats::runif(200L, 50, 2000), 4L)
+  tols <- vapply(
+    mzs,
+    function(mz) {
+      q <- to_massql(paste0(mz, "_frag"), dalton = 0.01, ppm = 30)
+      as.numeric(sub(".*TOLERANCEMZ=", "", q))
+    },
+    numeric(1L)
+  )
+  exact <- 0.01 + mzs * 30 / 1e6
+  testthat::expect_true(all(tols >= exact - 1e-12))
+  testthat::expect_true(all(tols - exact < 1e-6))
+})

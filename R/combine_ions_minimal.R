@@ -238,7 +238,9 @@ to_massql <- function(
     eff_da <- if (is_nl) {
       dalton
     } else {
-      round(dalton + max(mzs) * (ppm / 1e6), 6L)
+      # Round up to 1e-6 Da so the emitted window contains the match window;
+      # the inner round() absorbs floating-point noise before ceiling().
+      ceiling(round((dalton + max(mzs) * (ppm / 1e6)) * 1e6, 6L)) / 1e6
     }
     paste0(":TOLERANCEMZ=", fmt_num(eff_da), int_mod)
   }
