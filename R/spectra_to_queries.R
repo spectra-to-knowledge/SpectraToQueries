@@ -105,7 +105,7 @@ load_input_spectra <- function(spectra) {
       package = "SpectraToQueries",
       envir = data_env
     )
-    df_to_spectra(data_env[[name]])
+    Spectra::Spectra(data_env[[name]])
   }
 
   if (is.null(spectra)) {
@@ -126,7 +126,7 @@ load_input_spectra <- function(spectra) {
       MsBackendMgf::readMgf() |>
       Spectra::Spectra()
   } else if (is.data.frame(spectra)) {
-    mia_spectra <- df_to_spectra(spectra)
+    mia_spectra <- Spectra::Spectra(spectra)
   } else {
     mia_spectra <- spectra
   }
@@ -175,7 +175,7 @@ preprocess_spectra <- function(spectra_obj, dalton, ppm, intensity_min) {
 #' @title Build feature matrix from harmonized spectra and fix m/z centroids
 #' @keywords internal
 #' @noRd
-bin_and_fix_spectra <- function(
+build_feature_matrix <- function(
   spectra_obj,
   label,
   dalton,
@@ -185,9 +185,9 @@ bin_and_fix_spectra <- function(
 ) {
   mat <- create_matrix(spectra_obj, name = spectra_obj$SKELETON)
   message("Fixing mzs (", label, ")")
-  fix_binned_mzs(
+  refine_feature_mzs(
     mat,
-    original_mzs = spectra_obj,
+    spectra = spectra_obj,
     decimals = decimals,
     dalton = dalton,
     ppm = ppm
@@ -635,7 +635,7 @@ summarize_best_queries <- function(
 #'    neutral-loss peaks, and aligns m/z values across spectra using
 #'    intensity-weighted consensus centroids within `dalton + mz * ppm / 1e6`.
 #' 2. Evaluates candidate fragment and neutral-loss centroids against the raw
-#'    unbinned spectra (requiring `precursor_mz - nl > 0`).
+#'    unprocessed spectra (requiring `precursor_mz - nl > 0`).
 #' 3. Selects up to `ions_max` candidate ions per skeleton using greedy
 #'    hitting-set pruning on 100%-recall ions followed by forward conjunctive
 #'    MCC selection with negative-class correlation penalty (mRMR).
@@ -796,7 +796,7 @@ spectra_to_queries <- function(
   message("Create fragments and neutral-loss feature matrix.")
   message("Remove features not appearing in at least ", n_spec_min, " spectra.")
 
-  spectra_mat <- bin_and_fix_spectra(
+  spectra_mat <- build_feature_matrix(
     mia_spectra_w,
     label = "fragments",
     dalton = dalton,
@@ -804,7 +804,7 @@ spectra_to_queries <- function(
     decimals = decimals,
     n_spec_min = n_spec_min
   )
-  spectra_nl_mat <- bin_and_fix_spectra(
+  spectra_nl_mat <- build_feature_matrix(
     mia_spectra_w_nl,
     label = "losses",
     dalton = dalton,

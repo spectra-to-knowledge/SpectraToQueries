@@ -27,9 +27,9 @@ For each chemical class (`SKELETON`) with at least `n_skel_min` spectra,
    are normalized to 100%, peaks below `intensity_min` and non-positive neutral
    losses are removed, and m/z values across spectra are aligned to
    intensity-weighted consensus centroids within `dalton + mz * ppm / 1e6`.
-2. **Unbinned centroid evaluation**: Candidate fragment and neutral-loss
-   centroids are matched directly against the unbinned spectra, enforcing
-   physical feasibility (`precursor_mz - nl > 0`).
+2. **Centroid evaluation on unprocessed spectra**: Candidate fragment and
+   neutral-loss centroids are matched directly against the unprocessed spectra,
+   enforcing physical feasibility (`precursor_mz - nl > 0`).
 3. **Candidate ion selection (hitting set + mRMR)**: Exact duplicate hit
    profiles are collapsed. Ions with 100% recall on the target skeleton are
    pruned via a greedy hitting-set cover of false-positive spectra, and

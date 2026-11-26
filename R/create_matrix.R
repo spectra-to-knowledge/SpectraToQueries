@@ -1,6 +1,6 @@
 #' @title Create matrix
 #'
-#' @param spectra Spectra object (binned)
+#' @param spectra Spectra object
 #' @param name Row names for the resulting matrix
 #'
 #' @return Spectra x m/z intensity matrix; columns whose intensities are all
@@ -39,7 +39,7 @@ create_matrix <- function(spectra, name) {
     return(spectra_mat)
   }
 
-  # Sparse path (e.g. binned with zero.rm = TRUE)
+  # Sparse path: spectra with differing m/z grids
   all_mz <- unlist(lapply(pks, function(x) x[, 1L]), use.names = FALSE)
   all_int <- unlist(lapply(pks, function(x) x[, 2L]), use.names = FALSE)
   u_mz <- sort(unique(all_mz))

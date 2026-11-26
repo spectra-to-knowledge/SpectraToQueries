@@ -75,7 +75,7 @@ For each skeleton class with at least \code{n_skel_min} spectra, the pipeline:
 neutral-loss peaks, and aligns m/z values across spectra using
 intensity-weighted consensus centroids within \code{dalton + mz * ppm / 1e6}.
 \item Evaluates candidate fragment and neutral-loss centroids against the raw
-unbinned spectra (requiring \code{precursor_mz - nl > 0}).
+unprocessed spectra (requiring \code{precursor_mz - nl > 0}).
 \item Selects up to \code{ions_max} candidate ions per skeleton using greedy
 hitting-set pruning on 100\%-recall ions followed by forward conjunctive
 MCC selection with negative-class correlation penalty (mRMR).

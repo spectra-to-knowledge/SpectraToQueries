@@ -13,11 +13,11 @@ Tests use `testthat` edition 3 and live under `tests/testthat/`:
   `.Rd` inventory in `man/`, clean `basename()` values in bundled `dataOrigin`
   columns, and `DESCRIPTION` `Collate`/`Imports`/`Suggests` synchronization.
 - `tests/testthat/test-functions.R`: Unit, boundary, and end-to-end tests across
-  preprocessing (`normalize_peaks`, `harmonize_mzs`, `fix_binned_mzs`,
+  preprocessing (`normalize_peaks`, `harmonize_mzs`, `refine_feature_mzs`,
   `create_matrix`, `filter_matrix`), candidate selection and Branch-and-Bound
-  search, Boolean minimization (`combine_ions_minimal`), MassQL translation
-  (`to_massql`), input validation, non-`MsBackendMgf` backends
-  (`MsBackendDataFrame`), and full `spectra_to_queries()` execution.
+  search, MassQL translation and Boolean simplification (`to_massql`), input
+  validation, non-`MsBackendMgf` backends (`MsBackendDataFrame`), and full
+  `spectra_to_queries()` execution.
 
 ## Testing Conventions
 
@@ -37,7 +37,7 @@ Tests use `testthat` edition 3 and live under `tests/testthat/`:
 
 3. **Classed Error Conditions**
    - Input validation errors are raised via the internal `abort_input()` helper
-     in `R/spectra_utils.R` with condition class `"stq_input_error"`.
+     in `R/input_checks.R` with condition class `"stq_input_error"`.
    - Missing input file paths in `load_input_spectra()` raise class
      `"stq_file_not_found_error"`.
    - Assert both condition class and message text:

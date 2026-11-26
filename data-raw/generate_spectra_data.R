@@ -1,7 +1,7 @@
 # Run from the package root directory: Rscript data-raw/generate_spectra_data.R
 
 pkg_root <- normalizePath(".", mustWork = TRUE)
-source(file.path(pkg_root, "R", "spectra_utils.R"))
+source(file.path(pkg_root, "R", "spectra_df.R"))
 
 mgf_raw <- file.path(
   pkg_root,

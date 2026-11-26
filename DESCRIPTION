@@ -41,12 +41,13 @@ Collate:
     'create_matrix.R'
     'data.R'
     'filter_matrix.R'
-    'fix_binned_mzs.R'
     'harmonize_mzs.R'
+    'input_checks.R'
     'normalize_peaks.R'
-    'perform_list_of_queries.R'
+    'query_hits.R'
+    'refine_feature_mzs.R'
+    'spectra_df.R'
     'spectra_to_queries.R'
-    'spectra_utils.R'
     'to_massql.R'
 Config/roxygen2/markdown: TRUE
 Config/roxygen2/version: 8.1.1

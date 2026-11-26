@@ -1,11 +1,14 @@
-#' @title Fix binned mzs
+#' @title Refine feature matrix m/z values
 #'
-#' @description Replaces binned matrix column m/z names with intensity-weighted
-#'   centroids of matching unbinned peaks within `dalton + mz * ppm / 1e6`, and
-#'   merges columns that round to the same value.
+#' @description Replaces each column m/z `c` of a spectra x m/z feature matrix
+#'   by the weighted mean of the consensus peaks of `spectra` (from
+#'   [Spectra::combinePeaksData()]) within `dalton + mz * ppm / 1e6` of `c`,
+#'   with weights `max(0, intensity) + 1`; the `+ 1` keeps zero-intensity peaks
+#'   in the mean. Columns whose refined m/z values round to the same value at
+#'   `decimals` are summed.
 #'
-#' @param binned_m Binned matrix
-#' @param original_mzs Original `Spectra` object with unbinned m/z values
+#' @param feature_mat Spectra x m/z intensity matrix
+#' @param spectra `Spectra` object the matrix was built from
 #' @param dalton Tolerance in Dalton
 #' @param ppm Tolerance in parts per million
 #' @param decimals Number of decimal places for rounding
@@ -14,13 +17,13 @@
 #'
 #' @keywords internal
 #' @noRd
-fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
-  if (ncol(binned_m) == 0L) {
-    return(binned_m)
+refine_feature_mzs <- function(feature_mat, spectra, dalton, ppm, decimals) {
+  if (ncol(feature_mat) == 0L) {
+    return(feature_mat)
   }
 
-  if (length(original_mzs) > 0L) {
-    combined_peaks <- original_mzs |>
+  if (length(spectra) > 0L) {
+    combined_peaks <- spectra |>
       Spectra::peaksData() |>
       Spectra::combinePeaksData(
         tolerance = dalton,
@@ -37,7 +40,7 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
     all_ints <- numeric(0)
   }
 
-  old_colnames <- as.numeric(colnames(binned_m))
+  old_colnames <- as.numeric(colnames(feature_mat))
   new_colnames <- old_colnames
 
   if (length(all_mzs) > 0L) {
@@ -65,9 +68,9 @@ fix_binned_mzs <- function(binned_m, original_mzs, dalton, ppm, decimals) {
 
   # Fast path when all rounded column names are already unique
   if (!anyDuplicated(new_colnames_rounded)) {
-    colnames(binned_m) <- as.character(new_colnames_rounded)
-    return(binned_m)
+    colnames(feature_mat) <- as.character(new_colnames_rounded)
+    return(feature_mat)
   }
 
-  t(rowsum(t(binned_m), new_colnames_rounded, reorder = FALSE))
+  t(rowsum(t(feature_mat), new_colnames_rounded, reorder = FALSE))
 }

@@ -250,7 +250,7 @@ testthat::test_that("spectra conversion and matrix helpers round-trip", {
     envir = environment()
   )
   sub_df <- mia_spectra_df[3:12, ]
-  sp <- df_to_spectra(sub_df)
+  sp <- Spectra::Spectra(sub_df)
   rownames(sp@backend@spectraData) <- paste0("custom_", seq_along(sp))
   testthat::expect_s4_class(sp, "Spectra")
   testthat::expect_identical(length(sp), 10L)
@@ -274,9 +274,9 @@ testthat::test_that("spectra conversion and matrix helpers round-trip", {
   testthat::expect_equal(m_sparse, m_dense)
 
   m_filt <- filter_matrix(m_sparse, n = 2L)
-  m_fixed <- fix_binned_mzs(
+  m_fixed <- refine_feature_mzs(
     m_filt,
-    original_mzs = sp_harm,
+    spectra = sp_harm,
     dalton = 0.01,
     ppm = 30,
     decimals = 4L
@@ -296,7 +296,7 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
     list(numeric(0), numeric(0))
   )
   mat_no_pks <- create_matrix(
-    df_to_spectra(df_no_pks),
+    Spectra::Spectra(df_no_pks),
     name = c("A", "B")
   )
   testthat::expect_identical(dim(mat_no_pks), c(2L, 0L))
@@ -309,7 +309,7 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
     list(c(10, 20), numeric(0))
   )
   mat_one_empty <- create_matrix(
-    df_to_spectra(df_one_empty),
+    Spectra::Spectra(df_one_empty),
     name = c("A", "B")
   )
   testthat::expect_identical(
@@ -329,7 +329,7 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
     list(c(0, 10), c(0, 20))
   )
   testthat::expect_identical(
-    create_matrix(df_to_spectra(df_same), name = c("S1", "S2")),
+    create_matrix(Spectra::Spectra(df_same), name = c("S1", "S2")),
     matrix(
       c(10, 20),
       nrow = 2L,
@@ -344,7 +344,7 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
     list(c(100, 200), c(100, 300), c(100, 200)),
     list(c(10, 20), c(30, 40), c(50, 60))
   )
-  sp_mid_diff <- df_to_spectra(df_mid_diff)
+  sp_mid_diff <- Spectra::Spectra(df_mid_diff)
 
   mat_mid <- create_matrix(
     sp_mid_diff,
@@ -369,13 +369,13 @@ testthat::test_that("create_matrix handles empty, fast, and sparse paths", {
   testthat::expect_identical(mat_mid, expected_mid)
 })
 
-testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
+testthat::test_that("harmonize_mzs and refine_feature_mzs respect tolerances", {
   # Spectra with 0 peaks across all spectra (n_avg == 0L)
   df_empty_pks <- make_spectra_df(
     c("A", "B"),
     list(numeric(0), numeric(0))
   )
-  sp_empty_pks <- df_to_spectra(df_empty_pks)
+  sp_empty_pks <- Spectra::Spectra(df_empty_pks)
   testthat::expect_identical(
     Spectra::mz(harmonize_mzs(sp_empty_pks, dalton = 0.01, ppm = 30)),
     Spectra::mz(sp_empty_pks)
@@ -391,7 +391,7 @@ testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
     ),
     list(c(10, 20, 30, 40), c(10, 20, 30, 40), numeric(0))
   )
-  sp_h <- harmonize_mzs(df_to_spectra(df_h), dalton = 0.25, ppm = 500)
+  sp_h <- harmonize_mzs(Spectra::Spectra(df_h), dalton = 0.25, ppm = 500)
   mzs_h <- as.list(Spectra::mz(sp_h))
   # With dalton = 0.25, ppm = 500:
   # - 99.875 and 100.125 average to 100.0 (diff 0.125 <= 0.30)
@@ -409,7 +409,7 @@ testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
   )
   testthat::expect_identical(mzs_h[[3L]], numeric(0))
 
-  # fix_binned_mzs: 0-column input
+  # refine_feature_mzs: 0-column input
   mat_0col <- matrix(
     0,
     nrow = 2L,
@@ -417,27 +417,27 @@ testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
     dimnames = list(c("A", "B"), NULL)
   )
   testthat::expect_identical(
-    fix_binned_mzs(mat_0col, sp_h, dalton = 0.01, ppm = 30, decimals = 2L),
+    refine_feature_mzs(mat_0col, sp_h, dalton = 0.01, ppm = 30, decimals = 2L),
     mat_0col
   )
 
-  # fix_binned_mzs: fast path + exact binary tolerance boundary
+  # refine_feature_mzs: fast path + exact binary tolerance boundary
   df_orig <- make_spectra_df(
     "A",
     list(c(100.5, 200.125)),
     list(c(50, 100))
   )
-  sp_orig <- df_to_spectra(df_orig)
+  sp_orig <- Spectra::Spectra(df_orig)
 
-  binned_unique <- matrix(
+  feat_unique <- matrix(
     c(10, 20, 30, 40),
     nrow = 2L,
     ncol = 2L,
     dimnames = list(c("S1", "S2"), c("100.00", "200.00"))
   )
-  fixed_unique <- fix_binned_mzs(
-    binned_unique,
-    original_mzs = sp_orig,
+  fixed_unique <- refine_feature_mzs(
+    feat_unique,
+    spectra = sp_orig,
     dalton = 0.5,
     ppm = 0,
     decimals = 3L
@@ -445,16 +445,16 @@ testthat::test_that("harmonize_mzs and fix_binned_mzs respect tolerances", {
   testthat::expect_identical(colnames(fixed_unique), c("100.5", "200.125"))
   testthat::expect_identical(as.vector(fixed_unique), c(10, 20, 30, 40))
 
-  # fix_binned_mzs: column-merging path when two columns round to the same value
-  binned_dup <- matrix(
+  # refine_feature_mzs: columns rounding to the same value are merged
+  feat_dup <- matrix(
     c(1, 2, 3, 4, 5, 6),
     nrow = 2L,
     ncol = 3L,
     dimnames = list(c("S1", "S2"), c("100.001", "100.004", "300.5"))
   )
-  fixed_dup <- fix_binned_mzs(
-    binned_dup,
-    original_mzs = sp_orig,
+  fixed_dup <- refine_feature_mzs(
+    feat_dup,
+    spectra = sp_orig,
     dalton = 0.01,
     ppm = 0,
     decimals = 2L
@@ -479,7 +479,7 @@ testthat::test_that("query matching helpers work across all branches", {
     list(c(50.0, 100.0), c(50.0, 100.0)),
     precursorMz = c(200.0, 300.0)
   )
-  sp_qd <- df_to_spectra(df_qd)
+  sp_qd <- Spectra::Spectra(df_qd)
   prep <- prepare_query_data(sp_qd)
   testthat::expect_identical(prep$mz, list(c(100.0, 150.0), 250.0))
   testthat::expect_identical(prep$precursor_mz, c(200.0, 300.0))
@@ -492,7 +492,7 @@ testthat::test_that("query matching helpers work across all branches", {
     list(numeric(0), c(NaN, 100.0), c(0.0, 0.0), c(10.0, 100.0)),
     precursorMz = c(300.0, 300.0, 300.0, 300.0)
   )
-  prep_int <- prepare_query_data(df_to_spectra(df_int), intensity_min = 50)
+  prep_int <- prepare_query_data(Spectra::Spectra(df_int), intensity_min = 50)
   testthat::expect_identical(
     prep_int$mz,
     list(numeric(0), numeric(0), numeric(0), 200.0)
@@ -620,7 +620,7 @@ testthat::test_that("spectra_to_queries validates inputs and synthetic cases", {
     PRECURSOR_MZ = c(300.0, 400.0, 500.0, 600.0, 700.0, 800.0)
   )
 
-  synth_sp <- df_to_spectra(synth_df)
+  synth_sp <- Spectra::Spectra(synth_df)
   res_sp <- spectra_to_queries(
     spectra = synth_sp,
     export = NULL,
@@ -684,9 +684,9 @@ testthat::test_that("pipeline functions handle empty and filtered-out inputs", {
     ncol = 1L,
     dimnames = list("S1", "100.12345")
   )
-  fixed_empty <- fix_binned_mzs(
+  fixed_empty <- refine_feature_mzs(
     mat_one,
-    original_mzs = sp_empty,
+    spectra = sp_empty,
     dalton = 0.01,
     ppm = 30,
     decimals = 2L
@@ -1069,7 +1069,7 @@ testthat::test_that("pipeline handles numeric skeletons and backends", {
     list(c(10.0, 25.0, 50.0), c(5.0, 10.0))
   )
   mat_dup_mz <- create_matrix(
-    df_to_spectra(df_dup_mz),
+    Spectra::Spectra(df_dup_mz),
     name = c("A", "B")
   )
   testthat::expect_identical(mat_dup_mz["A", "100"], 35.0)
@@ -1099,7 +1099,7 @@ testthat::test_that("spectra_to_queries works when TITLE is absent", {
 })
 
 testthat::test_that("preprocess_spectra keeps spectra with missing TITLE", {
-  sp <- df_to_spectra(make_spectra_df(
+  sp <- Spectra::Spectra(make_spectra_df(
     c("A", "A", "B", "B"),
     list(c(100.0, 150.0), c(100.0, 160.0), c(200.0, 250.0), c(200.0, 260.0)),
     TITLE = c("t1", NA, "t1", NA),
