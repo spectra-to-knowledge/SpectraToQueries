@@ -60,6 +60,33 @@ jobs:
           covr::to_cobertura(cov)
         shell: Rscript {0}
 
+      - name: Benchmark smoke check
+        run: |
+          pkgload::load_all(".", quiet = TRUE)
+          utils::data("mia_spectra_df", package = "SpectraToQueries")
+          sub <- mia_spectra_df[
+            mia_spectra_df$SKELETON %in%
+              c("Corynanthean", "Iboga", "Aspidosperma"),
+          ]
+          t0 <- proc.time()[["elapsed"]]
+          res <- suppressMessages(spectra_to_queries(
+            spectra = sub,
+            export = NULL,
+            ions_max = 4L
+          ))
+          elapsed <- proc.time()[["elapsed"]] - t0
+          cat(sprintf("Benchmark smoke check elapsed: %.2fs\n", elapsed))
+          stopifnot(
+            is.data.frame(res),
+            nrow(res) == 3L,
+            identical(
+              colnames(res),
+              c("skeleton", "mcc", "combined_ions", "massql")
+            ),
+            elapsed < 60
+          )
+        shell: Rscript {0}
+
       - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5
         with:
           fail_ci_if_error: ${{ github.event_name != 'pull_request' && true || false }}

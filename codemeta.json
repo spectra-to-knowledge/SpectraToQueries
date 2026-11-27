@@ -45,6 +45,18 @@
   "softwareSuggestions": [
     {
       "@type": "SoftwareApplication",
+      "identifier": "knitr",
+      "name": "knitr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=knitr"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "spelling",
       "name": "spelling",
       "provider": {
@@ -67,6 +79,11 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=testthat"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "tools",
+      "name": "tools"
     }
   ],
   "softwareRequirements": {
@@ -104,13 +121,18 @@
     },
     "4": {
       "@type": "SoftwareApplication",
+      "identifier": "stats",
+      "name": "stats"
+    },
+    "5": {
+      "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
     "SystemRequirements": null
   },
   "keywords": ["mass-spectrometry", "metabolomics", "cheminformatics", "natural-products", "spectral-analysis", "diagnostic-ions", "query-generation", "edam:topic_3172", "edam:topic_0154", "edam:topic_3370", "edam:topic_2258", "edam:topic_0780", "edam:operation_3214", "edam:operation_3803", "edam:operation_4074", "edam:operation_3629", "edam:operation_3695", "edam:operation_2990", "edam:operation_0224", "edam:data_2536", "edam:data_0943", "edam:data_0962", "edam:data_2048", "edam:format_3651", "edam:format_3475", "knowledge-extraction", "spectral-library", "tandem-ms", "monoterpene-indole-alkaloids", "querying-system", "spectral-information"],
-  "fileSize": "1394.406KB",
+  "fileSize": "1470.02KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
