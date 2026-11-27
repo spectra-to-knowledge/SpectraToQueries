@@ -156,10 +156,10 @@ parse_massql_dnf <- function(q) {
 #'   - `dalton == 0`, `ppm == 0`: `TOLERANCEMZ=0`.
 #'
 #'   [spectra_to_queries()] computes MCC with the same windows (for `MS2NL`,
-#'   `dalton`, or `nl * ppm / 1e6` when `dalton == 0`), except that MassQL
-#'   bounds are strict where the pipeline's are closed: `MS2NL` windows, and
-#'   `INTENSITYPERCENT` (MassQL keeps peaks above the threshold; the pipeline
-#'   keeps peaks at or above `intensity_min`). `MS2PROD` windows are rounded up
+#'   `dalton`, or `nl * ppm / 1e6` when `dalton == 0`) and the same intensity
+#'   rule (relative intensity `> min(intensity_min, 99)`, as MassQL applies
+#'   `INTENSITYPERCENT`). Remaining differences: MassQL `MS2NL` bounds are
+#'   strict where the pipeline's are closed, `MS2PROD` windows are rounded up
 #'   to 1e-6 Da, and `OR` groups use the window of their largest m/z.
 #'
 #'   Expressions are expanded to disjunctive normal form and absorbed

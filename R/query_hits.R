@@ -1,13 +1,17 @@
 #' @title Prepare spectra data for querying
 #' @param spectra Spectra object
-#' @param intensity_min Minimal relative intensity threshold in `[0, 100]`.
+#' @param intensity_min Relative intensity threshold in `[0, 100]` (percent of
+#'   the spectrum's base peak).
 #' @description Extracts m/z, precursor m/z, and normalized skeleton labels once
 #'   as plain R vectors/lists so query precomputation avoids repeated S4
-#'   dispatch.
+#'   dispatch. When `intensity_min > 0`, keeps peaks with relative intensity
+#'   `> min(intensity_min, 99)`, the rule MassQL applies to
+#'   `INTENSITYPERCENT` (strict comparison, threshold capped at 99%).
 #' @keywords internal
 #' @noRd
 prepare_query_data <- function(spectra, intensity_min = 0.0) {
   if (is.finite(intensity_min) && intensity_min > 0) {
+    threshold <- min(intensity_min, 99)
     pks <- Spectra::peaksData(spectra)
     clean_mz <- lapply(pks, function(x) {
       if (nrow(x) == 0L) {
@@ -23,7 +27,7 @@ prepare_query_data <- function(spectra, intensity_min = 0.0) {
       if (max_int <= 0) {
         return(numeric(0))
       }
-      mz_v[fin & ((100 * int_v / max_int) >= intensity_min)]
+      mz_v[fin & ((100 * int_v / max_int) > threshold)]
     })
   } else {
     raw_mz <- as.list(Spectra::mz(spectra))

@@ -35,8 +35,10 @@ values match when \verb{|a - b| <= dalton + b * ppm / 1e6}. Default is \code{0.0
 \item{decimals}{Decimal places for reported m/z values and MCC; MCC ties are
 resolved at this precision. Default is \code{4L}.}
 
-\item{intensity_min}{Minimal relative intensity threshold (0 to 100). Default
-is \code{0.0}.}
+\item{intensity_min}{Relative intensity threshold in percent of the base peak
+(0 to 100). Candidate discovery keeps peaks \verb{>= intensity_min}; MCC is
+computed with peaks \verb{> min(intensity_min, 99)}, as MassQL applies
+\code{INTENSITYPERCENT}. Default is \code{0.0} (all peaks).}
 
 \item{ions_max}{Maximal number of ions in a query combination. Default is
 \code{10L}.}

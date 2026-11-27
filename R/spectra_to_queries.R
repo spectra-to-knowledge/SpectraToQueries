@@ -675,8 +675,10 @@ summarize_best_queries <- function(
 #'   values match when `|a - b| <= dalton + b * ppm / 1e6`. Default is `0.01`.
 #' @param decimals Decimal places for reported m/z values and MCC; MCC ties are
 #'   resolved at this precision. Default is `4L`.
-#' @param intensity_min Minimal relative intensity threshold (0 to 100). Default
-#'   is `0.0`.
+#' @param intensity_min Relative intensity threshold in percent of the base peak
+#'   (0 to 100). Candidate discovery keeps peaks `>= intensity_min`; MCC is
+#'   computed with peaks `> min(intensity_min, 99)`, as MassQL applies
+#'   `INTENSITYPERCENT`. Default is `0.0` (all peaks).
 #' @param ions_max Maximal number of ions in a query combination. Default is
 #'   `10L`.
 #' @param n_skel_min Minimal number of MS2 spectra per skeleton class
@@ -753,11 +755,14 @@ spectra_to_queries <- function(
 
   mia_spectra <- load_input_spectra(spectra)
   mia_spectra <- Spectra::filterMsLevel(mia_spectra, 2L)
-  skel_raw <- as.character(mia_spectra$SKELETON)
-  valid_skel <- !is.na(skel_raw) & nzchar(trimws(skel_raw))
+  skel_raw <- trimws(as.character(mia_spectra$SKELETON))
+  valid_skel <- !is.na(skel_raw) & nzchar(skel_raw)
   if (!all(valid_skel)) {
     mia_spectra <- mia_spectra[valid_skel]
     skel_raw <- skel_raw[valid_skel]
+  }
+  if (length(mia_spectra) > 0L) {
+    mia_spectra$SKELETON <- skel_raw
   }
 
   total_spectra <- length(mia_spectra)

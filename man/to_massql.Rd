@@ -43,10 +43,10 @@ to 1e-6 Da for \code{MS2PROD}, and \code{dalton} for \code{MS2NL};
 }
 
 \code{\link[=spectra_to_queries]{spectra_to_queries()}} computes MCC with the same windows (for \code{MS2NL},
-\code{dalton}, or \code{nl * ppm / 1e6} when \code{dalton == 0}), except that MassQL
-bounds are strict where the pipeline's are closed: \code{MS2NL} windows, and
-\code{INTENSITYPERCENT} (MassQL keeps peaks above the threshold; the pipeline
-keeps peaks at or above \code{intensity_min}). \code{MS2PROD} windows are rounded up
+\code{dalton}, or \code{nl * ppm / 1e6} when \code{dalton == 0}) and the same intensity
+rule (relative intensity \verb{> min(intensity_min, 99)}, as MassQL applies
+\code{INTENSITYPERCENT}). Remaining differences: MassQL \code{MS2NL} bounds are
+strict where the pipeline's are closed, \code{MS2PROD} windows are rounded up
 to 1e-6 Da, and \code{OR} groups use the window of their largest m/z.
 
 Expressions are expanded to disjunctive normal form and absorbed

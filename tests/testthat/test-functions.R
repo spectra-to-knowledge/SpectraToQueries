@@ -1285,3 +1285,43 @@ testthat::test_that("neutral-loss hits use the tolerance emitted to MassQL", {
     "QUERY scaninfo(MS2DATA) WHERE MS2NL=100:TOLERANCEMZ=0.01"
   )
 })
+
+testthat::test_that("intensity filter matches MassQL INTENSITYPERCENT", {
+  # Relative intensities 25, 50, 100 (%)
+  sp <- Spectra::Spectra(make_spectra_df(
+    "A",
+    list(c(100.0, 200.0, 300.0)),
+    list(c(25.0, 50.0, 100.0)),
+    precursorMz = 400.0
+  ))
+  # MassQL keeps peaks strictly above the threshold
+  testthat::expect_identical(
+    prepare_query_data(sp, intensity_min = 50)$mz,
+    list(300.0)
+  )
+  testthat::expect_identical(
+    prepare_query_data(sp, intensity_min = 25)$mz,
+    list(c(200.0, 300.0))
+  )
+  # MassQL caps INTENSITYPERCENT at 99%, so the base peak always passes
+  testthat::expect_identical(
+    prepare_query_data(sp, intensity_min = 100)$mz,
+    list(300.0)
+  )
+})
+
+testthat::test_that("SKELETON labels are trimmed before grouping", {
+  df <- make_spectra_df(
+    c("A", " A", "A ", "B", "B", "B"),
+    list(100, 100, 100, 200, 200, 200),
+    precursorMz = rep(300.0, 6L)
+  )
+  res <- suppressMessages(spectra_to_queries(
+    df,
+    export = NULL,
+    n_skel_min = 3L,
+    n_spec_min = 3L
+  ))
+  testthat::expect_setequal(res$skeleton, c("A", "B"))
+  testthat::expect_equal(res$mcc, c(1, 1), tolerance = 1e-12)
+})
