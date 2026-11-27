@@ -9,5 +9,14 @@ calc_mcc_vec <- function(tp, fp, n_pos, total_spectra) {
   fn_ <- n_pos - tp
   tn <- total_spectra - tp - fp - fn_
   denom <- sqrt((tp + fp) * (tp + fn_) * (tn + fp) * (tn + fn_))
-  ifelse(denom > 0, (tp * tn - fp * fn_) / denom, 0.0)
+  num <- tp * tn - fp * fn_
+  out <- numeric(length(denom))
+  pos <- !is.na(denom) & denom > 0
+  if (any(pos)) {
+    out[pos] <- num[pos] / denom[pos]
+  }
+  if (anyNA(denom)) {
+    out[is.na(denom)] <- NA_real_
+  }
+  out
 }

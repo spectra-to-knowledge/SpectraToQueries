@@ -304,8 +304,8 @@ spectra_to_queries <- function(
   merged_mat <- matrix(
     vapply(
       cand_cols,
-      function(u) as.numeric(hits[[u]]),
-      numeric(length(mia_spectra))
+      function(u) hits[[u]],
+      logical(length(mia_spectra))
     ),
     nrow = length(mia_spectra),
     dimnames = list(mia_spectra$SKELETON, cand_cols)

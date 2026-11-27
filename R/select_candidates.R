@@ -56,49 +56,74 @@ select_forward_mrmr_ions <- function(
   n_pos <- sum(is_group)
   total_spectra <- nrow(sub_mat)
   neg_mask <- !is_group
-  calc_mcc <- function(vec) {
-    calc_mcc_vec(
-      tp = sum(vec[is_group]),
-      fp = sum(vec[neg_mask]),
-      n_pos = n_pos,
-      total_spectra = total_spectra
-    )
-  }
+  pos_mat <- sub_mat[is_group, , drop = FALSE]
 
-  remaining <- setdiff(seq_len(ncol(sub_mat)), selected)
+  n_unique <- ncol(sub_mat)
+  remaining <- setdiff(seq_len(n_unique), selected)
   active_conjs <- lapply(selected, function(idx) sub_mat[, idx])
   active_mccs <- cand_mcc[selected]
 
+  # Track raw which.max(mccs_k) across active conjunctions incrementally
+  cache <- new.env(parent = emptyenv())
+  cache$mcc <- rep(-Inf, n_unique)
+  cache$k <- integer(n_unique)
+
+  update_conj_cache <- function(ac_vec, k_id) {
+    if (length(remaining) == 0L) {
+      return(invisible(NULL))
+    }
+    ac_pos <- which(ac_vec[is_group])
+    ac_neg <- which(ac_vec[neg_mask])
+    tp_v <- if (length(ac_pos) > 0L) {
+      colSums(pos_mat[ac_pos, remaining, drop = FALSE])
+    } else {
+      numeric(length(remaining))
+    }
+    fp_v <- if (length(ac_neg) > 0L) {
+      colSums(neg_mat[ac_neg, remaining, drop = FALSE])
+    } else {
+      numeric(length(remaining))
+    }
+    mcc_v <- calc_mcc_vec(tp_v, fp_v, n_pos, total_spectra)
+    better <- mcc_v > cache$mcc[remaining]
+    if (any(better)) {
+      idx_b <- remaining[better]
+      cache$mcc[idx_b] <- mcc_v[better]
+      cache$k[idx_b] <- k_id
+    }
+  }
+
+  for (k_id in seq_along(active_conjs)) {
+    update_conj_cache(active_conjs[[k_id]], k_id)
+  }
+
   while (length(selected) < ions_max && length(remaining) > 0L) {
     redundancy <- rowMeans(phi_mat[remaining, selected, drop = FALSE])
+    rk <- cache$k[remaining]
+    rmcc <- cache$mcc[remaining]
+    improved <- rk > 0L & rmcc > active_mccs[pmax(1L, rk)]
     best_conj_mcc <- cand_mcc[remaining]
+    best_conj_mcc[improved] <- rmcc[improved]
     best_conj_k <- integer(length(remaining))
-    for (r_i in seq_along(remaining)) {
-      col_v <- sub_mat[, remaining[r_i]]
-      mccs_k <- vapply(
-        active_conjs,
-        function(ac) calc_mcc(ac & col_v),
-        numeric(1L)
-      )
-      bk <- which.max(mccs_k)
-      if (mccs_k[bk] > active_mccs[bk]) {
-        best_conj_mcc[r_i] <- mccs_k[bk]
-        best_conj_k[r_i] <- bk
-      }
-    }
+    best_conj_k[improved] <- rk[improved]
+
     scores <- best_conj_mcc - mrmr_redundancy_weight * redundancy
     best_pos <- which.max(scores)
     chosen <- remaining[best_pos]
     selected <- c(selected, chosen)
+    remaining <- remaining[-best_pos]
+
     chosen_vec <- sub_mat[, chosen]
     active_conjs[[length(active_conjs) + 1L]] <- chosen_vec
     active_mccs <- c(active_mccs, cand_mcc[chosen])
+    update_conj_cache(chosen_vec, length(active_conjs))
+
     if (best_conj_mcc[best_pos] > cand_mcc[chosen]) {
       conj_vec <- active_conjs[[best_conj_k[best_pos]]] & chosen_vec
       active_conjs[[length(active_conjs) + 1L]] <- conj_vec
       active_mccs <- c(active_mccs, best_conj_mcc[best_pos])
+      update_conj_cache(conj_vec, length(active_conjs))
     }
-    remaining <- remaining[-best_pos]
   }
   selected
 }
@@ -174,7 +199,7 @@ extract_candidate_ions <- function(
   group_count_vec <- as.integer(group_counts_tab[groups_vec])
 
   # Count ion presence across all spectra so small-group FPs are included
-  nz_mat <- merged_mat != 0
+  nz_mat <- if (is.logical(merged_mat)) merged_mat else merged_mat != 0
   col_counts <- colSums(nz_mat)
   keep_ions <- col_counts >= n_spec_min
   nz_mat <- nz_mat[, keep_ions, drop = FALSE]
@@ -183,50 +208,46 @@ extract_candidate_ions <- function(
   keep_rows <- group_count_vec >= n_skel_min
   nz_sub <- nz_mat[keep_rows, , drop = FALSE]
   groups_sub <- groups_vec[keep_rows]
-  group_count_sub <- group_count_vec[keep_rows]
+  if (nrow(nz_sub) == 0L || ncol(nz_sub) == 0L) {
+    return(list())
+  }
 
-  # Pivot non-zero entries of qualifying skeleton groups to long format
-  nz_idx <- which(nz_sub, arr.ind = TRUE)
+  counts_mat <- rowsum(+nz_sub, groups_sub, reorder = FALSE)
+  nz_idx <- which(counts_mat > 0L, arr.ind = TRUE)
+  if (nrow(nz_idx) == 0L) {
+    return(list())
+  }
+
   row_idx <- nz_idx[, 1L]
   col_idx <- nz_idx[, 2L]
+  tp <- as.integer(counts_mat[nz_idx])
+  group_count <- as.integer(group_counts_tab[rownames(counts_mat)][row_idx])
+  count_per_ion <- as.integer(col_counts[col_idx])
 
   ions_df <- data.frame(
-    group = groups_sub[row_idx],
-    group_count = group_count_sub[row_idx],
+    group = rownames(counts_mat)[row_idx],
+    group_count = group_count,
     ion = as.character(colnames(nz_mat))[col_idx],
-    count_per_ion = as.integer(col_counts[col_idx]),
+    count_per_ion = count_per_ion,
+    count_per_ion_per_group = tp,
+    precision = tp / count_per_ion,
+    recall = tp / group_count,
+    mcc = calc_mcc_vec(
+      tp = tp,
+      fp = count_per_ion - tp,
+      n_pos = group_count,
+      total_spectra = total_spectra
+    ),
     stringsAsFactors = FALSE
   )
 
-  grp_ion_key <- paste(ions_df$group, ions_df$ion, sep = "\r")
-  u_grp_ion <- unique(grp_ion_key)
-  grp_ion_tab <- tabulate(
-    match(grp_ion_key, u_grp_ion),
-    nbins = length(u_grp_ion)
-  )
-  ions_df <- ions_df[!duplicated(grp_ion_key), , drop = FALSE]
-  ions_df$count_per_ion_per_group <- grp_ion_tab
-
-  ions_df$precision <- ions_df$count_per_ion_per_group / ions_df$count_per_ion
-  ions_df$recall <- ions_df$count_per_ion_per_group / ions_df$group_count
-
   ions_df <- ions_df[
-    ions_df$precision >= precision_min & ions_df$recall >= recall_min,
+    ions_df$precision >= precision_min &
+      ions_df$recall >= recall_min &
+      ions_df$mcc >= mcc_min,
     ,
     drop = FALSE
   ]
-
-  # Matthews Correlation Coefficient (MCC) for a single ion and group pair
-  tp <- ions_df$count_per_ion_per_group
-  fp <- ions_df$count_per_ion - tp
-  ions_df$mcc <- calc_mcc_vec(
-    tp = tp,
-    fp = fp,
-    n_pos = ions_df$group_count,
-    total_spectra = total_spectra
-  )
-
-  ions_df <- ions_df[ions_df$mcc >= mcc_min, , drop = FALSE]
   if (nrow(ions_df) == 0L) {
     return(list())
   }
