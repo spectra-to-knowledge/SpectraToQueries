@@ -68,6 +68,9 @@ Every invariant below is tested in `tests/testthat/test-architecture.R` or
   - When `dalton == 0 && ppm > 0`: `:TOLERANCEPPM=ppm`.
   - When `dalton == 0 && ppm == 0`: `:TOLERANCEMZ=0`. Never omit the modifier:
     MassQL defaults to 0.1 Da.
+- `precompute_ion_hits()` must evaluate each ion with the window of the
+  condition `to_massql()` emits for it, so reported MCC is reproducible by the
+  query: `MS2NL` uses `dalton`, or `nl * ppm / 1e6` when `dalton == 0`.
 - Format numeric literals via `fmt_num()` (`scientific = FALSE`, `trim = TRUE`,
   `digits = 15L`) so values like `1e-04` never enter MassQL queries.
 
