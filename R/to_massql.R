@@ -9,19 +9,21 @@ fmt_num <- function(x) {
   )
 }
 
-#' @title Canonicalize and absorb DNF ion clauses
+#' @title Sort and deduplicate one ion clause (fragments then neutral losses)
 #' @keywords internal
 #' @noRd
-absorb_dnf_clauses <- function(ion_lists) {
-  sort_ions <- function(ions) {
-    parsed <- parse_query_ions(unique(ions))
-    c(
-      sprintf("%s_frag", fmt_num(sort(parsed$frags))),
-      sprintf("%s_nl", fmt_num(sort(parsed$nls)))
-    )
-  }
+sort_ion_clause <- function(ions) {
+  parsed <- parse_query_ions(unique(ions))
+  c(
+    sprintf("%s_frag", fmt_num(sort(parsed$frags))),
+    sprintf("%s_nl", fmt_num(sort(parsed$nls)))
+  )
+}
 
-  clauses <- unique(Filter(length, lapply(ion_lists, sort_ions)))
+#' @title Drop strict superset DNF clauses via Boolean absorption
+#' @keywords internal
+#' @noRd
+drop_superset_clauses <- function(clauses) {
   n_clauses <- length(clauses)
   if (n_clauses <= 1L) {
     return(clauses)
@@ -44,6 +46,14 @@ absorb_dnf_clauses <- function(ion_lists) {
     }
   }
   clauses[keep_min]
+}
+
+#' @title Canonicalize and absorb DNF ion clauses
+#' @keywords internal
+#' @noRd
+absorb_dnf_clauses <- function(ion_lists) {
+  clauses <- unique(Filter(length, lapply(ion_lists, sort_ion_clause)))
+  drop_superset_clauses(clauses)
 }
 
 #' @title Format one ion conjunction in canonical order
@@ -136,6 +146,126 @@ parse_massql_dnf <- function(q) {
   clauses
 }
 
+#' @title Format MassQL tolerance and intensity qualifier suffix
+#' @keywords internal
+#' @noRd
+format_massql_tolerance <- function(
+  mzs,
+  dalton,
+  ppm,
+  int_mod,
+  is_nl = FALSE
+) {
+  if (dalton == 0 && ppm > 0) {
+    return(paste0(":TOLERANCEPPM=", fmt_num(ppm), int_mod))
+  }
+  if (dalton == 0) {
+    return(paste0(":TOLERANCEMZ=0", int_mod))
+  }
+  eff_da <- if (is_nl) {
+    dalton
+  } else {
+    # Round up to 1e-6 Da so the emitted window contains the match window;
+    # the inner round() absorbs floating-point noise before ceiling().
+    ceiling(round(mz_tolerance(max(mzs), dalton, ppm) * 1e6, 6L)) / 1e6
+  }
+  paste0(":TOLERANCEMZ=", fmt_num(eff_da), int_mod)
+}
+
+#' @title Format one MassQL conjunction clause
+#' @keywords internal
+#' @noRd
+format_massql_conjunction <- function(
+  ions_vec,
+  dalton,
+  ppm,
+  int_mod,
+  extra_clause = NULL
+) {
+  parsed <- parse_query_ions(ions_vec)
+  frag_clauses <- vapply(
+    parsed$frags,
+    function(mz) {
+      paste0(
+        "MS2PROD=",
+        fmt_num(mz),
+        format_massql_tolerance(mz, dalton, ppm, int_mod, FALSE)
+      )
+    },
+    character(1L)
+  )
+  nl_clauses <- sprintf(
+    "MS2NL=%s%s",
+    fmt_num(parsed$nls),
+    format_massql_tolerance(parsed$nls, dalton, ppm, int_mod, TRUE)
+  )
+  clauses <- c(frag_clauses, nl_clauses, extra_clause)
+  paste0(
+    "QUERY scaninfo(MS2DATA) WHERE ",
+    paste(clauses, collapse = " AND ")
+  )
+}
+
+#' @title Factor DNF clauses differing by one same-type ion into OR syntax
+#' @keywords internal
+#' @noRd
+try_factor_single_or_clause <- function(clauses, dalton, ppm, int_mod) {
+  common_ions <- Reduce(intersect, clauses)
+  remaining <- lapply(clauses, setdiff, common_ions)
+  if (!all(lengths(remaining) == 1L)) {
+    return(NULL)
+  }
+
+  alt_ions <- unlist(remaining, use.names = FALSE)
+  alt_parsed <- parse_query_ions(alt_ions)
+  is_all_frag <- length(alt_parsed$frags) == length(alt_ions)
+  if (!is_all_frag && length(alt_parsed$nls) != length(alt_ions)) {
+    return(NULL)
+  }
+
+  vals <- if (is_all_frag) alt_parsed$frags else alt_parsed$nls
+  or_clause <- sprintf(
+    "%s=(%s)%s",
+    if (is_all_frag) "MS2PROD" else "MS2NL",
+    paste(fmt_num(vals), collapse = " OR "),
+    format_massql_tolerance(vals, dalton, ppm, int_mod, !is_all_frag)
+  )
+  format_massql_conjunction(common_ions, dalton, ppm, int_mod, or_clause)
+}
+
+#' @title Translate one ion query expression string into MassQL
+#' @keywords internal
+#' @noRd
+format_massql_single <- function(q, dalton, ppm, int_mod) {
+  if (is.na(q) || !nzchar(trimws(q))) {
+    return("")
+  }
+  clauses <- parse_massql_dnf(q)
+  if (length(clauses) == 0L) {
+    return("")
+  }
+  if (length(clauses) == 1L) {
+    return(format_massql_conjunction(clauses[[1L]], dalton, ppm, int_mod))
+  }
+
+  factored <- try_factor_single_or_clause(clauses, dalton, ppm, int_mod)
+  if (!is.null(factored)) {
+    return(factored)
+  }
+
+  paste(
+    vapply(
+      clauses,
+      format_massql_conjunction,
+      character(1L),
+      dalton = dalton,
+      ppm = ppm,
+      int_mod = int_mod
+    ),
+    collapse = " ; "
+  )
+}
+
 #' @title Convert ion queries to MassQL syntax
 #'
 #' @description Translates one or more ion query expressions (such as
@@ -220,81 +350,13 @@ to_massql <- function(
     ""
   }
 
-  tol_mod <- function(mzs, is_nl = FALSE) {
-    if (dalton == 0 && ppm > 0) {
-      return(paste0(":TOLERANCEPPM=", fmt_num(ppm), int_mod))
-    }
-    if (dalton == 0) {
-      return(paste0(":TOLERANCEMZ=0", int_mod))
-    }
-    eff_da <- if (is_nl) {
-      dalton
-    } else {
-      # Round up to 1e-6 Da so the emitted window contains the match window;
-      # the inner round() absorbs floating-point noise before ceiling().
-      ceiling(round(mz_tolerance(max(mzs), dalton, ppm) * 1e6, 6L)) / 1e6
-    }
-    paste0(":TOLERANCEMZ=", fmt_num(eff_da), int_mod)
-  }
-
-  format_conjunction <- function(ions_vec, extra_clause = NULL) {
-    parsed <- parse_query_ions(ions_vec)
-    frag_clauses <- vapply(
-      parsed$frags,
-      function(mz) paste0("MS2PROD=", fmt_num(mz), tol_mod(mz, FALSE)),
-      character(1L)
-    )
-    nl_clauses <- sprintf(
-      "MS2NL=%s%s",
-      fmt_num(parsed$nls),
-      tol_mod(parsed$nls, TRUE)
-    )
-    clauses <- c(frag_clauses, nl_clauses, extra_clause)
-    paste0(
-      "QUERY scaninfo(MS2DATA) WHERE ",
-      paste(clauses, collapse = " AND ")
-    )
-  }
-
   vapply(
     query,
-    function(q) {
-      if (is.na(q) || !nzchar(trimws(q))) {
-        return("")
-      }
-      clauses <- parse_massql_dnf(q)
-      if (length(clauses) == 0L) {
-        return("")
-      }
-      if (length(clauses) == 1L) {
-        return(format_conjunction(clauses[[1L]]))
-      }
-
-      common_ions <- Reduce(intersect, clauses)
-      remaining <- lapply(clauses, setdiff, common_ions)
-
-      if (all(lengths(remaining) == 1L)) {
-        alt_ions <- unlist(remaining, use.names = FALSE)
-        alt_parsed <- parse_query_ions(alt_ions)
-        is_all_frag <- length(alt_parsed$frags) == length(alt_ions)
-        if (is_all_frag || length(alt_parsed$nls) == length(alt_ions)) {
-          vals <- if (is_all_frag) alt_parsed$frags else alt_parsed$nls
-          or_clause <- sprintf(
-            "%s=(%s)%s",
-            if (is_all_frag) "MS2PROD" else "MS2NL",
-            paste(fmt_num(vals), collapse = " OR "),
-            tol_mod(vals, !is_all_frag)
-          )
-          return(format_conjunction(common_ions, or_clause))
-        }
-      }
-
-      paste(
-        vapply(clauses, format_conjunction, character(1L)),
-        collapse = " ; "
-      )
-    },
+    format_massql_single,
     character(1L),
+    dalton = dalton,
+    ppm = ppm,
+    int_mod = int_mod,
     USE.NAMES = FALSE
   )
 }
