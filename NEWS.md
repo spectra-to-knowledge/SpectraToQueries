@@ -1,5 +1,13 @@
 # SpectraToQueries (development version)
 
+## Breaking changes
+
+- Neutral losses are evaluated with the window MassQL applies to the emitted
+  `MS2NL` condition: `dalton`, or `nl * ppm / 1e6` when `dalton == 0`
+  (previously `dalton + (precursor_mz - nl) * ppm / 1e6`). Reported MCC is now
+  reproducible by the emitted query. On the bundled data, 15 of 21 raw and 13 of
+  17 grouped skeletons change query or MCC.
+
 ## Bug fixes
 
 - Spectra without a `TITLE` are no longer dropped during preprocessing.
@@ -12,8 +20,8 @@
 
 ## Documentation
 
-- `?to_massql` documents where emitted MassQL differs from the matching used for
-  MCC (`MS2NL` tolerance, `INTENSITYPERCENT` boundary, `" ; "` joins).
+- `?to_massql` documents the tolerance modifiers, the remaining boundary
+  differences from the matching used for MCC, and `" ; "` joins.
 - `?spectra_to_queries` states the MCC definition and the meaning of `dalton`,
   `ppm`, `zero_val`, and `n_skel_min`.
 

@@ -42,17 +42,12 @@ to 1e-6 Da for \code{MS2PROD}, and \code{dalton} for \code{MS2NL};
 \item \code{dalton == 0}, \code{ppm == 0}: \code{TOLERANCEMZ=0}.
 }
 
-Differences from the matching used by \code{\link[=spectra_to_queries]{spectra_to_queries()}} to compute
-MCC:
-\itemize{
-\item \code{MS2NL}: the pipeline matches a peak within
-\code{dalton + (precursor - nl) * ppm / 1e6} of \code{precursor - nl}; the emitted
-\code{TOLERANCEMZ} is \code{dalton} alone, and MassQL applies \code{TOLERANCEPPM} to the
-neutral-loss value. A query with neutral losses can match fewer spectra
-than its reported MCC implies.
-\item \code{INTENSITYPERCENT}: MassQL keeps peaks strictly above the threshold; the
-pipeline keeps peaks at or above \code{intensity_min}.
-}
+\code{\link[=spectra_to_queries]{spectra_to_queries()}} computes MCC with the same windows (for \code{MS2NL},
+\code{dalton}, or \code{nl * ppm / 1e6} when \code{dalton == 0}), except that MassQL
+bounds are strict where the pipeline's are closed: \code{MS2NL} windows, and
+\code{INTENSITYPERCENT} (MassQL keeps peaks above the threshold; the pipeline
+keeps peaks at or above \code{intensity_min}). \code{MS2PROD} windows are rounded up
+to 1e-6 Da, and \code{OR} groups use the window of their largest m/z.
 
 Expressions are expanded to disjunctive normal form and absorbed
 (\code{A | (A & B) = A}). When all clauses share a common conjunction and differ

@@ -117,9 +117,8 @@ Notes on query semantics:
 
 - Queries encode peak presence after base-peak normalization (`0` to `100`) and
   `intensity_min` filtering; intensity ratios between peaks are not encoded.
-- Tolerance modifiers, and where the emitted MassQL differs from the matching
-  used to compute `mcc` (neutral-loss tolerance, `INTENSITYPERCENT` boundary),
-  are documented in `?to_massql`.
+- Tolerance modifiers, and the boundary cases where the emitted MassQL differs
+  from the matching used to compute `mcc`, are documented in `?to_massql`.
 - `+` characters in `SKELETON` labels are replaced with `.` for internal
   grouping (a warning is emitted if distinct labels collide).
 

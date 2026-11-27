@@ -155,15 +155,12 @@ parse_massql_dnf <- function(q) {
 #'   - `dalton == 0`, `ppm > 0`: `TOLERANCEPPM` = `ppm`;
 #'   - `dalton == 0`, `ppm == 0`: `TOLERANCEMZ=0`.
 #'
-#'   Differences from the matching used by [spectra_to_queries()] to compute
-#'   MCC:
-#'   - `MS2NL`: the pipeline matches a peak within
-#'     `dalton + (precursor - nl) * ppm / 1e6` of `precursor - nl`; the emitted
-#'     `TOLERANCEMZ` is `dalton` alone, and MassQL applies `TOLERANCEPPM` to the
-#'     neutral-loss value. A query with neutral losses can match fewer spectra
-#'     than its reported MCC implies.
-#'   - `INTENSITYPERCENT`: MassQL keeps peaks strictly above the threshold; the
-#'     pipeline keeps peaks at or above `intensity_min`.
+#'   [spectra_to_queries()] computes MCC with the same windows (for `MS2NL`,
+#'   `dalton`, or `nl * ppm / 1e6` when `dalton == 0`), except that MassQL
+#'   bounds are strict where the pipeline's are closed: `MS2NL` windows, and
+#'   `INTENSITYPERCENT` (MassQL keeps peaks above the threshold; the pipeline
+#'   keeps peaks at or above `intensity_min`). `MS2PROD` windows are rounded up
+#'   to 1e-6 Da, and `OR` groups use the window of their largest m/z.
 #'
 #'   Expressions are expanded to disjunctive normal form and absorbed
 #'   (`A | (A & B) = A`). When all clauses share a common conjunction and differ

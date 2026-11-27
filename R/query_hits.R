@@ -76,8 +76,10 @@ parse_query_ions <- function(ions) {
 #'   fragment `f_frag` hits a spectrum with a peak within
 #'   `dalton + f * ppm / 1e6` of `f`. A neutral loss `n_nl` hits a spectrum
 #'   with finite precursor m/z `p` when `p - n > 0` and a peak lies within
-#'   `dalton + (p - n) * ppm / 1e6` of `p - n` (window on the fragment m/z).
-#'   Intervals are closed.
+#'   `tol` of `p - n`, with `tol = dalton` if `dalton > 0`, else
+#'   `n * ppm / 1e6`. This is the window of the `MS2NL` condition emitted by
+#'   [to_massql()] (MassQL applies `TOLERANCEPPM` to the loss value), so the
+#'   reported MCC is reproducible by the emitted query. Intervals are closed.
 #' @return Named list of logical vectors, one per element of `unique_ions`.
 #' @keywords internal
 #' @noRd
@@ -91,20 +93,22 @@ precompute_ion_hits <- function(
 ) {
   n_spec <- length(all_mz)
   valid_idx <- which(valid_prec_and_spec)
-  hit_any <- function(spec_mz, target) {
-    any(abs(spec_mz - target) <= dalton + target * (ppm / 1e6))
+  hit_any <- function(spec_mz, target, tol) {
+    any(abs(spec_mz - target) <= tol)
   }
 
   hits <- lapply(unique_ions, function(u) {
     parsed <- parse_query_ions(u)
     if (length(parsed$frags) == 1L) {
-      return(vapply(all_mz, hit_any, logical(1L), target = parsed$frags))
+      f <- parsed$frags
+      return(vapply(all_mz, hit_any, logical(1L), f, dalton + f * ppm / 1e6))
     }
+    nl_tol <- if (dalton > 0) dalton else parsed$nls * ppm / 1e6
     vec <- logical(n_spec)
     for (idx in valid_idx) {
       tmz <- precursor_mz[idx] - parsed$nls
       if (tmz > 0) {
-        vec[idx] <- hit_any(all_mz[[idx]], tmz)
+        vec[idx] <- hit_any(all_mz[[idx]], tmz, nl_tol)
       }
     }
     vec

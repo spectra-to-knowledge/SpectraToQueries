@@ -880,7 +880,7 @@ testthat::test_that("spectra_to_queries reproduces raw and grouped results", {
   testthat::expect_true(file.exists(tmp_grp))
   testthat::expect_s3_class(res_grp, "data.frame")
   testthat::expect_identical(nrow(res_grp), 17L)
-  testthat::expect_identical(res_grp$skeleton[1L], "Lapidilectine.Lunduran")
+  testthat::expect_identical(res_grp$skeleton[1L], "Cinchona")
   testthat::expect_equal(res_grp$mcc[1L], 1.0)
 
   tsv_raw_path <- testthat::test_path(
@@ -1263,4 +1263,25 @@ testthat::test_that("spectra_to_queries is invariant to spectrum order", {
   }
   set.seed(7L)
   testthat::expect_identical(run(sub_df[sample(nrow(sub_df)), ]), run(sub_df))
+})
+
+testthat::test_that("neutral-loss hits use the tolerance emitted to MassQL", {
+  # Precursor 300, loss 100 -> fragment target 200
+  all_mz <- list(200.0125, 200.008, 200.004, 200.002)
+  prec <- rep(300.0, 4L)
+  ok <- rep(TRUE, 4L)
+  # dalton > 0: MS2NL TOLERANCEMZ=dalton, no ppm term (0.0125 > 0.01)
+  testthat::expect_identical(
+    precompute_ion_hits("100_nl", all_mz, prec, ok, dalton = 0.01, ppm = 30),
+    list("100_nl" = c(FALSE, TRUE, TRUE, TRUE))
+  )
+  # dalton == 0: MS2NL TOLERANCEPPM, applied to the loss (100 * 30e-6 = 0.003)
+  testthat::expect_identical(
+    precompute_ion_hits("100_nl", all_mz, prec, ok, dalton = 0, ppm = 30),
+    list("100_nl" = c(FALSE, FALSE, FALSE, TRUE))
+  )
+  testthat::expect_identical(
+    to_massql("100_nl", dalton = 0.01, ppm = 30),
+    "QUERY scaninfo(MS2DATA) WHERE MS2NL=100:TOLERANCEMZ=0.01"
+  )
 })

@@ -29,7 +29,9 @@ For each chemical class (`SKELETON`) with at least `n_skel_min` spectra,
    intensity-weighted consensus centroids within `dalton + mz * ppm / 1e6`.
 2. **Centroid evaluation on unprocessed spectra**: Candidate fragment and
    neutral-loss centroids are matched against the input spectra after
-   `intensity_min` filtering only, requiring `precursor_mz - nl > 0`.
+   `intensity_min` filtering only, requiring `precursor_mz - nl > 0`. Neutral
+   losses use the MassQL `MS2NL` window (`dalton`, or `nl * ppm / 1e6` when
+   `dalton == 0`), so each reported MCC is reproducible by its query.
 3. **Candidate ion selection (hitting set + mRMR)**: Exact duplicate hit
    profiles are collapsed. Ions with 100% recall on the target skeleton are
    pruned via a greedy hitting-set cover of false-positive spectra, and

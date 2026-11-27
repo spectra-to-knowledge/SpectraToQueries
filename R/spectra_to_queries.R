@@ -639,8 +639,10 @@ summarize_best_queries <- function(
 #'    neutral-loss peaks, and aligns m/z values across spectra using
 #'    intensity-weighted consensus centroids within `dalton + mz * ppm / 1e6`.
 #' 2. Evaluates candidate fragment and neutral-loss centroids against the input
-#'    spectra after `intensity_min` filtering only (requiring
-#'    `precursor_mz - nl > 0`).
+#'    spectra after `intensity_min` filtering only. A neutral loss `nl` matches
+#'    a peak within `dalton` (or `nl * ppm / 1e6` when `dalton == 0`) of
+#'    `precursor_mz - nl > 0`, the window of the emitted MassQL `MS2NL`
+#'    condition.
 #' 3. Selects up to `ions_max` candidate ions per skeleton using greedy
 #'    hitting-set pruning on 100%-recall ions followed by forward conjunctive
 #'    MCC selection with negative-class correlation penalty (mRMR).
