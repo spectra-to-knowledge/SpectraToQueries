@@ -70,6 +70,111 @@ parse_query_ions <- function(ions) {
   list(frags = vals[is_frag], nls = vals[is_nl])
 }
 
+#' @title Match fragment ions against a globally sorted peak m/z index
+#' @keywords internal
+#' @noRd
+match_fragment_hits <- function(f_vals, all_mz, dalton, ppm, n_spec) {
+  out <- rep(list(logical(n_spec)), length(f_vals))
+  lens <- lengths(all_mz)
+  if (!any(lens > 0L)) {
+    return(out)
+  }
+
+  flat_mz <- unlist(all_mz, use.names = FALSE)
+  flat_sp <- rep.int(seq_len(n_spec), lens)
+  fin <- is.finite(flat_mz)
+  if (!any(fin)) {
+    return(out)
+  }
+
+  flat_mz <- flat_mz[fin]
+  flat_sp <- flat_sp[fin]
+  ord <- order(flat_mz)
+  sorted_mz <- flat_mz[ord]
+  sorted_sp <- flat_sp[ord]
+
+  f_tols <- mz_tolerance(f_vals, dalton, ppm)
+  pad <- pmax(f_tols, abs(f_vals), 1) * 1e-9 + 1e-9
+  lo_vec <- findInterval(f_vals - f_tols - pad, sorted_mz, left.open = TRUE) +
+    1L
+  hi_vec <- findInterval(f_vals + f_tols + pad, sorted_mz)
+
+  for (j in seq_along(f_vals)) {
+    lo <- lo_vec[j]
+    hi <- hi_vec[j]
+    if (hi >= lo) {
+      idx <- lo:hi
+      matched <- idx[abs(sorted_mz[idx] - f_vals[j]) <= f_tols[j]]
+      if (length(matched) > 0L) {
+        out[[j]][sorted_sp[matched]] <- TRUE
+      }
+    }
+  }
+  out
+}
+
+#' @title Match neutral-loss ions against a globally sorted loss index
+#' @keywords internal
+#' @noRd
+match_nl_hits <- function(
+  n_vals,
+  all_mz,
+  precursor_mz,
+  valid_idx,
+  dalton,
+  ppm,
+  n_spec
+) {
+  out <- rep(list(logical(n_spec)), length(n_vals))
+  nl_lens <- lengths(all_mz[valid_idx])
+  if (!any(nl_lens > 0L)) {
+    return(out)
+  }
+
+  nl_mz <- unlist(all_mz[valid_idx], use.names = FALSE)
+  nl_sp <- rep.int(valid_idx, nl_lens)
+  nl_prec <- rep.int(precursor_mz[valid_idx], nl_lens)
+  fin_nl <- is.finite(nl_mz)
+  if (!any(fin_nl)) {
+    return(out)
+  }
+
+  nl_mz <- nl_mz[fin_nl]
+  nl_sp <- nl_sp[fin_nl]
+  nl_prec <- nl_prec[fin_nl]
+  obs_nl <- nl_prec - nl_mz
+  ord_nl <- order(obs_nl)
+  sorted_obs_nl <- obs_nl[ord_nl]
+  sorted_nl_mz <- nl_mz[ord_nl]
+  sorted_nl_prec <- nl_prec[ord_nl]
+  sorted_nl_sp <- nl_sp[ord_nl]
+
+  n_tols <- nl_tolerance(n_vals, dalton, ppm)
+  max_prec <- max(abs(precursor_mz[valid_idx]))
+  pad_nl <- pmax(n_tols, abs(n_vals), max_prec, 1) * 1e-9 + 1e-9
+  lo_nl <- findInterval(
+    n_vals - n_tols - pad_nl,
+    sorted_obs_nl,
+    left.open = TRUE
+  ) +
+    1L
+  hi_nl <- findInterval(n_vals + n_tols + pad_nl, sorted_obs_nl)
+
+  for (j in seq_along(n_vals)) {
+    lo <- lo_nl[j]
+    hi <- hi_nl[j]
+    if (hi >= lo) {
+      idx <- lo:hi
+      tmz <- sorted_nl_prec[idx] - n_vals[j]
+      matched <- idx[tmz > 0 & abs(sorted_nl_mz[idx] - tmz) <= n_tols[j]]
+      if (length(matched) > 0L) {
+        out[[j]][sorted_nl_sp[matched]] <- TRUE
+      }
+    }
+  }
+  out
+}
+
 #' @title Precompute single-ion hit vectors across all spectra
 #' @description For each ion token returns a logical vector over spectra. A
 #'   fragment `f_frag` hits a spectrum with a peak within
@@ -90,34 +195,43 @@ precompute_ion_hits <- function(
   dalton,
   ppm
 ) {
-  n_spec <- length(all_mz)
-  valid_idx <- which(valid_prec_and_spec)
-  hit_any <- function(spec_mz, target, tol) {
-    any(abs(spec_mz - target) <= tol)
+  n_ions <- length(unique_ions)
+  if (n_ions == 0L) {
+    return(stats::setNames(list(), character(0)))
   }
 
-  hits <- lapply(unique_ions, function(u) {
-    parsed <- parse_query_ions(u)
-    if (length(parsed$frags) == 1L) {
-      f <- parsed$frags
-      return(vapply(
-        all_mz,
-        hit_any,
-        logical(1L),
-        f,
-        mz_tolerance(f, dalton, ppm)
-      ))
-    }
-    nl_tol <- nl_tolerance(parsed$nls, dalton, ppm)
-    vec <- logical(n_spec)
-    for (idx in valid_idx) {
-      tmz <- precursor_mz[idx] - parsed$nls
-      if (tmz > 0) {
-        vec[idx] <- hit_any(all_mz[[idx]], tmz, nl_tol)
-      }
-    }
-    vec
-  })
-  names(hits) <- unique_ions
+  ions_clean <- trimws(as.character(unique_ions))
+  parsed <- parse_query_ions(ions_clean)
+  non_empty <- !is.na(ions_clean) & nzchar(ions_clean)
+  is_frag <- is_frag_ion(ions_clean)
+  frag_pos <- which(non_empty & is_frag)
+  nl_pos <- which(non_empty & !is_frag)
+
+  n_spec <- length(all_mz)
+  hits <- stats::setNames(rep(list(logical(n_spec)), n_ions), unique_ions)
+
+  if (length(frag_pos) > 0L) {
+    hits[frag_pos] <- match_fragment_hits(
+      parsed$frags,
+      all_mz,
+      dalton,
+      ppm,
+      n_spec
+    )
+  }
+
+  valid_idx <- which(valid_prec_and_spec)
+  if (length(nl_pos) > 0L && length(valid_idx) > 0L) {
+    hits[nl_pos] <- match_nl_hits(
+      parsed$nls,
+      all_mz,
+      precursor_mz,
+      valid_idx,
+      dalton,
+      ppm,
+      n_spec
+    )
+  }
+
   hits
 }

@@ -113,7 +113,7 @@ mz_tolerance <- function(mz, dalton, ppm) {
 #' @keywords internal
 #' @noRd
 nl_tolerance <- function(nl, dalton, ppm) {
-  if (dalton > 0) dalton else nl * (ppm / 1e6)
+  if (dalton > 0) rep(dalton, length(nl)) else nl * (ppm / 1e6)
 }
 
 #' @title Normalize skeleton labels by replacing '+' with '.'
