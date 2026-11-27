@@ -207,6 +207,7 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#spectratoqueries-development-version" id="toc-spectratoqueries-development-version" class="nav-link active" data-scroll-target="#spectratoqueries-development-version">SpectraToQueries (development version)</a>
   <ul class="collapse">
+  <li><a href="#breaking-changes" id="toc-breaking-changes" class="nav-link" data-scroll-target="#breaking-changes">Breaking changes</a></li>
   <li><a href="#bug-fixes" id="toc-bug-fixes" class="nav-link" data-scroll-target="#bug-fixes">Bug fixes</a></li>
   <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
   </ul></li>
@@ -231,6 +232,12 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="spectratoqueries-development-version" class="level1">
 <h1>SpectraToQueries (development version)</h1>
+<section id="breaking-changes" class="level2">
+<h2 class="anchored" data-anchor-id="breaking-changes">Breaking changes</h2>
+<ul>
+<li>Neutral losses are evaluated with the window MassQL applies to the emitted <code>MS2NL</code> condition: <code>dalton</code>, or <code>nl * ppm / 1e6</code> when <code>dalton == 0</code> (previously <code>dalton + (precursor_mz - nl) * ppm / 1e6</code>). Reported MCC is now reproducible by the emitted query. On the bundled data, 15 of 21 raw and 13 of 17 grouped skeletons change query or MCC.</li>
+</ul>
+</section>
 <section id="bug-fixes" class="level2">
 <h2 class="anchored" data-anchor-id="bug-fixes">Bug fixes</h2>
 <ul>
@@ -243,7 +250,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="documentation" class="level2">
 <h2 class="anchored" data-anchor-id="documentation">Documentation</h2>
 <ul>
-<li><code>?to_massql</code> documents where emitted MassQL differs from the matching used for MCC (<code>MS2NL</code> tolerance, <code>INTENSITYPERCENT</code> boundary, <code>" ; "</code> joins).</li>
+<li><code>?to_massql</code> documents the tolerance modifiers, the remaining boundary differences from the matching used for MCC, and <code>" ; "</code> joins.</li>
 <li><code>?spectra_to_queries</code> states the MCC definition and the meaning of <code>dalton</code>, <code>ppm</code>, <code>zero_val</code>, and <code>n_skel_min</code>.</li>
 </ul>
 </section>

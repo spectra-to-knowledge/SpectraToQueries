@@ -325,7 +325,7 @@ Decimal places for reported m/z values and MCC; MCC ties are resolved at this pr
 <code id="intensity_min">intensity_min</code>
 </td>
 <td>
-Minimal relative intensity threshold (0 to 100). Default is <code>0.0</code>.
+Relative intensity threshold in percent of the base peak (0 to 100). Candidate discovery keeps peaks <code style="white-space: pre;">&gt;= intensity_min</code>; MCC is computed with peaks <code style="white-space: pre;">&gt; min(intensity_min, 99)</code>, as MassQL applies <code>INTENSITYPERCENT</code>. Default is <code>0.0</code> (all peaks).
 </td>
 </tr>
 <tr>
@@ -402,7 +402,7 @@ Feature filter: fragment and neutral-loss features whose relative intensity (0 t
 <p>Normalizes MS2 intensities, removes sub-threshold and non-positive neutral-loss peaks, and aligns m/z values across spectra using intensity-weighted consensus centroids within <code>dalton + mz * ppm / 1e6</code>.</p>
 </li>
 <li>
-<p>Evaluates candidate fragment and neutral-loss centroids against the input spectra after <code>intensity_min</code> filtering only (requiring <code>precursor_mz - nl &gt; 0</code>).</p>
+<p>Evaluates candidate fragment and neutral-loss centroids against the input spectra after <code>intensity_min</code> filtering only. A neutral loss <code>nl</code> matches a peak within <code>dalton</code> (or <code>nl * ppm / 1e6</code> when <code>dalton == 0</code>) of <code>precursor_mz - nl &gt; 0</code>, the window of the emitted MassQL <code>MS2NL</code> condition.</p>
 </li>
 <li>
 <p>Selects up to <code>ions_max</code> candidate ions per skeleton using greedy hitting-set pruning on 100%-recall ions followed by forward conjunctive MCC selection with negative-class correlation penalty (mRMR).</p>

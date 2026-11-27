@@ -323,15 +323,7 @@ Minimal relative intensity threshold in percent (<code>INTENSITYPERCENT</code>).
 <p><code>dalton == 0</code>, <code>ppm == 0</code>: <code>TOLERANCEMZ=0</code>.</p>
 </li>
 </ul>
-<p>Differences from the matching used by <code>spectra_to_queries()</code> to compute MCC:</p>
-<ul>
-<li>
-<p><code>MS2NL</code>: the pipeline matches a peak within <code>dalton + (precursor - nl) * ppm / 1e6</code> of <code>precursor - nl</code>; the emitted <code>TOLERANCEMZ</code> is <code>dalton</code> alone, and MassQL applies <code>TOLERANCEPPM</code> to the neutral-loss value. A query with neutral losses can match fewer spectra than its reported MCC implies.</p>
-</li>
-<li>
-<p><code>INTENSITYPERCENT</code>: MassQL keeps peaks strictly above the threshold; the pipeline keeps peaks at or above <code>intensity_min</code>.</p>
-</li>
-</ul>
+<p><code>spectra_to_queries()</code> computes MCC with the same windows (for <code>MS2NL</code>, <code>dalton</code>, or <code>nl * ppm / 1e6</code> when <code>dalton == 0</code>) and the same intensity rule (relative intensity <code style="white-space: pre;">&gt; min(intensity_min, 99)</code>, as MassQL applies <code>INTENSITYPERCENT</code>). Remaining differences: MassQL <code>MS2NL</code> bounds are strict where the pipeline’s are closed, <code>MS2PROD</code> windows are rounded up to 1e-6 Da, and <code>OR</code> groups use the window of their largest m/z.</p>
 <p>Expressions are expanded to disjunctive normal form and absorbed (<code>A | (A &amp; B) = A</code>). When all clauses share a common conjunction and differ by one ion of the same type, one <code style="white-space: pre;">MS2PROD=(a OR b)</code> or <code style="white-space: pre;">MS2NL=(a OR b)</code> condition is emitted. Otherwise one MassQL query per clause is returned, joined by <code>” ; “</code>; split on <code>” ; “</code> and run each query separately, as the MassQL grammar has no query separator.</p>
 </section>
 <section id="value" class="level3">

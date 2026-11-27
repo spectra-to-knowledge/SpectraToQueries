@@ -356,7 +356,7 @@ div.csl-indent {
 <p>Notes on query semantics:</p>
 <ul>
 <li>Queries encode peak presence after base-peak normalization (<code>0</code> to <code>100</code>) and <code>intensity_min</code> filtering; intensity ratios between peaks are not encoded.</li>
-<li>Tolerance modifiers, and where the emitted MassQL differs from the matching used to compute <code>mcc</code> (neutral-loss tolerance, <code>INTENSITYPERCENT</code> boundary), are documented in <code>?to_massql</code>.</li>
+<li>Tolerance modifiers, and the boundary cases where the emitted MassQL differs from the matching used to compute <code>mcc</code>, are documented in <code>?to_massql</code>.</li>
 <li><code>+</code> characters in <code>SKELETON</code> labels are replaced with <code>.</code> for internal grouping (a warning is emitted if distinct labels collide).</li>
 </ul>
 </section>
