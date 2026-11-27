@@ -193,9 +193,7 @@ to_massql <- function(
   ppm = 30.0,
   intensity_min = 0.0
 ) {
-  check_num(dalton, "dalton", lower = 0)
-  check_num(ppm, "ppm", lower = 0)
-  check_num(intensity_min, "intensity_min", lower = 0, upper = 100)
+  check_tolerance_args(dalton, ppm, intensity_min)
 
   if (length(query) == 0L) {
     return(character(0))
@@ -234,7 +232,7 @@ to_massql <- function(
     } else {
       # Round up to 1e-6 Da so the emitted window contains the match window;
       # the inner round() absorbs floating-point noise before ceiling().
-      ceiling(round((dalton + max(mzs) * (ppm / 1e6)) * 1e6, 6L)) / 1e6
+      ceiling(round(mz_tolerance(max(mzs), dalton, ppm) * 1e6, 6L)) / 1e6
     }
     paste0(":TOLERANCEMZ=", fmt_num(eff_da), int_mod)
   }

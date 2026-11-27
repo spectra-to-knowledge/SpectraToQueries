@@ -1,3 +1,27 @@
+#' @title Compute consensus peaks across spectra
+#'
+#' @description Combines peaks across `spectra` using intensity-weighted union
+#'   centroids within `dalton + mz * ppm / 1e6`.
+#'
+#' @param spectra Spectra object
+#' @param dalton Tolerance in Dalton
+#' @param ppm Tolerance in parts per million
+#'
+#' @return Peak matrix with `mz` and `intensity` columns
+#'
+#' @keywords internal
+#' @noRd
+compute_consensus_peaks <- function(spectra, dalton, ppm) {
+  spectra |>
+    Spectra::peaksData() |>
+    Spectra::combinePeaksData(
+      tolerance = dalton,
+      ppm = ppm,
+      peaks = "union",
+      weighted = TRUE
+    )
+}
+
 #' @title Harmonize mzs
 #'
 #' @description Aligns peak m/z values across spectra to intensity-weighted
@@ -16,14 +40,7 @@ harmonize_mzs <- function(spectra, dalton, ppm) {
     return(spectra)
   }
 
-  combined_peaks <- spectra |>
-    Spectra::peaksData() |>
-    Spectra::combinePeaksData(
-      tolerance = dalton,
-      ppm = ppm,
-      peaks = "union",
-      weighted = TRUE
-    )
+  combined_peaks <- compute_consensus_peaks(spectra, dalton, ppm)
   consensus_mzs <- combined_peaks[, "mz"]
   consensus_mzs <- consensus_mzs[is.finite(consensus_mzs)]
   n_avg <- length(consensus_mzs)
@@ -47,7 +64,7 @@ harmonize_mzs <- function(spectra, dalton, ppm) {
       best_idx <- ifelse(use_right, idx_right, idx_left_clamped)
 
       target_mzs <- consensus_mzs[best_idx]
-      within <- min_diff <= (dalton + target_mzs * (ppm / 1e6))
+      within <- min_diff <= mz_tolerance(target_mzs, dalton, ppm)
       if (any(within)) {
         mzs[within] <- target_mzs[within]
         x[, 1L] <- mzs

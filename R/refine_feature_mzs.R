@@ -23,14 +23,7 @@ refine_feature_mzs <- function(feature_mat, spectra, dalton, ppm, decimals) {
   }
 
   if (length(spectra) > 0L) {
-    combined_peaks <- spectra |>
-      Spectra::peaksData() |>
-      Spectra::combinePeaksData(
-        tolerance = dalton,
-        ppm = ppm,
-        peaks = "union",
-        weighted = TRUE
-      )
+    combined_peaks <- compute_consensus_peaks(spectra, dalton, ppm)
     keep_fin <- is.finite(combined_peaks[, "mz"]) &
       is.finite(combined_peaks[, "intensity"])
     all_mzs <- combined_peaks[keep_fin, "mz"]
@@ -44,7 +37,7 @@ refine_feature_mzs <- function(feature_mat, spectra, dalton, ppm, decimals) {
   new_colnames <- old_colnames
 
   if (length(all_mzs) > 0L) {
-    tolerance_vec <- dalton + all_mzs * (ppm / 1e6)
+    tolerance_vec <- mz_tolerance(all_mzs, dalton, ppm)
     max_tol <- max(tolerance_vec)
     left_bounds <- pmax(1L, findInterval(old_colnames - max_tol, all_mzs))
     right_bounds <- findInterval(old_colnames + max_tol, all_mzs)

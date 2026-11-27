@@ -42,58 +42,6 @@ write_query_table <- function(queries, export) {
   invisible(queries)
 }
 
-#' @title Validate inputs for `spectra_to_queries`
-#' @keywords internal
-#' @noRd
-validate_stq_inputs <- function(
-  spectra,
-  export,
-  dalton,
-  decimals,
-  intensity_min,
-  ions_max,
-  n_skel_min,
-  n_spec_min,
-  ppm,
-  mcc_min,
-  precision_min,
-  recall_min,
-  zero_val
-) {
-  is_valid_str <- function(x) {
-    is.character(x) && length(x) == 1L && !is.na(x) && nzchar(x)
-  }
-
-  valid_spectra <- is.null(spectra) ||
-    is.data.frame(spectra) ||
-    inherits(spectra, "Spectra") ||
-    is_valid_str(spectra)
-  if (!valid_spectra) {
-    abort_input(
-      paste(
-        "`spectra` must be NULL, a non-empty string,",
-        "a data.frame, or a Spectra object."
-      )
-    )
-  }
-  if (!is.null(export) && !is_valid_str(export)) {
-    abort_input("`export` must be NULL or a non-empty character string.")
-  }
-
-  check_num(dalton, "dalton", lower = 0)
-  check_num(ppm, "ppm", lower = 0)
-  check_num(decimals, "decimals", lower = 0, whole = TRUE)
-  check_num(ions_max, "ions_max", lower = 1, whole = TRUE)
-  check_num(n_skel_min, "n_skel_min", lower = 1, whole = TRUE)
-  check_num(n_spec_min, "n_spec_min", lower = 1, whole = TRUE)
-  check_num(precision_min, "precision_min", lower = 0, upper = 1)
-  check_num(recall_min, "recall_min", lower = 0, upper = 1)
-  check_num(mcc_min, "mcc_min", lower = -1, upper = 1)
-  check_num(intensity_min, "intensity_min", lower = 0, upper = 100)
-  check_num(zero_val, "zero_val")
-  invisible(TRUE)
-}
-
 #' @title Load or coerce spectra input
 #' @keywords internal
 #' @noRd
@@ -216,7 +164,7 @@ select_mrmr_ions <- function(
     return(cand_ions)
   }
 
-  is_frag <- endsWith(cand_ions, "_frag")
+  is_frag <- is_frag_ion(cand_ions)
   ord <- order(cand_mcc, cand_recall, is_frag, decreasing = TRUE)
   cand_ions <- cand_ions[ord]
   cand_mcc <- cand_mcc[ord]
@@ -330,12 +278,7 @@ extract_candidate_ions <- function(
   recall_min,
   mcc_min
 ) {
-  groups_vec <- gsub(
-    pattern = "+",
-    replacement = ".",
-    x = as.character(rownames(merged_mat)),
-    fixed = TRUE
-  )
+  groups_vec <- normalize_skeleton_labels(rownames(merged_mat))
   group_counts_tab <- table(groups_vec)
   group_count_vec <- as.integer(group_counts_tab[groups_vec])
 
@@ -589,7 +532,7 @@ summarize_best_queries <- function(
   n_ions_vec <- lengths(ions_vec)
   n_frags_vec <- vapply(
     ions_vec,
-    function(x) sum(endsWith(x, "_frag")),
+    function(x) sum(is_frag_ion(x)),
     integer(1L)
   )
 
@@ -770,7 +713,7 @@ spectra_to_queries <- function(
     return(write_query_table(empty_query_table(), export))
   }
 
-  skel_norm <- gsub("+", ".", skel_raw, fixed = TRUE)
+  skel_norm <- normalize_skeleton_labels(skel_raw)
   if (length(unique(skel_norm)) < length(unique(skel_raw))) {
     warning(
       "Distinct `SKELETON` labels collide after '+' to '.' normalization.",

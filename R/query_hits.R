@@ -38,12 +38,7 @@ prepare_query_data <- function(spectra, intensity_min = 0.0) {
   list(
     mz = clean_mz,
     precursor_mz = as.numeric(Spectra::precursorMz(spectra)),
-    skeleton = gsub(
-      "+",
-      ".",
-      as.character(Spectra::spectraData(spectra)$SKELETON),
-      fixed = TRUE
-    )
+    skeleton = normalize_skeleton_labels(Spectra::spectraData(spectra)$SKELETON)
   )
 }
 
@@ -57,7 +52,7 @@ prepare_query_data <- function(spectra, intensity_min = 0.0) {
 parse_query_ions <- function(ions) {
   ions <- trimws(as.character(ions))
   ions <- ions[!is.na(ions) & nzchar(ions)]
-  is_frag <- endsWith(ions, "_frag")
+  is_frag <- is_frag_ion(ions)
   is_nl <- endsWith(ions, "_nl")
   vals <- suppressWarnings(as.numeric(
     substr(ions, 1L, nchar(ions) - ifelse(is_frag, 5L, 3L))
@@ -105,9 +100,15 @@ precompute_ion_hits <- function(
     parsed <- parse_query_ions(u)
     if (length(parsed$frags) == 1L) {
       f <- parsed$frags
-      return(vapply(all_mz, hit_any, logical(1L), f, dalton + f * ppm / 1e6))
+      return(vapply(
+        all_mz,
+        hit_any,
+        logical(1L),
+        f,
+        mz_tolerance(f, dalton, ppm)
+      ))
     }
-    nl_tol <- if (dalton > 0) dalton else parsed$nls * ppm / 1e6
+    nl_tol <- nl_tolerance(parsed$nls, dalton, ppm)
     vec <- logical(n_spec)
     for (idx in valid_idx) {
       tmz <- precursor_mz[idx] - parsed$nls
