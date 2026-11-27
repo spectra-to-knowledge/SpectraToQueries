@@ -6,15 +6,8 @@ testthat::test_that("namespace exports only public API", {
 })
 
 testthat::test_that("spectra_to_queries matches MIADB subset baseline", {
-  utils::data(
-    "mia_spectra_df",
-    package = "SpectraToQueries",
-    envir = environment()
-  )
-  keep <- mia_spectra_df$SKELETON %in%
-    c("Corynanthean", "Iboga", "Aspidosperma")
   res <- suppressMessages(spectra_to_queries(
-    spectra = mia_spectra_df[keep, ],
+    spectra = make_miadb_subset(),
     export = NULL,
     ions_max = 4L
   ))
@@ -95,10 +88,8 @@ testthat::test_that("only public Rd help pages are shipped", {
 })
 
 testthat::test_that("bundled datasets have no directory paths in dataOrigin", {
-  for (ds_name in c("mia_spectra_df", "mia_spectra_grouped_df")) {
-    env <- new.env(parent = emptyenv())
-    utils::data(list = ds_name, package = "SpectraToQueries", envir = env)
-    df <- env[[ds_name]]
+  for (grouped in c(FALSE, TRUE)) {
+    df <- load_miadb_df(grouped = grouped)
     if ("dataOrigin" %in% names(df)) {
       origins <- df$dataOrigin[!is.na(df$dataOrigin)]
       testthat::expect_false(any(grepl("[/\\\\]", origins)))

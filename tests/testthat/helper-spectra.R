@@ -15,3 +15,17 @@ make_spectra_df <- function(
   df$intensity <- intensity
   df
 }
+
+load_miadb_df <- function(grouped = FALSE) {
+  ds_name <- if (grouped) "mia_spectra_grouped_df" else "mia_spectra_df"
+  env <- new.env(parent = emptyenv())
+  utils::data(list = ds_name, package = "SpectraToQueries", envir = env)
+  env[[ds_name]]
+}
+
+make_miadb_subset <- function(
+  skeletons = c("Corynanthean", "Iboga", "Aspidosperma")
+) {
+  df <- load_miadb_df()
+  df[df$SKELETON %in% skeletons, , drop = FALSE]
+}

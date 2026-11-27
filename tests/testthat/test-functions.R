@@ -244,12 +244,7 @@ testthat::test_that("filter_matrix and normalize_peaks handle boundaries", {
 })
 
 testthat::test_that("spectra conversion and matrix helpers round-trip", {
-  utils::data(
-    "mia_spectra_df",
-    package = "SpectraToQueries",
-    envir = environment()
-  )
-  sub_df <- mia_spectra_df[3:12, ]
+  sub_df <- load_miadb_df()[3:12, ]
   sp <- Spectra::Spectra(sub_df)
   rownames(sp@backend@spectraData) <- paste0("custom_", seq_along(sp))
   testthat::expect_s4_class(sp, "Spectra")
@@ -693,12 +688,7 @@ testthat::test_that("pipeline functions handle empty and filtered-out inputs", {
   )
   testthat::expect_identical(colnames(fixed_empty), "100.12")
 
-  utils::data(
-    "mia_spectra_df",
-    package = "SpectraToQueries",
-    envir = environment()
-  )
-  sub_df <- mia_spectra_df[1:10, ]
+  sub_df <- load_miadb_df()[1:10, ]
   expected_empty <- data.frame(
     skeleton = character(0),
     mcc = numeric(0),
@@ -1250,14 +1240,7 @@ testthat::test_that("branch-and-bound selection equals exhaustive search", {
 })
 
 testthat::test_that("spectra_to_queries is invariant to spectrum order", {
-  utils::data(
-    mia_spectra_df,
-    package = "SpectraToQueries",
-    envir = environment()
-  )
-  keep <- mia_spectra_df$SKELETON %in%
-    c("Corynanthean", "Iboga", "Aspidosperma")
-  sub_df <- mia_spectra_df[keep, ]
+  sub_df <- make_miadb_subset()
   run <- function(df) {
     suppressMessages(spectra_to_queries(df, export = NULL, ions_max = 3L))
   }
