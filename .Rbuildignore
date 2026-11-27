@@ -6,6 +6,7 @@
 ^CITATION\.cff$
 ^CLAUDE[.]md$
 ^CONTRIBUTING\.md$
+^DEBT\.md$
 ^GEMINI[.]md$
 ^LICENSE\.md$
 ^README\.Rmd$
